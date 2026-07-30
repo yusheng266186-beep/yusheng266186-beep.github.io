@@ -1,0 +1,33 @@
+name: Refresh Market History
+
+on:
+  schedule:
+    - cron: "20 0,4,8,12,16 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aurum-data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch AU9999 history
+        run: node scripts/fetch-market-history.mjs
+      - name: Rebuild direct-open data
+        run: node scripts/build-embedded-data.mjs
+      - name: Commit history snapshot
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: refresh AU9999 market history"
+          file_pattern: data/market-history.json data/embedded-data.js

@@ -1,0 +1,33 @@
+name: Refresh Official News
+
+on:
+  schedule:
+    - cron: "12 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aurum-data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch official RSS snapshot
+        run: node scripts/fetch-official-news.mjs
+      - name: Rebuild direct-open data
+        run: node scripts/build-embedded-data.mjs
+      - name: Commit snapshot
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: refresh official gold macro news"
+          file_pattern: data/news.json data/embedded-data.js
