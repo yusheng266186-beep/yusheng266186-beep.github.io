@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>AURUM OS 3.0 · 96 项商用级重构报告</title>
+    <style>
+      :root {
+        --bg: #080a08;
+        --surface: #11130f;
+        --line: #2a2f26;
+        --text: #f4f1e8;
+        --muted: #92988b;
+        --gold: #e8ba5d;
+        --green: #51d3a2;
+        font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; color: var(--text); background: var(--bg); line-height: 1.65; }
+      main { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 40px 0 70px; }
+      header { border-bottom: 1px solid var(--line); padding-bottom: 24px; }
+      .eyebrow { color: var(--gold); font: 800 10px Consolas, monospace; }
+      h1 { margin: 7px 0; font-size: clamp(28px, 5vw, 48px); line-height: 1.08; }
+      header p { max-width: 780px; margin: 0; color: var(--muted); font-size: 12px; }
+      .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 18px 0; }
+      .stats div { border: 1px solid var(--line); border-radius: 6px; padding: 12px; background: var(--surface); }
+      .stats b { display: block; color: var(--gold); font: 800 18px Consolas, monospace; }
+      .stats span { color: var(--muted); font-size: 9px; }
+      .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 7px; }
+      table { width: 100%; min-width: 820px; border-collapse: collapse; background: var(--surface); }
+      th, td { border-bottom: 1px solid var(--line); padding: 10px; text-align: left; vertical-align: top; font-size: 10px; }
+      th { position: sticky; top: 0; color: var(--muted); background: #151812; font-size: 9px; }
+      td:first-child { width: 44px; color: var(--gold); font: 800 10px Consolas, monospace; }
+      td:nth-child(2) { width: 130px; color: var(--green); font-weight: 800; }
+      td:nth-child(3) { width: 240px; color: #d4d1c8; }
+      td:last-child { color: var(--muted); }
+      tr:last-child td { border-bottom: 0; }
+      tr:hover td { background: rgba(255,255,255,.014); }
+      footer { margin-top: 22px; color: #697064; font-size: 9px; }
+      @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="eyebrow">COMMERCIAL REFACTOR · AURUM OS 3.0</span>
+        <h1>96 项商用级重构清单</h1>
+        <p>本报告只记录已经落到代码、数据或交互中的变更。重构目标是国内 AU9999 口径可靠、无行情 API 仍可用、历史与预测不混淆，并具备成熟的模拟交易和决策体验。</p>
+      </header>
+
+      <div class="stats">
+        <div><b>12</b><span>架构与可靠性</span></div>
+        <div><b>18</b><span>行情准确性</span></div>
+        <div><b>20</b><span>历史与预测</span></div>
+        <div><b>16</b><span>视觉与动效</span></div>
+        <div><b>13</b><span>交易与风控</span></div>
+        <div><b>17</b><span>情报、AI 与部署</span></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>分类</th><th>旧问题或缺口</th><th>已完成的优化</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>架构</td><td>2600 行单文件难维护</td><td>拆分为语义 HTML、独立视觉系统、独立应用逻辑和独立数据脚本。</td></tr>
+            <tr><td>2</td><td>架构</td><td>改一处容易影响全页</td><td>行情、历史、预测、交易、消息、AI 采用清晰的状态与渲染边界。</td></tr>
+            <tr><td>3</td><td>架构</td><td>双击打开时 fetch 受限</td><td>新增 <code>data/embedded-data.js</code>，离线直接打开仍可加载行情、历史和消息。</td></tr>
+            <tr><td>4</td><td>架构</td><td>离线数据容易过期不同步</td><td>新增构建脚本，三个数据工作流刷新后自动重建内嵌数据包。</td></tr>
+            <tr><td>5</td><td>架构</td><td>依赖安装增加失败面</td><td>交付物保持零前端依赖、零构建、零 npm 安装。</td></tr>
+            <tr><td>6</td><td>架构</td><td>旧配置污染新版本</td><td>升级配置与账户存储版本键，旧版脏状态不会覆盖重构版默认值。</td></tr>
+            <tr><td>7</td><td>架构</td><td>无异常回退层级</td><td>建立多源状态机，逐源失败时继续切换并保留上一笔有效行情。</td></tr>
+            <tr><td>8</td><td>架构</td><td>错误反馈不集中</td><td>新增状态横幅和全局 Toast，成功、降级、失败均有明确反馈。</td></tr>
+            <tr><td>9</td><td>架构</td><td>键盘操作缺失</td><td>支持非输入状态下按 R 刷新，Esc 关闭设置抽屉和确认弹窗。</td></tr>
+            <tr><td>10</td><td>架构</td><td>安全 URL 处理不足</td><td>所有动态外链经过协议校验，模型文本经过转义后再渲染。</td></tr>
+            <tr><td>11</td><td>架构</td><td>移动和桌面逻辑分裂</td><td>单一响应式应用结构覆盖桌面、平板和手机。</td></tr>
+            <tr><td>12</td><td>架构</td><td>缺少可访问性降级</td><td>加入跳转链接、ARIA 状态、键盘焦点和 prefers-reduced-motion。</td></tr>
+
+            <tr><td>13</td><td>行情</td><td>国际金价换算成国内主价</td><td>主价格固定为国内 AU9999 人民币克价。</td></tr>
+            <tr><td>14</td><td>行情</td><td>页面单位混用盎司</td><td>业务展示统一为元/克，国际盎司价不作为主要显示单位。</td></tr>
+            <tr><td>15</td><td>行情</td><td>国际参考影响国内主价</td><td>国际价格只用于内外盘折算价差，不参与 AU9999 生成。</td></tr>
+            <tr><td>16</td><td>行情</td><td>单一行情源风险高</td><td>浏览器优先直连东方财富 AU9999/Au(T+D)。</td></tr>
+            <tr><td>17</td><td>行情</td><td>主源失败即断流</td><td>新增新浪 SGE_AU9999 / SGE_AUTD 自动备用源。</td></tr>
+            <tr><td>18</td><td>行情</td><td>公开源都失败时空白</td><td>自动回退 GitHub 部署快照。</td></tr>
+            <tr><td>19</td><td>行情</td><td>离线打开没有行情</td><td>最终回退随包内嵌国内快照。</td></tr>
+            <tr><td>20</td><td>行情</td><td>公开行情缺少官方校验</td><td>GitHub 数据任务用上海黄金交易所官方延时价交叉校验。</td></tr>
+            <tr><td>21</td><td>行情</td><td>异常偏价可能直接入库</td><td>公开价与官方价偏差超过 2.5% 时自动采用官方延时价。</td></tr>
+            <tr><td>22</td><td>行情</td><td>无法追踪校验结果</td><td>快照写入官方校验价、差异比例和校验时间。</td></tr>
+            <tr><td>23</td><td>行情</td><td>GitHub Pages 读到旧缓存</td><td>JSON 请求追加时间戳并使用 no-store。</td></tr>
+            <tr><td>24</td><td>行情</td><td>刷新与价格变化混为一谈</td><td>分别显示行情时间、轮询状态和最近价格变化。</td></tr>
+            <tr><td>25</td><td>行情</td><td>价格不变像是页面卡死</td><td>轮询成功但价格相同时明确提示“价格暂无变化”。</td></tr>
+            <tr><td>26</td><td>行情</td><td>不知道是否休市</td><td>按 Asia/Shanghai 判断日盘、夜盘和休市状态。</td></tr>
+            <tr><td>27</td><td>行情</td><td>数据新鲜度不透明</td><td>显示数据年龄并对超过阈值的快照发出警报。</td></tr>
+            <tr><td>28</td><td>行情</td><td>来源不可核验</td><td>显示当前来源并提供可点击的原始页面链接。</td></tr>
+            <tr><td>29</td><td>行情</td><td>只看 AU9999 缺短线参照</td><td>加入 Au(T+D) 合约卡片和涨跌对照。</td></tr>
+            <tr><td>30</td><td>行情</td><td>自动刷新过程不可见</td><td>新增轮询倒计时、进度条、刷新旋转状态和源健康文本。</td></tr>
+
+            <tr><td>31</td><td>历史预测</td><td>历史线由随机数合成</td><td>彻底移除伪造历史价格生成器。</td></tr>
+            <tr><td>32</td><td>历史预测</td><td>没有国内真实历史</td><td>新增上海黄金交易所 Au99.99 官方每日行情抓取。</td></tr>
+            <tr><td>33</td><td>历史预测</td><td>公共历史端点偶发 502</td><td>东方财富历史失败时自动转入上金所分月分页抓取。</td></tr>
+            <tr><td>34</td><td>历史预测</td><td>历史抓取一次失败会清空</td><td>验证不足 30 点时保留上一份有效历史快照。</td></tr>
+            <tr><td>35</td><td>历史预测</td><td>只保存收盘价</td><td>保存开、高、低、收、成交量、成交额和涨跌幅。</td></tr>
+            <tr><td>36</td><td>历史预测</td><td>历史与当前价断层</td><td>当前盘中报价以 LIVE 点追加到真实历史末端。</td></tr>
+            <tr><td>37</td><td>历史预测</td><td>盘中点冒充收盘价</td><td>LIVE 点单独标识，不写回官方日线历史。</td></tr>
+            <tr><td>38</td><td>历史预测</td><td>固定图表区间</td><td>支持 1M、3M、6M、1Y 切换。</td></tr>
+            <tr><td>39</td><td>历史预测</td><td>缺少均线</td><td>新增 MA20 与 MA60，可独立开关。</td></tr>
+            <tr><td>40</td><td>历史预测</td><td>图表不能精确读取</td><td>新增鼠标交叉线和 OHLC 浮层。</td></tr>
+            <tr><td>41</td><td>历史预测</td><td>缺少收益动量</td><td>计算 20 日和 60 日真实历史变化。</td></tr>
+            <tr><td>42</td><td>历史预测</td><td>缺少波动率</td><td>基于真实对数收益计算年化波动率。</td></tr>
+            <tr><td>43</td><td>历史预测</td><td>缺少超买超卖观察</td><td>新增 RSI 14 和偏热、偏冷、中性提示。</td></tr>
+            <tr><td>44</td><td>历史预测</td><td>历史线和预测线难区分</td><td>预测区域使用独立背景、虚线、概率带和 FORECAST 标记。</td></tr>
+            <tr><td>45</td><td>历史预测</td><td>只有单点预测</td><td>新增 1 周、1 月、6 月、1 年、3 年五个周期。</td></tr>
+            <tr><td>46</td><td>历史预测</td><td>预测冒充确定价格</td><td>每个周期展示基准中枢、上下区间和模型置信度。</td></tr>
+            <tr><td>47</td><td>历史预测</td><td>没有情景分布</td><td>新增乐观、基准、谨慎三情景概率锥。</td></tr>
+            <tr><td>48</td><td>历史预测</td><td>国内因素权重不足</td><td>提高国内需求、人民币、沪金动量和内外盘价差权重。</td></tr>
+            <tr><td>49</td><td>历史预测</td><td>预测参数不可探索</td><td>九个驱动因子可拖动进行情景压力测试。</td></tr>
+            <tr><td>50</td><td>历史预测</td><td>因子改动会污染行情</td><td>因子只改变预测和建议，绝不改写实时价格。</td></tr>
+
+            <tr><td>51</td><td>视觉动效</td><td>米黄色旧式卡片风格</td><td>重做为深色石墨、金属金和风险色构成的专业终端视觉。</td></tr>
+            <tr><td>52</td><td>视觉动效</td><td>首屏没有产品识别</td><td>新增 AURUM 品牌标识、国内市场状态和主报价舞台。</td></tr>
+            <tr><td>53</td><td>视觉动效</td><td>全页层级混乱</td><td>建立市场、预测、交易、情报、AI 五个清晰工作区。</td></tr>
+            <tr><td>54</td><td>视觉动效</td><td>桌面导航弱</td><td>新增固定侧栏和滚动区域联动高亮。</td></tr>
+            <tr><td>55</td><td>视觉动效</td><td>手机导航不便</td><td>新增悬浮移动端底部导航。</td></tr>
+            <tr><td>56</td><td>视觉动效</td><td>关键数据不够醒目</td><td>主克价使用等宽数字、金色高对比和响应式尺寸。</td></tr>
+            <tr><td>57</td><td>视觉动效</td><td>价格更新无感知</td><td>新增数字补间和上涨、下跌方向闪色。</td></tr>
+            <tr><td>58</td><td>视觉动效</td><td>实时状态僵硬</td><td>新增行情信标、波形、轮询进度和数据源轨道动画。</td></tr>
+            <tr><td>59</td><td>视觉动效</td><td>首屏缺少精细动效</td><td>新增品牌流光、报价扫描线和更新脉冲。</td></tr>
+            <tr><td>60</td><td>视觉动效</td><td>滚动体验生硬</td><td>新增 IntersectionObserver 分批入场动画。</td></tr>
+            <tr><td>61</td><td>视觉动效</td><td>图表在高清屏模糊</td><td>Canvas 按设备像素比重绘。</td></tr>
+            <tr><td>62</td><td>视觉动效</td><td>窗口变化后图表变形</td><td>窗口缩放后节流重算全部 Canvas。</td></tr>
+            <tr><td>63</td><td>视觉动效</td><td>设置占据主页面</td><td>改为右侧设置抽屉。</td></tr>
+            <tr><td>64</td><td>视觉动效</td><td>危险操作缺确认</td><td>新增专用确认弹窗和遮罩过渡。</td></tr>
+            <tr><td>65</td><td>视觉动效</td><td>反馈组件风格不统一</td><td>统一按钮、输入、状态标签、Toast 和风险色语义。</td></tr>
+            <tr><td>66</td><td>视觉动效</td><td>移动端可能溢出</td><td>对图表、表格、价格、按钮和网格设置稳定响应式约束。</td></tr>
+
+            <tr><td>67</td><td>交易风控</td><td>交易输入像普通表单</td><td>重做专业模拟订单票据和买卖方向切换。</td></tr>
+            <tr><td>68</td><td>交易风控</td><td>常用克数输入慢</td><td>新增 1g、5g、10g、20g、50g 快捷克数。</td></tr>
+            <tr><td>69</td><td>交易风控</td><td>费用计算不透明</td><td>下单前展示成交价、手续费、订单金额和订单后仓位。</td></tr>
+            <tr><td>70</td><td>交易风控</td><td>价差和产品溢价混淆</td><td>分别计算模拟买卖价差、纯度换算和产品工费。</td></tr>
+            <tr><td>71</td><td>交易风控</td><td>可能超仓买入</td><td>下单前校验单笔仓位上限和可用现金。</td></tr>
+            <tr><td>72</td><td>交易风控</td><td>可能超持仓卖出</td><td>卖出前校验可卖克数。</td></tr>
+            <tr><td>73</td><td>交易风控</td><td>持仓均价不含费用</td><td>买入手续费计入持仓成本，卖出手续费计入已实现盈亏。</td></tr>
+            <tr><td>74</td><td>交易风控</td><td>盈亏视图不完整</td><td>展示总权益、现金、持仓、浮盈亏、已实现盈亏和总收益。</td></tr>
+            <tr><td>75</td><td>交易风控</td><td>看不到资产集中度</td><td>新增黄金仓位环、仓位利用率和综合风险等级。</td></tr>
+            <tr><td>76</td><td>交易风控</td><td>止盈止损只在文字里</td><td>动态展示止损价、止盈价、盈亏平衡价和建议单笔上限。</td></tr>
+            <tr><td>77</td><td>交易风控</td><td>刷新后交易记录丢失</td><td>模拟账户与最多 200 笔成交持久化到本机浏览器。</td></tr>
+            <tr><td>78</td><td>交易风控</td><td>账单无法带走</td><td>支持带 UTF-8 BOM 的中文 CSV 导出。</td></tr>
+            <tr><td>79</td><td>交易风控</td><td>误点重置不可恢复</td><td>重置账户前要求二次确认，行情和设置不会被清空。</td></tr>
+
+            <tr><td>80</td><td>情报 AI 部署</td><td>消息雷达几乎全是海外</td><td>新增上海黄金交易所官方公告抓取。</td></tr>
+            <tr><td>81</td><td>情报 AI 部署</td><td>美联储执法类消息噪声高</td><td>官方 RSS 入库前按黄金相关关键词过滤。</td></tr>
+            <tr><td>82</td><td>情报 AI 部署</td><td>消息缺少国内盘面解释</td><td>合并 AU9999、真实动量和内外盘价差三类结构化观察。</td></tr>
+            <tr><td>83</td><td>情报 AI 部署</td><td>无法按用途筛选消息</td><td>支持全部、国内、宏观、高影响四类过滤。</td></tr>
+            <tr><td>84</td><td>情报 AI 部署</td><td>不知道消息偏多偏空</td><td>新增影响标签、权重、方向矩阵和观察标签。</td></tr>
+            <tr><td>85</td><td>情报 AI 部署</td><td>数据来源藏在说明里</td><td>情报区展示上金所、公开行情与人民银行来源卡片。</td></tr>
+            <tr><td>86</td><td>情报 AI 部署</td><td>没有 API 就无建议</td><td>内置本地规则引擎，无模型 API 也能生成执行框架。</td></tr>
+            <tr><td>87</td><td>情报 AI 部署</td><td>模型 API 被误用于行情</td><td>模型接口只接收页面已有数据，完全不参与行情采集。</td></tr>
+            <tr><td>88</td><td>情报 AI 部署</td><td>模型输入上下文不足</td><td>输入包含国内报价、历史指标、五周期预测、九因子、账户和风控规则。</td></tr>
+            <tr><td>89</td><td>情报 AI 部署</td><td>只能接一种模型</td><td>支持 OpenAI-compatible Endpoint、模型名和提供商配置。</td></tr>
+            <tr><td>90</td><td>情报 AI 部署</td><td>模型失败会清空报告</td><td>调用失败自动回退本地规则报告。</td></tr>
+            <tr><td>91</td><td>情报 AI 部署</td><td>密钥默认持久化风险</td><td>默认不保存 API Key，只有用户主动开启才写入本机。</td></tr>
+            <tr><td>92</td><td>情报 AI 部署</td><td>没有服务端密钥方案</td><td>保留 Cloudflare Worker 代理模板供商用部署。</td></tr>
+            <tr><td>93</td><td>情报 AI 部署</td><td>只有页面部署工作流</td><td>新增行情、历史、消息三类独立数据刷新工作流。</td></tr>
+            <tr><td>94</td><td>情报 AI 部署</td><td>数据任务可能同时提交冲突</td><td>三个刷新任务使用同一 GitHub Actions 并发锁串行提交。</td></tr>
+            <tr><td>95</td><td>情报 AI 部署</td><td>文档乱码与方向过时</td><td>README、快速入口和重构报告全部重写并验证 UTF-8。</td></tr>
+            <tr><td>96</td><td>情报 AI 部署</td><td>缺少系统化交付验证</td><td>完成脚本语法、DOM 引用、重复 ID、运行时交互、交易流程和 Canvas 非空像素校验。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <footer>说明：公开行情不等同于授权逐笔行情。本项目定位为研究与虚拟交易终端。</footer>
+    </main>
+  </body>
+</html>

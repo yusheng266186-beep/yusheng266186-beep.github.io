@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080a08" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="以 AU9999 人民币克价为主锚的国内黄金研究、预测、风控与虚拟交易工作台。"
+    />
+    <title>AURUM OS · 国内黄金决策终端</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080a08'/%3E%3Cpath d='M14 46 27 16h10l13 30h-9l-2.6-7H25.2l-2.7 7zm14-15h7.5L31.8 21z' fill='%23e9bd62'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#mainContent">跳到主要内容</a>
+
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="i-grid" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+      </symbol>
+      <symbol id="i-chart" viewBox="0 0 24 24">
+        <path d="M3 3v18h18"></path>
+        <path d="m7 16 4-5 3 3 5-7"></path>
+      </symbol>
+      <symbol id="i-wallet" viewBox="0 0 24 24">
+        <path d="M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h15v12H5a3 3 0 0 1-3-3V6"></path>
+        <path d="M16 13h2"></path>
+      </symbol>
+      <symbol id="i-news" viewBox="0 0 24 24">
+        <path d="M4 22h16a2 2 0 0 0 2-2V4H8v16a2 2 0 0 1-4 0V2H2v18a2 2 0 0 0 2 2Z"></path>
+        <path d="M12 8h6M12 12h6M12 16h4"></path>
+      </symbol>
+      <symbol id="i-sparkles" viewBox="0 0 24 24">
+        <path d="m12 3-1.4 3.6L7 8l3.6 1.4L12 13l1.4-3.6L17 8l-3.6-1.4Z"></path>
+        <path d="m5 14-.8 2.2L2 17l2.2.8L5 20l.8-2.2L8 17l-2.2-.8Z"></path>
+        <path d="m19 13-1 2.5-2.5 1 2.5 1 1 2.5 1-2.5 2.5-1-2.5-1Z"></path>
+      </symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24">
+        <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
+      </symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24">
+        <path d="M20 6v5h-5"></path>
+        <path d="M4 18v-5h5"></path>
+        <path d="M18.6 9A7 7 0 0 0 6.7 6.7L4 11M20 13l-2.7 4.3A7 7 0 0 1 5.4 15"></path>
+      </symbol>
+      <symbol id="i-arrow-up" viewBox="0 0 24 24">
+        <path d="m18 15-6-6-6 6"></path>
+      </symbol>
+      <symbol id="i-arrow-down" viewBox="0 0 24 24">
+        <path d="m6 9 6 6 6-6"></path>
+      </symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24">
+        <path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3Z"></path>
+        <path d="m9 12 2 2 4-4"></path>
+      </symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M12 7v5l3 2"></path>
+      </symbol>
+      <symbol id="i-external" viewBox="0 0 24 24">
+        <path d="M15 3h6v6M10 14 21 3"></path>
+        <path d="M18 13v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h7"></path>
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path>
+      </symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24">
+        <path d="M10.3 4.1 2.5 18a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 4.1a2 2 0 0 0-3.4 0Z"></path>
+        <path d="M12 9v4M12 17h.01"></path>
+      </symbol>
+      <symbol id="i-x" viewBox="0 0 24 24">
+        <path d="M18 6 6 18M6 6l12 12"></path>
+      </symbol>
+    </svg>
+
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="主导航">
+        <a class="brand" href="#overview" aria-label="AURUM OS 首页">
+          <span class="brand-mark"><span>Au</span><i></i></span>
+          <span class="brand-copy"><strong>AURUM</strong><small>GOLD INTELLIGENCE</small></span>
+        </a>
+
+        <nav class="nav-list">
+          <a class="nav-item active" href="#overview" data-section="overview">
+            <svg><use href="#i-grid"></use></svg><span>市场总览</span>
+          </a>
+          <a class="nav-item" href="#forecast" data-section="forecast">
+            <svg><use href="#i-chart"></use></svg><span>周期预测</span>
+          </a>
+          <a class="nav-item" href="#trading" data-section="trading">
+            <svg><use href="#i-wallet"></use></svg><span>模拟交易</span>
+          </a>
+          <a class="nav-item" href="#intelligence" data-section="intelligence">
+            <svg><use href="#i-news"></use></svg><span>情报雷达</span>
+          </a>
+          <a class="nav-item" href="#decision" data-section="decision">
+            <svg><use href="#i-sparkles"></use></svg><span>AI 决策舱</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+        <div class="source-orbit" aria-label="数据链路状态">
+          <div class="orbit-rings"><i></i><i></i><span>CN</span></div>
+          <div>
+            <strong id="sideSource">国内公开行情</strong>
+            <small id="sideHealth">多源自动切换</small>
+          </div>
+        </div>
+        <button class="sidebar-action" id="openSettings" type="button">
+          <svg><use href="#i-settings"></use></svg>
+          <span>终端设置</span>
+        </button>
+        <p class="version">AURUM OS 3.0 · SIMULATION</p>
+      </aside>
+
+      <div class="workspace">
+        <header class="topbar">
+          <div class="mobile-brand">
+            <span class="brand-mark small"><span>Au</span><i></i></span>
+            <strong>AURUM OS</strong>
+          </div>
+          <div class="market-state">
+            <span class="live-beacon" id="liveBeacon"></span>
+            <div>
+              <strong id="sessionLabel">检测交易时段</strong>
+              <small id="sessionDetail">上海黄金交易所 · Asia/Shanghai</small>
+            </div>
+          </div>
+          <div class="topbar-spacer"></div>
+          <div class="poll-state">
+            <svg><use href="#i-clock"></use></svg>
+            <span id="pollLabel">下次轮询 15s</span>
+            <i><b id="pollProgress"></b></i>
+          </div>
+          <div class="asof-state">
+            <small>行情时间</small>
+            <strong id="quoteClock">--:--:--</strong>
+          </div>
+          <button class="icon-button" id="refreshBtn" type="button" title="立即刷新行情" aria-label="立即刷新行情">
+            <svg><use href="#i-refresh"></use></svg>
+          </button>
+          <button class="icon-button mobile-settings" id="openSettingsMobile" type="button" title="打开设置" aria-label="打开设置">
+            <svg><use href="#i-settings"></use></svg>
+          </button>
+        </header>
+
+        <main id="mainContent">
+          <div class="status-banner" id="statusBanner" role="status">
+            <div>
+              <svg><use href="#i-alert"></use></svg>
+              <span id="statusBannerText">正在建立国内黄金行情链路</span>
+            </div>
+            <button type="button" id="dismissBanner" aria-label="关闭提示">
+              <svg><use href="#i-x"></use></svg>
+            </button>
+          </div>
+
+          <div class="ticker-strip" aria-label="市场速览">
+            <div class="ticker-track" id="tickerTrack"></div>
+          </div>
+
+          <section class="view-section" id="overview" data-observe>
+            <div class="section-heading reveal">
+              <div>
+                <span class="section-index">01 / MARKET</span>
+                <h1>国内黄金决策终端</h1>
+                <p>AU9999 主锚定价，人民币每克口径。国际价格只用于溢价对照。</p>
+              </div>
+              <div class="heading-actions">
+                <span class="trust-badge" id="trustBadge">
+                  <svg><use href="#i-shield"></use></svg>
+                  <span>校验数据源</span>
+                </span>
+                <button class="text-button" id="jumpTrade" type="button">进入模拟交易</button>
+              </div>
+            </div>
+
+            <div class="command-grid">
+              <article class="quote-stage reveal" id="quoteStage">
+                <div class="quote-stage-grid"></div>
+                <div class="quote-head">
+                  <div>
+                    <span class="contract-label"><i></i> SGE · AU9999</span>
+                    <h2>黄金 99.99</h2>
+                  </div>
+                  <span class="data-tier" id="dataTier">连接中</span>
+                </div>
+                <div class="price-block">
+                  <div class="price-wrap">
+                    <span class="currency">¥</span>
+                    <strong id="mainPrice">---.--</strong>
+                    <span class="unit">元/克</span>
+                  </div>
+                  <div class="change-chip neutral" id="changeChip">
+                    <svg><use href="#i-arrow-up"></use></svg>
+                    <strong id="changeValue">--</strong>
+                    <span id="changePercent">--</span>
+                  </div>
+                </div>
+                <div class="quote-freshness">
+                  <span class="update-wave"><i></i><i></i><i></i><i></i><i></i></span>
+                  <span id="priceEvent">等待首次行情</span>
+                  <b id="lastChanged">--</b>
+                </div>
+                <div class="quote-kpis">
+                  <div><span>今开</span><strong id="openPrice">--</strong></div>
+                  <div><span>最高</span><strong id="highPrice">--</strong></div>
+                  <div><span>最低</span><strong id="lowPrice">--</strong></div>
+                  <div><span>昨收</span><strong id="previousPrice">--</strong></div>
+                </div>
+                <div class="source-line">
+                  <span><i id="sourceDot"></i><b id="sourceName">建立连接</b></span>
+                  <span id="dataAge">数据年龄 --</span>
+                  <a id="sourceLink" href="https://www.sge.com.cn/sjzx/yshqbg" target="_blank" rel="noreferrer">
+                    查看来源 <svg><use href="#i-external"></use></svg>
+                  </a>
+                </div>
+              </article>
+
+              <article class="market-pulse panel reveal">
+                <div class="panel-heading compact">
+                  <div>
+                    <span class="eyebrow">LIVE PULSE</span>
+                    <h2>盘面脉冲</h2>
+                  </div>
+                  <div class="pulse-legend"><i></i><span id="pulseLegend">AU9999 日内区间</span></div>
+                </div>
+                <div class="intraday-chart">
+                  <canvas id="sparkCanvas" width="680" height="200"></canvas>
+                  <div class="session-marker" id="sessionMarker"><span></span></div>
+                </div>
+                <div class="contract-ribbon" id="contractRibbon"></div>
+                <div class="micro-stats">
+                  <div><span>振幅</span><strong id="amplitudeValue">--</strong></div>
+                  <div><span>成交量</span><strong id="volumeValue">--</strong></div>
+                  <div><span>成交额</span><strong id="turnoverValue">--</strong></div>
+                  <div><span>内外盘价差</span><strong id="premiumValue">--</strong></div>
+                </div>
+              </article>
+            </div>
+
+            <article class="chart-terminal panel reveal">
+              <div class="panel-heading chart-heading">
+                <div>
+                  <span class="eyebrow">VERIFIED HISTORY</span>
+                  <h2>AU9999 真实历史与情景区间</h2>
+                </div>
+                <div class="chart-controls">
+                  <div class="segmented" id="chartRanges" aria-label="历史区间">
+                    <button type="button" data-range="20">1M</button>
+                    <button type="button" data-range="60">3M</button>
+                    <button type="button" data-range="120">6M</button>
+                    <button type="button" data-range="260" class="active">1Y</button>
+                  </div>
+                  <div class="indicator-toggles">
+                    <label><input type="checkbox" data-indicator="ma20" checked /><span>MA20</span></label>
+                    <label><input type="checkbox" data-indicator="ma60" checked /><span>MA60</span></label>
+                    <label><input type="checkbox" data-indicator="forecast" checked /><span>预测带</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-meta">
+                <span><i class="legend-dot price"></i>AU9999 收盘价</span>
+                <span><i class="legend-line ma20"></i>20 日均线</span>
+                <span><i class="legend-line ma60"></i>60 日均线</span>
+                <span><i class="legend-area"></i>未来概率区间</span>
+                <b id="historyQuality">正在加载真实历史数据</b>
+              </div>
+              <div class="terminal-canvas-wrap" id="priceChartWrap">
+                <canvas id="priceCanvas" width="1400" height="520"></canvas>
+                <div class="chart-tooltip" id="chartTooltip" aria-hidden="true"></div>
+              </div>
+              <div class="chart-footer">
+                <div><span>20 日变化</span><strong id="return20">--</strong></div>
+                <div><span>60 日变化</span><strong id="return60">--</strong></div>
+                <div><span>年化波动</span><strong id="annualVol">--</strong></div>
+                <div><span>RSI 14</span><strong id="rsiValue">--</strong></div>
+                <div><span>趋势结构</span><strong id="trendState">--</strong></div>
+              </div>
+            </article>
+
+            <div class="signal-grid">
+              <article class="signal-card reveal">
+                <span class="signal-icon momentum"><svg><use href="#i-chart"></use></svg></span>
+                <div><span>趋势动量</span><strong id="momentumSignal">计算中</strong><p id="momentumExplain">等待历史数据</p></div>
+                <b class="signal-score" id="momentumScore">--</b>
+              </article>
+              <article class="signal-card reveal">
+                <span class="signal-icon premium"><span>CN</span></span>
+                <div><span>国内溢价</span><strong id="premiumSignal">计算中</strong><p id="premiumExplain">等待国际参照</p></div>
+                <b class="signal-score" id="premiumScore">--</b>
+              </article>
+              <article class="signal-card reveal">
+                <span class="signal-icon risk"><svg><use href="#i-shield"></use></svg></span>
+                <div><span>综合风险</span><strong id="riskSignal">计算中</strong><p id="riskExplain">基于波动、仓位和消息</p></div>
+                <b class="signal-score" id="riskScore">--</b>
+              </article>
+            </div>
+          </section>
+
+          <section class="view-section" id="forecast" data-observe>
+            <div class="section-heading reveal">
+              <div>
+                <span class="section-index">02 / FORECAST</span>
+                <h2>多周期概率预测</h2>
+                <p>规则模型在本地运行；接入大模型后，只增强解释与执行建议，不参与行情采集。</p>
+              </div>
+              <span class="model-chip" id="forecastModel">LOCAL QUANT · V3</span>
+            </div>
+
+            <div class="forecast-strip" id="forecastCards"></div>
+
+            <div class="forecast-layout">
+              <article class="panel forecast-chart-panel reveal">
+                <div class="panel-heading compact">
+                  <div>
+                    <span class="eyebrow">SCENARIO CONE</span>
+                    <h2>未来价格概率锥</h2>
+                  </div>
+                  <span class="chart-disclaimer">非确定性报价</span>
+                </div>
+                <div class="forecast-canvas-wrap">
+                  <canvas id="forecastCanvas" width="920" height="430"></canvas>
+                </div>
+                <div class="scenario-legend">
+                  <span><i class="bull"></i>乐观情景 <b id="bullProbability">--</b></span>
+                  <span><i class="base"></i>基准情景 <b id="baseProbability">--</b></span>
+                  <span><i class="bear"></i>谨慎情景 <b id="bearProbability">--</b></span>
+                </div>
+              </article>
+
+              <article class="panel decision-brief reveal">
+                <div class="panel-heading compact">
+                  <div>
+                    <span class="eyebrow">ACTION BRIEF</span>
+                    <h2>今日执行框架</h2>
+                  </div>
+                  <span class="confidence-ring" id="confidenceRing"><b>--</b><small>置信</small></span>
+                </div>
+                <div class="stance-block" id="stanceBlock">
+                  <span>当前倾向</span>
+                  <strong id="stanceTitle">计算中</strong>
+                  <p id="stanceSummary">正在综合国内盘面、真实历史、内外盘价差和官方消息。</p>
+                </div>
+                <ol class="action-list" id="actionList"></ol>
+                <button class="wide-button" id="useStrategyBtn" type="button">将建议参数带入模拟交易</button>
+              </article>
+            </div>
+
+            <article class="panel factors-panel reveal">
+              <div class="panel-heading compact">
+                <div>
+                  <span class="eyebrow">FACTOR LAB</span>
+                  <h2>国内与宏观驱动因子</h2>
+                </div>
+                <span class="factor-total">综合分 <strong id="factorTotal">--</strong></span>
+              </div>
+              <div class="factor-grid" id="factorGrid"></div>
+              <p class="panel-footnote">拖动因子可做情景压力测试。因子只改变预测与建议，不会篡改实时行情。</p>
+            </article>
+          </section>
+
+          <section class="view-section" id="trading" data-observe>
+            <div class="section-heading reveal">
+              <div>
+                <span class="section-index">03 / SIMULATION</span>
+                <h2>虚拟交易与盈亏</h2>
+                <p>按国内克价模拟买卖，包含价差、手续费、持仓均价、已实现与浮动盈亏。</p>
+              </div>
+              <div class="heading-actions">
+                <button class="icon-text-button" id="exportBtn" type="button">
+                  <svg><use href="#i-download"></use></svg>导出账单
+                </button>
+                <button class="icon-text-button danger-ghost" id="resetBtn" type="button">重置账户</button>
+              </div>
+            </div>
+
+            <div class="account-strip reveal" id="accountStrip">
+              <div><span>总权益</span><strong id="equityValue">--</strong><small id="equityDelta">初始资金 ¥100,000</small></div>
+              <div><span>可用现金</span><strong id="cashValue">--</strong><small id="cashRatio">--</small></div>
+              <div><span>黄金持仓</span><strong id="holdingValue">--</strong><small id="holdingCost">--</small></div>
+              <div><span>浮动盈亏</span><strong id="unrealizedValue">--</strong><small id="unrealizedPct">--</small></div>
+              <div><span>已实现盈亏</span><strong id="realizedValue">--</strong><small>已扣模拟手续费</small></div>
+            </div>
+
+            <div class="trade-layout">
+              <article class="panel order-ticket reveal">
+                <div class="panel-heading compact">
+                  <div>
+                    <span class="eyebrow">ORDER TICKET</span>
+                    <h2>AU9999 模拟订单</h2>
+                  </div>
+                  <span class="ticket-price" id="ticketPrice">--</span>
+                </div>
+                <div class="order-tabs">
+                  <button type="button" class="active buy" data-side="buy">买入</button>
+                  <button type="button" data-side="sell">卖出</button>
+                </div>
+                <div class="order-form">
+                  <label>
+                    <span>交易克数</span>
+                    <div class="input-shell"><input id="tradeGrams" type="number" min="0.01" step="0.01" value="10" /><b>g</b></div>
+                  </label>
+                  <div class="quick-amounts" id="quickAmounts">
+                    <button type="button" data-grams="1">1g</button>
+                    <button type="button" data-grams="5">5g</button>
+                    <button type="button" data-grams="10" class="active">10g</button>
+                    <button type="button" data-grams="20">20g</button>
+                    <button type="button" data-grams="50">50g</button>
+                  </div>
+                  <div class="two-fields">
+                    <label><span>手续费率</span><div class="input-shell"><input id="feeRate" type="number" min="0" step="0.01" value="0.035" /><b>%</b></div></label>
+                    <label><span>模拟价差</span><div class="input-shell"><input id="tradeSpread" type="number" min="0" step="0.01" value="0.10" /><b>%</b></div></label>
+                  </div>
+                  <label><span>交易备注</span><input id="tradeNote" placeholder="例如：回踩 MA20 后分批建仓" /></label>
+                </div>
+                <div class="order-preview">
+                  <div><span>预计成交价</span><strong id="executionPrice">--</strong></div>
+                  <div><span>预计手续费</span><strong id="estimatedFee">--</strong></div>
+                  <div><span>订单金额</span><strong id="orderValue">--</strong></div>
+                  <div><span>订单后仓位</span><strong id="postPosition">--</strong></div>
+                </div>
+                <div class="risk-checks" id="riskChecks"></div>
+                <button class="execute-button buy" id="tradeBtn" type="button">
+                  <span>确认模拟买入</span><b id="tradeButtonAmount">--</b>
+                </button>
+                <p class="form-error" id="tradeError" role="alert"></p>
+              </article>
+
+              <article class="panel portfolio-visual reveal">
+                <div class="panel-heading compact">
+                  <div>
+                    <span class="eyebrow">PORTFOLIO RISK</span>
+                    <h2>仓位与回撤监控</h2>
+                  </div>
+                  <span class="risk-grade" id="riskGrade">LOW</span>
+                </div>
+                <div class="portfolio-ring-wrap">
+                  <canvas id="allocationCanvas" width="520" height="330"></canvas>
+                  <div class="ring-center"><strong id="goldAllocation">0%</strong><span>黄金仓位</span></div>
+                </div>
+                <div class="risk-meter">
+                  <div><span>仓位利用</span><strong id="positionUse">0%</strong></div>
+                  <i><b id="positionBar"></b></i>
+                </div>
+                <div class="risk-boundaries">
+                  <div><span>建议单笔上限</span><strong id="maxOrderValue">--</strong></div>
+                  <div><span>止损参考</span><strong id="stopPrice">--</strong></div>
+                  <div><span>止盈参考</span><strong id="takePrice">--</strong></div>
+                  <div><span>盈亏平衡</span><strong id="breakEvenPrice">--</strong></div>
+                </div>
+              </article>
+            </div>
+
+            <article class="panel ledger-panel reveal">
+              <div class="panel-heading compact">
+                <div>
+                  <span class="eyebrow">TRADE LEDGER</span>
+                  <h2>模拟成交记录</h2>
+                </div>
+                <span id="tradeCount">0 笔成交</span>
+              </div>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr><th>时间</th><th>方向</th><th>克数</th><th>成交价</th><th>手续费</th><th>金额</th><th>备注</th></tr>
+                  </thead>
+                  <tbody id="tradeRows"></tbody>
+                </table>
+              </div>
+            </article>
+          </section>
+
+          <section class="view-section" id="intelligence" data-observe>
+            <div class="section-heading reveal">
+              <div>
+                <span class="section-index">04 / INTELLIGENCE</span>
+                <h2>黄金情报雷达</h2>
+                <p>聚焦能影响国内黄金的官方与高权重消息，低相关内容自动降噪。</p>
+              </div>
+              <div class="news-filters" id="newsFilters">
+                <button type="button" class="active" data-filter="all">全部</button>
+                <button type="button" data-filter="domestic">国内</button>
+                <button type="button" data-filter="macro">宏观</button>
+                <button type="button" data-filter="high">高影响</button>
+              </div>
+            </div>
+
+            <div class="intel-layout">
+              <article class="panel impact-map reveal">
+                <div class="panel-heading compact">
+                  <div>
+                    <span class="eyebrow">IMPACT MAP</span>
+                    <h2>波动原因矩阵</h2>
+                  </div>
+                  <span id="impactDirection">中性平衡</span>
+                </div>
+                <div class="impact-score">
+                  <span>利空</span><div><i id="impactPointer"></i></div><span>利多</span>
+                </div>
+                <div class="impact-list" id="impactList"></div>
+                <div class="watchlist">
+                  <span>重点观察</span>
+                  <div id="watchTags"></div>
+                </div>
+              </article>
+
+              <article class="panel news-terminal reveal">
+                <div class="panel-heading compact">
+                  <div>
+                    <span class="eyebrow">OFFICIAL FEED</span>
+                    <h2>消息时间线</h2>
+                  </div>
+                  <span id="newsFreshness">更新中</span>
+                </div>
+                <div class="news-list" id="newsList"></div>
+              </article>
+            </div>
+
+            <div class="source-grid reveal" id="sourceGrid"></div>
+          </section>
+
+          <section class="view-section" id="decision" data-observe>
+            <div class="section-heading reveal">
+              <div>
+                <span class="section-index">05 / AI COPILOT</span>
+                <h2>AI 决策舱</h2>
+                <p>行情、历史、交易和风控无需模型 API；模型只负责推理、解释和形成可执行方案。</p>
+              </div>
+              <span class="model-status" id="modelStatus"><i></i><b>本地规则引擎</b></span>
+            </div>
+
+            <div class="ai-layout">
+              <article class="panel ai-console reveal">
+                <div class="ai-console-head">
+                  <div class="ai-avatar"><svg><use href="#i-sparkles"></use></svg><i></i></div>
+                  <div><span>AURUM COPILOT</span><strong id="aiHeadline">准备生成国内黄金执行建议</strong></div>
+                  <button class="icon-button" id="configureAI" type="button" title="配置模型接口" aria-label="配置模型接口">
+                    <svg><use href="#i-settings"></use></svg>
+                  </button>
+                </div>
+                <div class="prompt-chips" id="promptChips">
+                  <button type="button" data-prompt="daily">今日操作</button>
+                  <button type="button" data-prompt="risk">持仓风控</button>
+                  <button type="button" data-prompt="forecast">周期预测</button>
+                  <button type="button" data-prompt="news">消息影响</button>
+                </div>
+                <div class="ai-output" id="aiOutput" aria-live="polite"></div>
+                <div class="ai-actions">
+                  <button class="wide-button" id="generateAdvice" type="button">
+                    <svg><use href="#i-sparkles"></use></svg><span>生成实时决策报告</span>
+                  </button>
+                  <button class="icon-text-button" id="copyAdvice" type="button">复制报告</button>
+                </div>
+              </article>
+
+              <aside class="decision-context reveal">
+                <article class="context-card">
+                  <span>模型看到的数据</span>
+                  <div id="modelContextList"></div>
+                </article>
+                <article class="context-card security-card">
+                  <svg><use href="#i-shield"></use></svg>
+                  <div><strong>数据与 AI 解耦</strong><p>关闭模型接口后，行情、图表、预测、模拟交易和本地建议仍可正常使用。</p></div>
+                </article>
+                <article class="context-card">
+                  <span>当前风控规则</span>
+                  <div class="rule-list" id="ruleList"></div>
+                </article>
+              </aside>
+            </div>
+          </section>
+
+          <footer class="app-footer">
+            <div>
+              <strong>AURUM OS</strong>
+              <span>国内黄金研究与虚拟交易终端</span>
+            </div>
+            <p>公开行情可能延迟且不包含逐笔盘口，仅用于研究和虚拟交易，不构成投资建议。</p>
+            <div>
+              <a href="README.html">使用说明</a>
+              <a href="OPTIMIZATION_REPORT.html">重构报告</a>
+            </div>
+          </footer>
+        </main>
+      </div>
+    </div>
+
+    <nav class="mobile-nav" aria-label="移动端主导航">
+      <a href="#overview" class="active"><svg><use href="#i-grid"></use></svg><span>总览</span></a>
+      <a href="#forecast"><svg><use href="#i-chart"></use></svg><span>预测</span></a>
+      <a href="#trading"><svg><use href="#i-wallet"></use></svg><span>交易</span></a>
+      <a href="#intelligence"><svg><use href="#i-news"></use></svg><span>情报</span></a>
+      <a href="#decision"><svg><use href="#i-sparkles"></use></svg><span>AI</span></a>
+    </nav>
+
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <aside class="settings-drawer" id="settingsDrawer" aria-hidden="true" aria-label="终端设置">
+      <div class="drawer-head">
+        <div><span>TERMINAL SETTINGS</span><h2>终端设置</h2></div>
+        <button class="icon-button" id="closeSettings" type="button" aria-label="关闭设置"><svg><use href="#i-x"></use></svg></button>
+      </div>
+      <div class="settings-scroll">
+        <section>
+          <h3>行情与显示</h3>
+          <label><span>行情模式</span>
+            <select id="priceProvider">
+              <option value="domestic">国内公开行情自动切换</option>
+              <option value="manual">手动校准克价</option>
+              <option value="snapshot">仅使用本地快照</option>
+            </select>
+          </label>
+          <label><span>手动克价</span><div class="input-shell"><input id="manualPrice" type="number" min="0" step="0.01" /><b>元/g</b></div></label>
+          <label><span>刷新间隔</span><div class="input-shell"><input id="refreshSeconds" type="number" min="10" step="5" /><b>秒</b></div></label>
+          <label><span>纯度换算</span>
+            <select id="purity">
+              <option value="1">Au9999 / 基准</option>
+              <option value="0.999">Au999</option>
+              <option value="0.916">Au916 / 22K</option>
+              <option value="0.75">Au750 / 18K</option>
+            </select>
+          </label>
+          <label><span>产品工费/溢价</span><div class="input-shell"><input id="productPremium" type="number" step="0.01" /><b>%</b></div></label>
+        </section>
+
+        <section>
+          <h3>风控参数</h3>
+          <label><span>单笔仓位上限</span><div class="input-shell"><input id="maxPosition" type="number" min="1" max="100" step="1" /><b>%</b></div></label>
+          <label><span>止损阈值</span><div class="input-shell"><input id="stopLoss" type="number" min="0.1" step="0.1" /><b>%</b></div></label>
+          <label><span>止盈阈值</span><div class="input-shell"><input id="takeProfit" type="number" min="0.1" step="0.1" /><b>%</b></div></label>
+          <div class="two-fields">
+            <label><span>下方预警</span><input id="alertLower" type="number" min="0" step="0.01" /></label>
+            <label><span>上方预警</span><input id="alertUpper" type="number" min="0" step="0.01" /></label>
+          </div>
+        </section>
+
+        <section>
+          <h3>模型接口</h3>
+          <label><span>OpenAI-compatible Endpoint</span><input id="aiEndpoint" /></label>
+          <div class="two-fields">
+            <label><span>模型名称</span><input id="aiModel" /></label>
+            <label><span>提供商</span><input id="aiProvider" /></label>
+          </div>
+          <label><span>API Key</span><input id="aiApiKey" type="password" placeholder="仅用于生成 AI 建议" /></label>
+          <label class="switch-row"><span><b>本机保存密钥</b><small>只建议在个人设备上开启</small></span><input id="saveApiKey" type="checkbox" /><i></i></label>
+          <p class="security-note"><svg><use href="#i-shield"></use></svg>商用部署建议使用随附的 Cloudflare Worker 代理，不要把模型密钥写入仓库。</p>
+        </section>
+      </div>
+      <div class="drawer-footer">
+        <button class="wide-button" id="saveSettings" type="button">保存并应用</button>
+        <button class="text-button" id="restoreDefaults" type="button">恢复默认设置</button>
+      </div>
+    </aside>
+
+    <div class="modal-backdrop" id="confirmBackdrop"></div>
+    <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <span class="confirm-icon"><svg><use href="#i-alert"></use></svg></span>
+      <h2 id="confirmTitle">重置模拟账户？</h2>
+      <p>这会清空全部虚拟持仓、盈亏和成交记录。行情与设置不会受到影响。</p>
+      <div><button class="text-button" id="cancelReset" type="button">取消</button><button class="danger-button" id="confirmReset" type="button">确认重置</button></div>
+    </div>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+    <script src="data/embedded-data.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>

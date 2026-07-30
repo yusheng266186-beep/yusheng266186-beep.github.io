@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>AURUM OS 3.0 使用说明</title>
+    <style>
+      :root {
+        --bg: #080a08;
+        --surface: #11130f;
+        --line: #2a2f26;
+        --text: #f4f1e8;
+        --muted: #92988b;
+        --gold: #e8ba5d;
+        --green: #51d3a2;
+        font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--text);
+        background:
+          linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px),
+          var(--bg);
+        background-size: 46px 46px;
+        line-height: 1.8;
+      }
+      main { width: min(980px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 70px; }
+      header { border-bottom: 1px solid var(--line); padding-bottom: 26px; }
+      .eyebrow { color: var(--gold); font: 800 10px Consolas, monospace; }
+      h1 { margin: 7px 0; font-size: clamp(30px, 6vw, 52px); line-height: 1.05; }
+      h2 { margin: 34px 0 12px; font-size: 20px; }
+      h3 { margin: 22px 0 8px; font-size: 14px; }
+      p, li { color: var(--muted); font-size: 13px; }
+      strong { color: var(--text); }
+      a { color: var(--gold); }
+      code {
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 2px 6px;
+        color: #f4d68b;
+        background: var(--surface);
+      }
+      .hero-note, .callout {
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 16px;
+        background: rgba(17, 19, 15, .88);
+      }
+      .hero-note { margin-top: 22px; border-left: 2px solid var(--green); }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+      .grid div { border: 1px solid var(--line); border-radius: 6px; padding: 14px; background: var(--surface); }
+      .grid b { display: block; color: var(--gold); font: 800 18px Consolas, monospace; }
+      .grid span { color: var(--muted); font-size: 10px; }
+      table { width: 100%; border-collapse: collapse; border: 1px solid var(--line); background: var(--surface); }
+      th, td { border-bottom: 1px solid var(--line); padding: 11px; text-align: left; vertical-align: top; font-size: 11px; }
+      th { color: var(--muted); }
+      td { color: #d4d1c8; }
+      .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 14px; }
+      .flow div { position: relative; border: 1px solid var(--line); border-radius: 5px; padding: 12px; color: #d4d1c8; background: var(--surface); font-size: 10px; }
+      .flow b { display: block; margin-bottom: 4px; color: var(--green); }
+      footer { margin-top: 42px; border-top: 1px solid var(--line); padding-top: 18px; color: #697064; font-size: 10px; }
+      @media (max-width: 700px) {
+        .grid, .flow { grid-template-columns: 1fr; }
+        table { min-width: 720px; }
+        .table-wrap { overflow-x: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="eyebrow">AURUM OS · VERSION 3.0</span>
+        <h1>国内黄金决策终端</h1>
+        <p>以 AU9999 人民币每克报价为主锚的行情研究、概率预测、风险控制和虚拟交易应用。</p>
+        <div class="hero-note">
+          <strong>直接打开：</strong>双击同目录的 <code>index.html</code>。不需要安装 Node，不需要行情 API Key，也不需要启动本地服务器。
+        </div>
+      </header>
+
+      <div class="grid">
+        <div><b>AU9999</b><span>国内主价格 · 元/克</span></div>
+        <div><b>259</b><span>随包附带的上金所真实日线点</span></div>
+        <div><b>95%+</b><span>无需模型 API 可用功能</span></div>
+      </div>
+
+      <h2>这版重构了什么</h2>
+      <ul>
+        <li>从旧式长页面重构为终端式工作台，包含桌面侧栏和移动端底部导航。</li>
+        <li>首页实时显示 AU9999 国内克价、行情时间、轮询倒计时、数据年龄和最近价格变化。</li>
+        <li>引入上金所 Au99.99 官方每日历史行情，历史曲线不再由随机数或国际金价换算生成。</li>
+        <li>新增多周期概率预测、情景锥、因子压力测试、执行框架和综合风险评分。</li>
+        <li>重做模拟订单、费用、价差、持仓均价、资产配置、止盈止损与成交账单。</li>
+        <li>新增上金所官方公告抓取与宏观消息降噪，低相关银行执法消息不会占据主要视野。</li>
+        <li>模型接口与行情链路完全解耦。没有模型 API 时，全部行情、图表、预测、交易和本地建议仍可用。</li>
+      </ul>
+
+      <h2>行情数据怎么工作</h2>
+      <p>用户不需要提供行情数据 API。页面和 GitHub Actions 使用公开行情与官方页面完成自动降级：</p>
+      <div class="flow">
+        <div><b>1 · 东方财富</b>浏览器尝试直连 AU9999 / Au(T+D)</div>
+        <div><b>2 · 新浪 SGE</b>主源失败时切到 SGE_AU9999</div>
+        <div><b>3 · 部署快照</b>读取 GitHub Actions 更新的 JSON</div>
+        <div><b>4 · 内嵌快照</b>离线双击打开时保证核心界面可用</div>
+      </div>
+      <p>部署快照在写入前会再与<strong>上海黄金交易所官方延时行情</strong>交叉校验。公开报价与官方价偏差超过阈值时，脚本会改用官方延时价并记录校验信息。</p>
+
+      <h3>为什么刷新了，价格可能仍然没变？</h3>
+      <p>页面把“行情时间”和“本次轮询”分开处理。轮询成功只表示获取了最新一笔公开报价；休市、流动性较低或没有新成交时，价格本来就可能保持不变。此时页面会明确显示“轮询成功，价格暂无变化”，倒计时和刷新状态仍会更新。</p>
+
+      <h2>历史与预测口径</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>模块</th><th>数据</th><th>含义</th></tr></thead>
+          <tbody>
+            <tr><td>历史主线</td><td>上金所 Au99.99 官方每日行情</td><td>真实开、高、低、收、成交量与成交额快照。</td></tr>
+            <tr><td>当前盘中点</td><td>当前 AU9999 国内公开报价</td><td>以 <code>LIVE</code> 标识追加到历史末端，不伪装成收盘价。</td></tr>
+            <tr><td>预测带</td><td>本地因子模型</td><td>按真实波动率、动量、国内需求、人民币、价差等生成概率区间。</td></tr>
+            <tr><td>AI 建议</td><td>可选大模型</td><td>只负责解释和执行方案，不采集或生成实时价格。</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>模型接口</h2>
+      <p>在“终端设置”中可以填写兼容 OpenAI Chat Completions 格式的 Endpoint、模型名称和 API Key。默认模型名为 <code>gpt-5</code>，也可以接入其他兼容服务。</p>
+      <div class="callout">
+        <strong>安全建议：</strong>浏览器直填密钥只适合个人设备测试。商用部署请使用 <code>serverless/openai-proxy-cloudflare-worker.js</code>，把密钥放在服务端环境变量，不要提交进 GitHub 仓库。
+      </div>
+
+      <h2>GitHub Pages 部署</h2>
+      <ol>
+        <li>新建 GitHub 仓库，把本目录的全部内容上传到仓库根目录。</li>
+        <li>进入 <code>Settings → Pages</code>，将 Source 设为 <code>GitHub Actions</code>。</li>
+        <li>推送到 <code>main</code> 后，<code>.github/workflows/pages.yml</code> 会部署网站。</li>
+        <li><code>refresh-market.yml</code> 每 5 分钟尝试刷新国内行情快照。</li>
+        <li><code>refresh-history.yml</code> 在交易日刷新真实历史数据。</li>
+        <li><code>refresh-news.yml</code> 每小时刷新官方消息；三个数据任务使用同一并发锁，避免提交冲突。</li>
+      </ol>
+
+      <h2>文件结构</h2>
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            <tr><td><code>index.html</code></td><td>应用结构与全部可访问控件。</td></tr>
+            <tr><td><code>assets/styles.css</code></td><td>响应式视觉系统、动画和状态样式。</td></tr>
+            <tr><td><code>assets/app.js</code></td><td>行情、图表、预测、交易、风控、消息与 AI 逻辑。</td></tr>
+            <tr><td><code>data/*.json</code></td><td>国内行情、真实历史与官方消息快照。</td></tr>
+            <tr><td><code>data/embedded-data.js</code></td><td>支持双击直接打开的离线数据包。</td></tr>
+            <tr><td><code>scripts/*.mjs</code></td><td>GitHub Actions 数据刷新与离线包构建脚本。</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>重要边界</h2>
+      <p>公开网页行情不是券商或交易所授权的逐笔盘口服务，可能有延迟、缓存或临时不可用。本应用适合研究与虚拟交易，不应替代真实交易终端，也不构成投资建议。需要毫秒级推送、五档盘口、真实下单和清算时，必须接入具备授权的数据与交易服务。</p>
+
+      <footer>AURUM OS 3.0 · 国内黄金研究与虚拟交易终端</footer>
+    </main>
+  </body>
+</html>
