@@ -6,6 +6,25 @@ AURUM OS 是一个面向国内黄金市场研究的浏览器端决策工作台�
 > GitHub：[查看源代码](https://github.com/yusheng266186-beep/yusheng266186-beep.github.io)  
 > 使用说明：[README.html](https://yusheng266186-beep.github.io/README.html)
 
+<!-- project-navigation:start -->
+## 项目概览
+
+| 项目 | 说明 |
+| --- | --- |
+| 分类 | 数据与信息观察 |
+| 平台 | 浏览器 / 行情数据 / 虚拟交易 |
+| 当前定位 | 市场研究与模拟工具 |
+
+围绕国内黄金行情、历史分析、情景预测与虚拟交易的浏览器工作台。
+
+[在线体验](https://yusheng266186-beep.github.io/) · [使用与开发](#使用方式) · [项目总导航](https://github.com/yusheng266186-beep/yusheng266186-beep)
+
+本库承载 AURUM 项目站点；个人项目导航位于 [GitHub 个人主页](https://github.com/yusheng266186-beep)。数据时效、模拟交易与风险边界见下文。
+
+**阅读导航：** [使用方式](#使用方式) · [目录结构](#目录结构)
+
+<!-- project-navigation:end -->
+
 ## 项目定位
 
 本项目把“看行情、看历史、做假设、记模拟交易”整合在一个静态网页中。它适合：
