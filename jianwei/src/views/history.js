@@ -1,0 +1,24 @@
+import { classTrajectory, selectScores, profile, subjectsFor, describe, gap, percentile, finite, personName, examShort } from '../model.js';
+import { header, filters, classSelect, select, pillChecks, toggle, metrics, metric, fmt, int, pct, trend, panel, table, personLink, note, chartTools, searchField, button, esc } from '../ui.js';
+import { lines } from '../charts.js';
+import { scoresSheet } from '../export.js';
+const metricLabels={avg:'总分均分',topRate:'特控上线率',underRate:'本科上线率',top:'特控人数',under:'本科人数',topGap:'平均特控分差',underGap:'平均本科分差'};
+export function history(data,s){
+ const rows=selectScores(data,{classNo:s.classNo}),subjects=subjectsFor(rows),exams=data.exams.filter(e=>rows.some(r=>r.exam===e.id)),chosen=exams.filter(e=>s.exams.includes(e.id));
+ const trajectory=classTrajectory(data,s.classNo,chosen.map(e=>e.id),s.metric,s.matched).filter(t=>chosen.some(e=>e.id===t.exam));
+ const first=trajectory.find(t=>finite(t.value)),last=[...trajectory].reverse().find(t=>finite(t.value)),change=first&&last?last.value-first.value:null;
+ const ids=new Set(trajectory.flatMap(t=>t.rows.map(r=>r.sid)));
+ let people=[...ids].map(sid=>({sid,name:personName(data,sid),records:trajectory.map(t=>t.rows.find(r=>r.sid===sid)||null)})).filter(p=>p.name.includes(s.search||''));
+ const cellValue=r=>!r?null:s.matrix==='percentile'?percentile(data,r):s.matrix==='top'?gap(data,r,'top'):s.matrix==='under'?gap(data,r,'under'):s.matrix==='rank'?(data.exams.find(e=>e.id===r.exam)?.scope==='city'?r.cityRank:r.schoolRank):s.matrix==='total'?r.total:r.subjects?.[s.matrix]?.score??null;
+ people=people.map(p=>{const values=p.records.map(cellValue).filter(finite);return {...p,change:values.length>1?values.at(-1)-values[0]:null};}).sort((a,b)=>s.sort==='growth'?(b.change??-Infinity)-(a.change??-Infinity):a.name.localeCompare(b.name,'zh'));
+ const columns=[{label:'姓名',render:p=>personLink(data,{sid:p.sid,exam:trajectory.at(-1)?.exam||''},p.name)},...trajectory.map((t,i)=>({label:t.exam,numeric:true,render:p=>{const v=cellValue(p.records[i]);return ['top','under'].includes(s.matrix)?trend(v):fmt(v,s.matrix==='rank'?0:1);}})),{label:'首末变化',numeric:true,render:p=>trend(p.change)}];
+ const html=header('04 / LONGITUDINAL VIEW','把变化，放回时间里。','班级独立选考次，区分参考人数与共同参考学生。看一条轨迹，也看轨迹里的每一个人。')+
+ filters(classSelect(data,'classNo',s.classNo)+select('metric','趋势指标',[...Object.entries(metricLabels),...subjects.map(s=>[s,s+'均分'])],s.metric)+toggle('matched','只比较共同参考学生',s.matched))+
+ panel('选择要并列的考试','只显示这个班有记录的考次，按学习阶段排列。',pillChecks('exams',exams.map(e=>[e.id,e.id+' · '+e.label]),s.exams))+
+ metrics(metric('比较考次',int(trajectory.length),'按实际选择的考试展开')+metric('首个考次',first?fmt(first.value):'—',first?examShort(data,first.exam):'暂无有效数值','blue')+metric('最近考次',last?fmt(last.value):'—',last?examShort(data,last.exam):'暂无有效数值','green')+metric('首末变化',change==null?'—':(change>0?'+':'')+fmt(change),s.metric.includes('Rate')?'单位：百分点':'结合各考次试卷难度判断','clay'))+
+ panel(metricLabels[s.metric]||s.metric+'均分','没有数据的考次保留断点，不补0；上线率变化以百分点展示。',lines('history-trend',trajectory.map(t=>t.exam),[{name:metricLabels[s.metric]||s.metric+'均分',values:trajectory.map(t=>t.value)}],{suffix:s.metric.includes('Rate')?'%':'',zero:s.metric.includes('Gap')}),chartTools('history-trend'))+
+ panel('考次结构','参考人数与分布，帮助判断变化来自哪里。',table([{label:'考试',render:t=>esc(t.label)},{label:'人数',numeric:true,render:t=>int(t.summary.count)},{label:'均分',numeric:true,render:t=>fmt(t.summary.avg)},{label:'中位数',numeric:true,render:t=>fmt(t.summary.median)},{label:'标准差',numeric:true,render:t=>fmt(t.summary.sd)},{label:'特控人数 / 率',numeric:true,render:t=>int(t.summary.top)+' / '+pct(t.summary.topRate)},{label:'本科人数 / 率',numeric:true,render:t=>int(t.summary.under)+' / '+pct(t.summary.underRate)}],trajectory))+
+ panel('学生纵向矩阵','分位值越高，表示在当次同类别、同届别学生中的相对位置越靠前。首末变化取该生第一条与最后一条有效值。','<div class="inline-controls">'+select('matrix','单元格内容',[['total','赋分总分'],['percentile','同类分位'],['rank','原考试排名'],['top','特控分差'],['under','本科分差'],...subjects.map(s=>[s,s+'成绩'])],s.matrix)+select('sort','排序',[['name','姓名'],['growth','首末变化']],s.sort)+searchField('search',s.search)+'</div>'+table(columns,people),button('导出多次对比','export-view'))+
+ note('市级考试与校内考试的原排名统计范围不同，请用同类分位或距线比较相对变化。某生转班后，个人轨迹仍按学生身份联结所有考次；班级矩阵按各次实际所在班级呈现。');
+ return {html,sheets:{'班级多次考试对比':[['姓名',...trajectory.flatMap(t=>[t.exam+'总分',t.exam+'排名',t.exam+'特控分差',t.exam+'本科分差'])],...people.map(p=>[p.name,...p.records.flatMap(r=>r?[r.total,data.exams.find(e=>e.id===r.exam)?.scope==='city'?r.cityRank:r.schoolRank,gap(data,r,'top'),gap(data,r,'under')]:[null,null,null,null])])],'完整成绩与六科':scoresSheet(data,trajectory.flatMap(t=>t.rows)),'考次汇总':[['考试','人数','均分','特控人数','本科人数','特控率','本科率'],...trajectory.map(t=>[t.label,t.summary.count,t.summary.avg,t.summary.top,t.summary.under,t.summary.topRate,t.summary.underRate])]}};
+}

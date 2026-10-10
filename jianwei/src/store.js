@@ -1,0 +1,8 @@
+const DB='jianwei-local',TABLE='workspace';
+function db(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DB,1);request.onupgradeneeded=()=>request.result.createObjectStore(TABLE);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
+export async function readDataset(){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction(TABLE,'readonly'),r=tx.objectStore(TABLE).get('dataset');r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error);tx.oncomplete=()=>d.close();});}
+export async function writeDataset(data){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction(TABLE,'readwrite');tx.objectStore(TABLE).put(data,'dataset');tx.oncomplete=()=>{d.close();resolve();};tx.onerror=()=>reject(tx.error);});}
+export async function clearDataset(){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction(TABLE,'readwrite');tx.objectStore(TABLE).delete('dataset');tx.oncomplete=()=>{d.close();resolve();};tx.onerror=()=>reject(tx.error);});}
+export function readPrefs(key,fallback={}){try{return JSON.parse(localStorage.getItem('jianwei:'+key))||fallback;}catch{return fallback;}}
+export function writePrefs(key,value){try{localStorage.setItem('jianwei:'+key,JSON.stringify(value));}catch{}}
+export async function loadSample(){const r=await fetch('./data/sample.json.gz');if(!r.ok)throw new Error('匿名成绩数据暂时无法读取，请使用数据书房导入原始表格。');const raw=await r.blob();if(!('DecompressionStream' in window))throw new Error('请使用新版浏览器，或直接导入原始 Excel 成绩表。');const decompressed=new Response(raw.stream().pipeThrough(new DecompressionStream('gzip')));return decompressed.json();}

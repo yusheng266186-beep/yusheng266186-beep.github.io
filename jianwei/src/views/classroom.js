@@ -1,0 +1,24 @@
+import { selectScores, profile, describe, subjectsFor, subjectStats, histogram, trackName, getLine, gap, finite, personName, mean, maxOf } from '../model.js';
+import { header, filters, examSelect, classSelect, select, segmented, metrics, metric, fmt, int, pct, panel, table, tag, trend, personLink, note, chartTools, searchField, button } from '../ui.js';
+import { bars, distribution, radar } from '../charts.js';
+import { scoresSheet } from '../export.js';
+export function classroom(data,s){
+ const p=profile(data,s.classNo),rows=selectScores(data,{exam:s.exam,classNo:s.classNo}),d=describe(data,rows),subs=subjectsFor(rows);
+ const peers=selectScores(data,{exam:s.exam,track:p.track,cohort:p.cohort}).filter(r=>s.baseline!=='type'||profile(data,r.classNo).type===p.type);
+ const baseline=describe(data,peers),filtered=rows.filter(r=>personName(data,r.sid).includes(s.search||'')).sort((a,b)=>{
+  const va=s.sort==='underGap'?gap(data,a,'under'):s.sort==='name'?0:a.total,vb=s.sort==='underGap'?gap(data,b,'under'):s.sort==='name'?0:b.total;
+  return s.sort==='name'?personName(data,a.sid).localeCompare(personName(data,b.sid),'zh'):((vb??-Infinity)-(va??-Infinity));
+ });
+ const pages=Math.max(1,Math.ceil(filtered.length/30)),page=Math.min(s.page||1,pages),shown=filtered.slice((page-1)*30,page*30);
+ const renderValue=(r,sub=null)=>s.mode==='top'?trend(gap(data,r,'top',sub)):s.mode==='under'?trend(gap(data,r,'under',sub)):s.mode==='rank'?int(sub?r.subjects[sub]?.rank:(data.exams.find(e=>e.id===s.exam)?.scope==='city'?r.cityRank:r.schoolRank)):fmt(sub?s.mode==='raw'?r.subjects[sub]?.raw:r.subjects[sub]?.score:s.mode==='raw'?r.rawTotal:r.total);
+ const cols=[{label:'姓名',render:r=>personLink(data,r)},{label:'语种',render:r=>tag(r.language)},{label:s.mode==='rank'?'总分名次':'总分',numeric:true,render:r=>renderValue(r)},...subs.map(sub=>({label:sub,numeric:true,render:r=>renderValue(r,sub)})),{label:'化+生本科分差',numeric:true,render:r=>{const a=gap(data,r,'under','化学'),b=gap(data,r,'under','生物');return finite(a)&&finite(b)?trend(a+b):'—';}}];
+ const html=header('03 / ONE CLASS · ONE EXAM',s.classNo+'班，深入这一卷。','选定班级后，类别、班型和学科自动跟随。每个分差都能追到具体学生。',button('生成班级报告','report-current'))+
+ filters(classSelect(data,'classNo',s.classNo)+examSelect(data,'exam',s.exam)+select('baseline','比较基准',[['cohort','同类别、同届别'],['type','同类别、同班型']],s.baseline)+'<div class="context-tags">'+tag(trackName(p.track))+tag(p.type)+tag(p.combination)+(p.lead?tag('班主任 '+p.lead):'')+'</div>')+
+ metrics(metric('有效总分人数',int(d.count),'共 '+int(rows.length)+' 条学生记录')+metric('总分均分',fmt(d.avg),'基准均分 '+fmt(baseline.avg),'blue')+metric('特控上线',int(d.top),pct(d.topRate)+' · 线 '+fmt(rows[0]?getLine(data,rows[0],'top'):null,2),'green')+metric('本科上线',int(d.under),pct(d.underRate)+' · 线 '+fmt(rows[0]?getLine(data,rows[0],'under'):null,2),'clay'))+
+ '<div class="grid-two">'+panel('这一班的学科结构','按各学科满分标准化；展示赋分成绩占满分的比例。',radar('classroom-radar',subs,[{name:s.classNo+'班',values:subs.map(sub=>subjectStats(data,rows,sub).avg/maxOf(sub))},{name:'比较基准',color:'#759be8',values:subs.map(sub=>subjectStats(data,peers,sub).avg/maxOf(sub))}]),chartTools('classroom-radar'))+
+ panel('学生分布','识别集中区间，也关注两端学生。',distribution('classroom-distribution',histogram(rows.map(r=>r.total),25)),chartTools('classroom-distribution'))+'</div>'+
+ panel('学科表现与有效线','点击学生前，先看学科在哪一层出现问题。',table([{label:'学科',key:'subject'},{label:'任课教师',render:r=>p.teachers?.[r.subject]||'—'},{label:'均分 / 原分',numeric:true,render:r=>fmt(r.avg)+' / '+fmt(r.rawAvg)},{label:'与基准差',numeric:true,render:r=>trend(r.avg==null||subjectStats(data,peers,r.subject).avg==null?null:r.avg-subjectStats(data,peers,r.subject).avg)},{label:'特控线',numeric:true,render:r=>fmt(r.topLine,2)},{label:'特控有效 / 双上线',numeric:true,render:r=>int(r.top)+' / '+int(r.topDouble)},{label:'本科线',numeric:true,render:r=>fmt(r.underLine,2)},{label:'本科有效 / 双上线',numeric:true,render:r=>int(r.under)+' / '+int(r.underDouble)}],subs.map(sub=>subjectStats(data,rows,sub))))+
+ panel('逐人展开','原分、赋分、排名和距线分差使用同一份学生记录。','<div class="inline-controls">'+segmented('mode',[['scores','赋分成绩'],['raw','原始成绩'],['rank','考试排名'],['top','距特控线'],['under','距本科线']],s.mode)+searchField('search',s.search)+select('sort','排序',[['total','总分从高到低'],['underGap','本科分差'],['name','姓名']],s.sort)+'</div>'+table(cols,shown)+'<div class="pagination"><span>'+filtered.length+'人 · 第'+page+' / '+pages+'页</span>'+button('上一页','page-prev','ghost',page<=1?'disabled':'')+button('下一页','page-next','ghost',page>=pages?'disabled':'')+'</div>',button('导出全班明细','export-view'))+
+ note('排名保留该场考试原有统计范围，跨考次优先观察分位与距线。化学+生物本科分差仅在两科和有效线均存在时计算。补习班按实际选科记录展开。');
+ return {html,sheets:{'班级成绩分析单次':scoresSheet(data,rows),'学科有效':[['学科','均分','原分均分','特控线','特控有效','特控双上线','本科线','本科有效','本科双上线'],...subs.map(sub=>{const v=subjectStats(data,rows,sub);return [sub,v.avg,v.rawAvg,v.topLine,v.top,v.topDouble,v.underLine,v.under,v.underDouble];})]}};
+}

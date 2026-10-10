@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#153e35">
+  <meta name="description" content="见微 · 学情研究台。从每一道题，看见每一次成长。独立的年级、班级、试卷与学生研究工作区。">
+  <title>见微 · 学情研究台</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到分析内容</a>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <aside class="sidebar" id="sidebar" aria-label="工作区导航">
+    <a class="brand" href="#overview"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="3" y="3" width="42" height="42" rx="13" fill="#d6e5ae"/><path d="M14 13h20v14H14zM18 17v6m6-6v6m6-6v6M18 28l-5 7m14-7v5c0 2 2 2 8 2" fill="none" stroke="#153e35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>见微<small>学情研究台</small></span></a>
+    <div class="workspace-label"><span class="status-dot"></span>LEARNING OBSERVATORY</div>
+    <nav id="navigation"></nav>
+    <div class="sidebar-bottom"><div class="sidebar-quote">从每一道题，<br>看见每一次成长。</div><button class="sidebar-import" data-action="import"><span>把原表带进来</span><span>↗</span></button><div class="sidebar-version">独立研究工作区 · v1.0</div></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="topbar-left"><button class="icon-btn mobile-menu" data-action="menu" aria-label="打开导航">☰</button><span class="breadcrumb">工作区 <span>/</span> <strong id="breadcrumb">年级研判</strong></span></div>
+      <div class="topbar-right"><button class="quick-search" data-action="palette" aria-label="搜索学生和分析入口"><span>⌕</span><span>查找学生与分析</span><kbd>⌘ K</kbd></button><button class="data-status" data-action="open-data" id="data-status">载入数据…</button><button class="btn primary small" data-action="import">导入原表 ↥</button></div>
+    </header>
+    <main id="main" tabindex="-1" aria-live="polite"><div class="startup"><div class="loading-mark">见微</div><p>正在打开学情研究工作区…</p><div class="loading-line"></div></div></main>
+    <footer class="workspace-footer"><span>见微 · 学情研究台</span><span>研究始于细节，教学落到个人。</span><button data-action="open-data">本机数据工作区 ↗</button></footer>
+  </div>
+  <input id="file-input" type="file" accept=".xlsx,.xls,.csv,.json" multiple hidden>
+  <dialog id="import-dialog" class="import-dialog"><div id="import-content"></div></dialog>
+  <dialog id="palette-dialog" class="palette-dialog"><div class="palette-head"><span>⌕</span><input id="palette-input" type="search" placeholder="输入姓名，或找到一个分析入口…" aria-label="搜索学生或页面"><button class="icon-btn" data-action="close-palette" aria-label="关闭">×</button></div><div id="palette-results"></div><div class="palette-foot">输入即可查找　·　Esc 关闭</div></dialog>
+  <div class="toast-region" id="toasts" role="status" aria-live="polite"></div>
+  <div id="print-area"></div>
+</body>
+</html>
