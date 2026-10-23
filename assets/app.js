@@ -1239,12 +1239,12 @@
     ctx.closePath();
     ctx.fillStyle = gradient;
     ctx.fill();
-    drawSmoothLine(ctx, points, "#a48345", 1.7);
+    drawSmoothLine(ctx, points, "#dcc080", 1.7);
     var last = points[points.length - 1];
     ctx.beginPath();
     ctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#ad9054";
-    ctx.shadowColor = "#a48345";
+    ctx.fillStyle = "#ecd398";
+    ctx.shadowColor = "#dcc080";
     ctx.shadowBlur = 10;
     ctx.fill();
     ctx.shadowBlur = 0;
@@ -1311,8 +1311,8 @@
       ctx.lineTo(splitX, plotBottom);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = "#84662f";
-      ctx.font = "10px Noto Sans SC, sans-serif";
+      ctx.fillStyle = "#ccb57d";
+      ctx.font = "11px Noto Sans SC, sans-serif";
       ctx.fillText("SCENARIO", splitX + 8, pad.top + 12);
       drawForecastBand(ctx, forecast, xForecast, y);
     }
@@ -1332,36 +1332,36 @@
     ctx.closePath();
     ctx.fillStyle = area;
     ctx.fill();
-    drawSmoothLine(ctx, pricePoints, "#a48345", 1.65);
+    drawSmoothLine(ctx, pricePoints, "#dcc080", 1.65);
 
     if (state.chartIndicators.ma20) {
-      drawSeriesLine(ctx, ma20, xHistory, y, "#5e9179", 1.05);
+      drawSeriesLine(ctx, ma20, xHistory, y, "#9cb7a7", 1.05);
     }
     if (state.chartIndicators.ma60) {
-      drawSeriesLine(ctx, ma60, xHistory, y, "#be9364", 1.05);
+      drawSeriesLine(ctx, ma60, xHistory, y, "#baa3c5", 1.05);
     }
 
     var last = pricePoints[pricePoints.length - 1];
     ctx.beginPath();
     ctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#ad9054";
+    ctx.fillStyle = "#ecd398";
     ctx.fill();
     drawChartHover(ctx, pad, plotBottom);
   }
 
   function drawGrid(ctx, width, height, pad, min, max, y) {
-    ctx.font = "10px Manrope, sans-serif";
+    ctx.font = "11px Manrope, sans-serif";
     ctx.textAlign = "left";
     for (var index = 0; index <= 4; index += 1) {
       var value = min + (max - min) * (1 - index / 4);
       var lineY = y(value);
-      ctx.strokeStyle = "rgba(146, 152, 139, .11)";
+      ctx.strokeStyle = "rgba(194, 193, 158, .12)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(pad.left, lineY);
       ctx.lineTo(width - pad.right, lineY);
       ctx.stroke();
-      ctx.fillStyle = "#697064";
+      ctx.fillStyle = "#a7b29b";
       ctx.fillText(value.toFixed(0), width - pad.right + 8, lineY + 3);
     }
   }
@@ -1392,7 +1392,7 @@
       if (index === 0) ctx.moveTo(x(index), y(point.center));
       else ctx.lineTo(x(index), y(point.center));
     });
-    ctx.strokeStyle = "rgba(163, 130, 65, .72)";
+    ctx.strokeStyle = "rgba(223, 194, 130, .8)";
     ctx.lineWidth = 1.2;
     ctx.stroke();
     ctx.setLineDash([]);
@@ -1433,7 +1433,7 @@
     ctx.arc(nearest.x, nearest.y, 4, 0, Math.PI * 2);
     ctx.fillStyle = "#080a08";
     ctx.fill();
-    ctx.strokeStyle = "#ad9054";
+    ctx.strokeStyle = "#ecd398";
     ctx.lineWidth = 2;
     ctx.stroke();
     renderChartTooltip(nearest);
@@ -1476,13 +1476,13 @@
     for (var grid = 0; grid <= 4; grid += 1) {
       var value = min + (max - min) * (1 - grid / 4);
       var gy = y(value);
-      ctx.strokeStyle = "rgba(146, 152, 139, .1)";
+      ctx.strokeStyle = "rgba(194, 193, 158, .12)";
       ctx.beginPath();
       ctx.moveTo(pad.left, gy);
       ctx.lineTo(width - pad.right, gy);
       ctx.stroke();
-      ctx.fillStyle = "#697064";
-      ctx.font = "10px Manrope, sans-serif";
+      ctx.fillStyle = "#a7b29b";
+      ctx.font = "11px Manrope, sans-serif";
       ctx.textAlign = "right";
       ctx.fillText(value.toFixed(0), pad.left - 8, gy + 3);
     }
@@ -1506,16 +1506,16 @@
       if (index === 0) ctx.moveTo(x(index), y(point.center));
       else ctx.lineTo(x(index), y(point.center));
     });
-    ctx.strokeStyle = "#a48345";
+    ctx.strokeStyle = "#dcc080";
     ctx.lineWidth = 1.7;
     ctx.stroke();
     points.forEach(function (point, index) {
       ctx.beginPath();
       ctx.arc(x(index), y(point.center), 3, 0, Math.PI * 2);
-      ctx.fillStyle = index === 0 ? "#80986b" : "#a48345";
+      ctx.fillStyle = index === 0 ? "#b8cbb1" : "#dcc080";
       ctx.fill();
-      ctx.fillStyle = "#617363";
-      ctx.font = "10px Noto Sans SC, sans-serif";
+      ctx.fillStyle = "#b2b99f";
+      ctx.font = "11px Noto Sans SC, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(point.label, x(index), height - 18);
     });
@@ -1535,13 +1535,13 @@
     ctx.lineWidth = 18;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = "#dfe7d4";
+    ctx.strokeStyle = "#283020";
     ctx.stroke();
     var fraction = clamp(stats.allocation / 100, 0, 1);
     if (fraction > 0) {
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * fraction);
-      ctx.strokeStyle = "#a48345";
+      ctx.strokeStyle = "#dcc080";
       ctx.lineCap = "round";
       ctx.shadowColor = "rgba(232, 186, 93, .25)";
       ctx.shadowBlur = 10;
@@ -1549,8 +1549,8 @@
       ctx.shadowBlur = 0;
       ctx.lineCap = "butt";
     }
-    ctx.fillStyle = "#697064";
-    ctx.font = "10px Noto Sans SC, sans-serif";
+    ctx.fillStyle = "#a7b29b";
+    ctx.font = "11px Noto Sans SC, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("现金 " + Math.max(0, 100 - stats.allocation).toFixed(0) + "%", centerX, centerY + radius + 32);
   }
@@ -1575,7 +1575,7 @@
   }
 
   function drawEmptyCanvas(ctx, width, height, message) {
-    ctx.fillStyle = "#697064";
+    ctx.fillStyle = "#a7b29b";
     ctx.font = "11px sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(message, width / 2, height / 2);

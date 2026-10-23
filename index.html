@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="light"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/cinematic.css"><link rel="preload" as="image" href="assets/gold-sculpture.png" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/cinematic.css"><link rel="preload" as="image" href="assets/gold-sculpture-master.png" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
       <symbol id="i-grid" viewBox="0 0 24 24">
         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
         <rect x="14" y="3" width="7" height="7" rx="1"></rect>
@@ -60,13 +60,13 @@
         <path d="M18 6 6 18M6 6l12 12"></path>
       </symbol>
     </svg>
-<div class="ambient" aria-hidden="true"><div class="ambient-halo"></div><div class="ambient-lines"></div></div><div id="chapterFlash" aria-hidden="true"></div>
+<div class="gold-world" id="goldWorld" aria-hidden="true" data-renderer="poster" data-scene="overview"><img class="world-poster" src="assets/gold-sculpture-master.png" alt="" width="1672" height="941" fetchpriority="high"><canvas class="world-canvas"></canvas><div class="world-shade"></div></div><div class="scene-wayfinder" aria-hidden="true"><b id="chapterNumber">01</b><i></i><span>/ 05</span></div><div class="ambient" aria-hidden="true"><div class="ambient-halo"></div><div class="ambient-lines"></div></div><div id="chapterFlash" aria-hidden="true"></div>
 <div class="app-shell" id="surface"><header class="topbar"><a class="brand" href="#overview"><img src="assets/mark.svg" alt="" width="43" height="43"><span><strong>AURUM</strong><small>黄金市场档案</small></span></a><nav class="chapter-nav" aria-label="研究章节"><span class="nav-bead" aria-hidden="true"></span><a class="nav-item" href="#overview" data-section="overview"><small>01</small><span>此刻</span></a><a class="nav-item" href="#history" data-section="history"><small>02</small><span>走势</span></a><a class="nav-item" href="#forecast" data-section="forecast"><small>03</small><span>情景</span></a><a class="nav-item" href="#trading" data-section="trading"><small>04</small><span>模拟</span></a><a class="nav-item" href="#intelligence" data-section="intelligence"><small>05</small><span>研究</span></a></nav><div class="header-tools"><button class="icon-button" id="refreshBtn" type="button" title="刷新行情" aria-label="刷新行情"><svg><use href="#i-refresh"></use></svg></button><button class="icon-button" id="motionToggle" type="button" aria-label="减少动态效果" aria-pressed="false"><svg><use href="#i-sparkles"></use></svg></button><button class="icon-button" id="openSettings" type="button" title="偏好与研究参数" aria-label="偏好与研究参数"><svg><use href="#i-settings"></use></svg></button><button id="openSettingsMobile" type="button" hidden>设置</button></div></header>
 <div class="workspace"><main id="mainContent"><div id="marketContext"><div class="market-ribbon"><div class="market-state"><i class="live-beacon" id="liveBeacon"></i><span id="sessionLabel">正在读取时段</span><small id="sessionDetail">上海黄金交易所 · 北京时间</small></div><div class="ribbon-right"><span class="asof-state">行情时点 <b id="quoteClock">--</b></span><span class="poll-state"><span id="pollLabel">等待刷新</span><i><b id="pollProgress"></b></i></span></div></div>
 <div class="status-banner" id="statusBanner" role="status"><svg><use href="#i-clock"></use></svg><span id="statusBannerText">正在读取行情来源与时间</span><button id="dismissBanner" type="button" aria-label="关闭提示" hidden>×</button></div>
 </div><section class="view-section" id="overview" data-page="overview">
 <div class="gold-hero">
-  <figure class="hero-art" aria-label="光影中的黄金雕塑"><img class="gold-sculpture" src="assets/gold-sculpture.png" alt="一道厚重黄金扭转而成的巨大金属雕塑，光线掠过拉丝表面" width="1672" height="941" fetchpriority="high"><figcaption>Au / 79 &nbsp; · &nbsp; A STUDY IN VALUE</figcaption></figure>
+  <figure class="hero-art" aria-label="光影中的黄金雕塑"><img class="gold-sculpture" src="assets/gold-sculpture-master.png" alt="一道厚重黄金扭转而成的巨大金属雕塑，光线掠过拉丝表面" width="1672" height="941" fetchpriority="high"><figcaption>Au / 79 &nbsp; · &nbsp; A STUDY IN VALUE</figcaption></figure>
   <div class="hero-copy">
     <span class="section-index">GOLD. BEYOND THE MOMENT.</span>
     <h1 class="hero-title"><span>黄金，</span><em>自有分量。</em></h1>
@@ -120,7 +120,7 @@
                 <b class="signal-score" id="riskScore">--</b>
               </article>
             </div><div class="ticker-strip" aria-label="市场速览"><div id="tickerTrack" class="ticker-track"></div></div></div></section>
-<section class="view-section" id="history" data-page="history" hidden><div class="section-heading"><div><span class="section-index">02 / A LONGER VIEW</span><h1>时间，给价格以参照。</h1><p>收盘走势、均线和波动指标，给每一次涨跌一个参照。</p></div><a class="text-button" href="#forecast">接下来，试试情景 ↗</a></div>            <article class="chart-terminal panel reveal">
+<section class="view-section" id="history" data-page="history" hidden><div class="section-heading"><div><span class="section-index">02 / A LONGER VIEW</span><h1>时间，是价值的坐标。</h1><p>收盘走势、均线和波动指标，给每一次涨跌一个参照。</p></div><a class="text-button" href="#forecast">接下来，试试情景 ↗</a></div>            <article class="chart-terminal panel reveal">
               <div class="panel-heading chart-heading">
                 <div>
                   <span class="eyebrow">VERIFIED HISTORY</span>
@@ -165,7 +165,7 @@
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">03 / SCENARIOS</span>
-                <h2>推演变化的边界。</h2>
+                <h2>在变化中，看见可能。</h2>
                 <p>调整假设，观察可能的路径。区间由历史波动推演，尚未经回测校准。</p>
               </div>
               <span class="model-chip" id="forecastModel">本地情景模型 · 假设可见</span>
@@ -224,7 +224,7 @@
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">04 / PRACTICE</span>
-                <h2>先记录，再验证。</h2>
+                <h2>让判断，经得起验证。</h2>
                 <p>从 10 万元虚拟资金开始，理解仓位、费用与盈亏。账户沿用保存在本机的记录。</p>
               </div>
               <div class="heading-actions">
@@ -332,7 +332,7 @@
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">05 / RESEARCH</span>
-                <h2>变化背后的线索。</h2>
+                <h2>读懂，涌动的力量。</h2>
                 <p>把盘面观察、官方资讯与个人假设分开阅读，找到值得继续核实的线索。</p>
               </div>
               <div class="news-filters" id="newsFilters">
@@ -490,4 +490,4 @@
     </div>
 
 
-<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div><script src="data/embedded-data.js"></script><script src="assets/core.js"></script><script src="assets/scene.js"></script><script src="assets/app.js"></script></body></html>
+<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div><script src="data/embedded-data.js"></script><script src="assets/core.js"></script><script src="assets/gold-geometry.js"></script><script src="assets/gold-world.js"></script><script src="assets/scene.js"></script><script src="assets/app.js"></script></body></html>
