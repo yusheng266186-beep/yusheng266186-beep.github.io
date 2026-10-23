@@ -14,7 +14,7 @@ async function checkModule(file){
 }
 await checkModule('assets/gold-world.js');
 await access('assets/environment/studio-small-03-1k.hdr');
-for(const match of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)"/g))await access(match[1]);
+for(const match of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)(?:[?#][^"]*)?"/g))await access(match[1]);
 const fonts=await readFile('assets/fonts.css','utf8');
 for(const match of fonts.matchAll(/url\(["']?([^\s)'"?#]+)/g))await access(resolve('assets',match[1]));
 console.log('DOM references, syntax, data, local fonts, and sculpture dependencies verified.');

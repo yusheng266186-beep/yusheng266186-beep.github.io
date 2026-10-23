@@ -17,9 +17,13 @@
       a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (error) { options.notify("手记导出失败", error.message, "error"); }
   }
+  function reconcile(parent, nodes) {
+    nodes.forEach((el,index) => { if (parent.children[index] !== el) parent.insertBefore(el,parent.children[index] || null); });
+    while (parent.children.length > nodes.length) parent.lastElementChild.remove();
+  }
   function render() {
     if (!options) return;
-    const list = $("journalList"), openIds = new Set([...list.querySelectorAll("details[open]")].map(el => el.dataset.entryId)); list.replaceChildren();
+    const list = $("journalList"), rows = new Map([...list.querySelectorAll(".journal-entry")].map(el => [el.dataset.entryId,el]));
     const undo = $("journalUndo"); undo.replaceChildren();
     if (removed) {
       undo.append(node("span", "", "已移除一条手记。"));
@@ -33,18 +37,24 @@
     let items;
     try { items = Store.read(localStorage); }
     catch (error) {
+      list.replaceChildren();
       list.append(node("p", "journal-empty", "本机手记暂时无法读取，原内容未覆盖。可先导出备份。"));
       $("exportJournal").disabled = false; $("journalNavCount").textContent = "—"; return;
     }
     $("journalNavCount").textContent = String(items.length); $("exportJournal").disabled = !items.length;
     if (!items.length) {
+      if (list.querySelector(".journal-empty")) return;
+      list.replaceChildren();
       const empty = node("div", "journal-empty");
       empty.append(node("p", "", "把当时的价格、假设和理由留在这里，给下一次回看一个参照。"));
       const link = node("a", "text-link", "记录第一个情景 ↗"); link.href = "#forecast"; empty.append(link); list.append(empty); return;
     }
     const quote = options.getQuote();
-    items.slice(0, showingAll ? items.length : 3).forEach(item => {
-      const row = node("details", "journal-entry"); row.dataset.entryId = item.id; row.open = openIds.has(item.id);
+    const nodes = items.slice(0, showingAll ? items.length : 3).map(item => {
+      const change = Store.changeSince(item, quote), comparisonText = change === null ? "等待更晚的有效报价" : (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
+      const signature = JSON.stringify(item), existing = rows.get(item.id);
+      if (existing?.entrySignature === signature) { existing.querySelector(".journal-change").textContent = comparisonText; return existing; }
+      const row = node("details", "journal-entry"); row.dataset.entryId = item.id; row.entrySignature = signature; row.open = !!existing?.open;
       const summary = node("summary", "journal-entry-summary");
       const title = node("div", "journal-entry-title");
       title.append(node("span", "", time(item.createdAt) + " · " + item.horizon), node("strong", "", item.note || "留存一份情景观察"));
@@ -55,8 +65,8 @@
       [["记录时主价", money(item.price) + " 元/克"], ["原情景区间", money(item.low) + " — " + money(item.high)]].forEach(([label, value]) => {
         const metric = node("div"); metric.append(node("span", "", label), node("strong", "", value)); metrics.append(metric);
       });
-      const change = Store.changeSince(item, quote), comparison = node("div");
-      comparison.append(node("span", "", "报价相对记录时变化"), node("strong", "", change === null ? "等待更晚的有效报价" : (change >= 0 ? "+" : "") + change.toFixed(2) + "%")); metrics.append(comparison);
+      const comparison = node("div");
+      comparison.append(node("span", "", "报价相对记录时变化"), node("strong", "journal-change", comparisonText)); metrics.append(comparison);
       const factors = node("div", "journal-factors"); item.factors.forEach(f => factors.append(node("span", "", f.name + " " + (f.value > 0 ? "+" : "") + f.value)));
       const tier = item.dataTier === "snapshot" ? "部署快照" : item.dataTier === "manual" ? "手动报价" : "公开行情记录";
       content.append(metrics, node("p", "journal-provenance", tier + " · 报价截至 " + new Date(item.quoteAsOf).toLocaleString("zh-CN", {hour12:false}) + " · " + item.source), factors,
@@ -69,12 +79,13 @@
         catch (error) { options.notify("无法移除手记", error.message, "error"); }
       };
       content.append(remove);
-      row.append(summary, content); list.append(row);
+      row.append(summary, content); return row;
     });
     if (items.length > 3) {
       const more = node("button", "text-button journal-more", showingAll ? "收起至最近三条" : "查看全部 " + items.length + " 条手记 ↗");
-      more.type = "button"; more.onclick = () => { showingAll = !showingAll; render(); }; list.append(more);
+      more.type = "button"; more.onclick = () => { showingAll = !showingAll; render(); $("journalList").querySelector(".journal-more")?.focus({preventScroll:true}); }; nodes.push(more);
     }
+    reconcile(list,nodes);
   }
   function open() {
     try {
@@ -100,6 +111,17 @@
       } catch (error) { $("journalError").textContent = error.message || "本机存储不可用，手记尚未保存。"; }
     });
     $("exportJournal").addEventListener("click", exportJournal);
+    $("importJournal").addEventListener("click", () => $("journalBackupFile").click());
+    $("journalBackupFile").addEventListener("change", async event => {
+      const file = event.target.files[0]; if (!file) return;
+      $("journalImportError").textContent = "";
+      try {
+        if (file.size > 1000000) throw Error("请选择小于 1 MB 的 AURUM 手记 JSON 备份。");
+        const result = Store.restore(localStorage,await file.text());
+        render(); options.notify("手记备份已合并", "新增 "+result.added+" 条，跳过 "+result.skipped+" 条重复记录。");
+      } catch (error) { $("journalImportError").textContent = error.message || "恢复失败，原手记未覆盖。"; }
+      finally { event.target.value = ""; }
+    });
     addEventListener("storage", event => { if (event.key === Store.key || event.key === null) render(); });
     render();
   }
