@@ -2,7 +2,7 @@ name: Refresh Official News
 
 on:
   schedule:
-    - cron: "12 * * * *"
+    - cron: "12 */2 * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,6 +15,7 @@ concurrency:
 jobs:
   refresh-news:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,3 +35,4 @@ jobs:
         with:
           commit_message: "chore: refresh official gold macro news"
           file_pattern: data/news.json data/embedded-data.js
+

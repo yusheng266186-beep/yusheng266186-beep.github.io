@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { mergeFeedResults } from "./news-utils.mjs";
 
 const sources = [
   ["fed-all", "Federal Reserve", "https://www.federalreserve.gov/feeds/press_all.xml"],
@@ -13,18 +14,13 @@ const settled = await Promise.allSettled([
   ...sources.map(fetchSource),
   fetchSgeNotices()
 ]);
-const items = dedupe(settled.flatMap((r) => (r.status === "fulfilled" ? r.value : [])))
-  .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-  .slice(0, 30);
-
+let previous = {};
+try { previous = JSON.parse(await readFile(outputPath,"utf8")); } catch {}
+const nextPayload = mergeFeedResults(previous, settled, [...sources.map(s => s[1]), "上海黄金交易所"]);
+const items = nextPayload.items;
 await mkdir(path.dirname(outputPath), { recursive: true });
-const next = JSON.stringify({ generatedAt: new Date().toISOString(), items }, null, 2);
-let current = "";
-try {
-  current = await readFile(outputPath, "utf8");
-} catch {
-  current = "";
-}
+const next = JSON.stringify(nextPayload, null, 2);
+const current = JSON.stringify(previous);
 
 if (normalize(current) !== normalize(next)) {
   await writeFile(outputPath, next);
@@ -40,9 +36,11 @@ async function fetchSource([id, name, url]) {
   });
   if (!res.ok) throw new Error(`${name} returned ${res.status}`);
   const xml = await res.text();
-  return parseItems(xml, { id, name, url })
+  const items = parseItems(xml, { id, name, url })
     .filter((item) => id !== "fed-all" || isGoldRelevant(item))
     .slice(0, 10);
+  if (!items.length) throw new Error(`${name} returned no dated items`);
+  return items;
 }
 
 async function fetchSgeNotices() {
@@ -59,7 +57,7 @@ async function fetchSgeNotices() {
       const dateMatch = text.match(/(\d{2})-(\d{2})-(\d{2})\s*$/);
       const title = text.replace(/\d{2}-\d{2}-\d{2}\s*$/, "").trim();
       const url = new URL(match[1], baseUrl).href;
-      if (!title) return null;
+      if (!title || !dateMatch) return null;
       const publishedAt = dateMatch
         ? new Date(`20${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T12:00:00+08:00`).toISOString()
         : new Date().toISOString();
@@ -81,7 +79,9 @@ async function fetchSgeNotices() {
     const current = longestByUrl.get(item.url);
     if (!current || item.title.length > current.title.length) longestByUrl.set(item.url, item);
   }
-  return [...longestByUrl.values()].slice(0, 8);
+  const items = [...longestByUrl.values()].slice(0, 8);
+  if (!items.length) throw new Error("SGE returned no dated notices");
+  return items;
 }
 
 function parseItems(xml, source) {
@@ -90,7 +90,8 @@ function parseItems(xml, source) {
     const title = clean(readTag(raw, "title") || `${source.name} update`);
     const summary = clean(readTag(raw, "description") || title);
     const url = clean(readTag(raw, "link") || source.url);
-    const publishedAt = safeDate(clean(readTag(raw, "pubDate") || new Date().toISOString()));
+    const publishedAt = safeDate(clean(readTag(raw, "pubDate")));
+    if (!publishedAt) return null;
     return {
       id: `${source.id}-${publishedAt.slice(0, 10)}-${index}`,
       source: source.name,
@@ -102,7 +103,7 @@ function parseItems(xml, source) {
       weight: inferWeight(`${title} ${summary}`),
       category: "macro"
     };
-  });
+  }).filter(Boolean);
 }
 
 function isGoldRelevant(item) {
@@ -142,7 +143,7 @@ function clean(value) {
 
 function safeDate(value) {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
 function inferImpact(text) {
@@ -180,3 +181,4 @@ function normalize(value) {
     return value.trim();
   }
 }
+

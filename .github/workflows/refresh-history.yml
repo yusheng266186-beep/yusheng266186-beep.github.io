@@ -2,7 +2,7 @@ name: Refresh Market History
 
 on:
   schedule:
-    - cron: "22 0,4,8,12,16 * * 1-5"
+    - cron: "22 0,8,16 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -15,6 +15,7 @@ concurrency:
 jobs:
   refresh-history:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,3 +35,4 @@ jobs:
         with:
           commit_message: "chore: refresh AU9999 market history"
           file_pattern: data/market-history.json data/embedded-data.js
+

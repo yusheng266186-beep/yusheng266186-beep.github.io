@@ -1,13 +1,17 @@
 (function () {
   "use strict";
 
+  var Core = window.AurumCore;
+  var portfolioSignature = null;
+  var storageNotice = "";
+  var portfolioReadFailed = false;
   var DATA = window.__AURUM_DATA__ || {};
   var CONFIG_KEY = "aurum-os-config-v5";
   var PORTFOLIO_KEY = "aurum-os-portfolio-v3";
   var DEFAULT_CONFIG = {
     priceProvider: "domestic",
     manualPrice: 0,
-    refreshSeconds: 15,
+    refreshSeconds: 60,
     purity: 1,
     productPremium: 0,
     maxPosition: 15,
@@ -22,15 +26,15 @@
     saveApiKey: false
   };
   var DEFAULT_FACTORS = [
-    { id: "cnDemand", name: "国内实物需求", value: 24, weight: 1.25, note: "节庆、金饰、金条与 ETF 需求" },
-    { id: "cny", name: "人民币强弱", value: 8, weight: 1.15, note: "人民币走弱通常抬高国内克价" },
+    { id: "cnDemand", name: "国内实物需求", value: 0, weight: 1.25, note: "节庆、金饰、金条与 ETF 需求" },
+    { id: "cny", name: "人民币强弱", value: 0, weight: 1.15, note: "人民币走弱通常抬高国内克价" },
     { id: "sgeMomentum", name: "沪金趋势动量", value: 0, weight: 1.35, note: "真实日线与均线结构动态计算" },
     { id: "premium", name: "内外盘溢价", value: 0, weight: 1.05, note: "国内相对国际折算价的偏离" },
-    { id: "centralBanks", name: "央行购金", value: 34, weight: 0.95, note: "中长期结构性需求" },
-    { id: "realRates", name: "海外实际利率", value: -12, weight: 0.85, note: "实际利率上行通常压制金价" },
-    { id: "usd", name: "美元方向", value: -8, weight: 0.72, note: "国际金价的外部定价条件" },
-    { id: "risk", name: "避险情绪", value: 22, weight: 0.92, note: "地缘、金融与流动性风险" },
-    { id: "positioning", name: "市场拥挤度", value: -4, weight: 0.68, note: "过度拥挤会放大回撤" }
+    { id: "centralBanks", name: "央行购金", value: 0, weight: 0.95, note: "中长期结构性需求" },
+    { id: "realRates", name: "海外实际利率", value: 0, weight: 0.85, note: "实际利率上行通常压制金价" },
+    { id: "usd", name: "美元方向", value: 0, weight: 0.72, note: "国际金价的外部定价条件" },
+    { id: "risk", name: "避险情绪", value: 0, weight: 0.92, note: "地缘、金融与流动性风险" },
+    { id: "positioning", name: "市场拥挤度", value: 0, weight: 0.68, note: "过度拥挤会放大回撤" }
   ];
   var SOURCES = [
     {
@@ -62,14 +66,15 @@
   var state = {
     config: loadConfig(),
     portfolio: loadPortfolio(),
-    quote: normalizeQuote(DATA.market || fallbackQuote()),
+    quote: normalizeQuote(Object.assign({}, DATA.market || fallbackQuote(), { dataTier: "snapshot" })),
     history: normalizeHistory(DATA.history),
     news: normalizeNews(DATA.news),
     factors: DEFAULT_FACTORS.map(function (item) { return Object.assign({}, item); }),
     forecasts: [],
     sourceHealth: [],
     refreshing: false,
-    pollRemaining: 15,
+    quoteGeneration: 0,
+    pollRemaining: 60,
     pollTimer: null,
     lastPollAt: null,
     lastPriceChangedAt: null,
@@ -90,31 +95,14 @@
   }
 
   function fallbackQuote() {
-    return {
-      market: "CN-SGE",
-      unit: "CNY/g",
-      primaryContract: "AU9999",
-      priceCnyGram: 895,
-      previousCnyGram: 881.98,
-      openCnyGram: 885,
-      highCnyGram: 895,
-      lowCnyGram: 884,
-      changeCnyGram: 13.02,
-      changePct: 1.48,
-      volume: 0,
-      turnover: 0,
-      asOf: "2026-07-30T14:20:07.000Z",
-      source: "内嵌 AU9999 国内行情快照",
-      sourceUrl: "https://www.sge.com.cn/sjzx/yshqbg",
-      dataTier: "snapshot",
-      contracts: []
-    };
+    return { priceCnyGram: 0, previousCnyGram: 0, asOf: null, source: "暂无有效行情", dataTier: "snapshot", contracts: [] };
   }
 
   function loadConfig() {
     try {
       var saved = JSON.parse(localStorage.getItem(CONFIG_KEY) || "{}");
       var config = Object.assign({}, DEFAULT_CONFIG, saved);
+      config.refreshSeconds = clamp(number(config.refreshSeconds,60),30,3600);
       if (!config.saveApiKey) config.aiApiKey = "";
       if (!["domestic", "manual", "snapshot"].includes(config.priceProvider)) {
         config.priceProvider = "domestic";
@@ -128,62 +116,32 @@
   function saveConfig() {
     var value = Object.assign({}, state.config);
     if (!value.saveApiKey) value.aiApiKey = "";
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(value));
+    try { localStorage.setItem(CONFIG_KEY, JSON.stringify(value)); }
+    catch (error) { showToast("设置仅在本次页面生效", "浏览器无法写入本机存储。", "error"); }
   }
 
   function loadPortfolio() {
-    var fallback = {
-      cash: 100000,
-      grams: 0,
-      avgCost: 0,
-      realized: 0,
-      totalFees: 0,
-      initialCash: 100000,
-      trades: []
-    };
     try {
-      var saved = JSON.parse(localStorage.getItem(PORTFOLIO_KEY) || "{}");
-      return Object.assign(fallback, saved, {
-        trades: Array.isArray(saved.trades) ? saved.trades : []
-      });
-    } catch {
-      return fallback;
+      portfolioSignature = localStorage.getItem(PORTFOLIO_KEY);
+      return portfolioSignature ? Core.validatePortfolio(JSON.parse(portfolioSignature)) : Core.emptyPortfolio();
+    } catch (error) {
+      portfolioReadFailed = true;
+      storageNotice = "本机账户读取失败，原记录未覆盖。请先备份浏览器数据，再恢复有效账户。";
+      return Core.emptyPortfolio();
     }
   }
 
-  function savePortfolio() {
-    localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(state.portfolio));
+  function savePortfolio(next, replaceInvalid) {
+    if (portfolioReadFailed && !replaceInvalid) throw new Error("原账户未通过校验，请先保存原始备份，再恢复或重置账户。");
+    var current = localStorage.getItem(PORTFOLIO_KEY);
+    if (current !== portfolioSignature) throw new Error("另一个页面更新了账户，请刷新后重试。");
+    var serialized = JSON.stringify(next || state.portfolio);
+    localStorage.setItem(PORTFOLIO_KEY, serialized);
+    portfolioSignature = serialized;
+    portfolioReadFailed = false;
   }
 
-  function normalizeQuote(raw) {
-    var base = Object.assign({}, fallbackQuote(), raw || {});
-    var price = number(base.priceCnyGram, number(base.latest, 0));
-    var previous = number(base.previousCnyGram, number(base.previousClose, price));
-    var change = number(base.changeCnyGram, price - previous);
-    var pct = number(base.changePct, previous ? change / previous * 100 : 0);
-    var international = base.internationalReference || {};
-    var internationalCny = number(international.priceCnyGram, NaN);
-    return Object.assign({}, base, {
-      priceCnyGram: price,
-      previousCnyGram: previous,
-      openCnyGram: number(base.openCnyGram, number(base.open, price)),
-      highCnyGram: number(base.highCnyGram, number(base.high, price)),
-      lowCnyGram: number(base.lowCnyGram, number(base.low, price)),
-      changeCnyGram: change,
-      changePct: pct,
-      volume: number(base.volume, 0),
-      turnover: number(base.turnover, 0),
-      asOf: validDate(base.asOf),
-      fetchedAt: validDate(base.fetchedAt || new Date().toISOString()),
-      source: String(base.source || "国内行情快照"),
-      sourceUrl: String(base.sourceUrl || "https://www.sge.com.cn/sjzx/yshqbg"),
-      dataTier: String(base.dataTier || "snapshot"),
-      contracts: Array.isArray(base.contracts) ? base.contracts : [],
-      internationalCnyGram: internationalCny,
-      domesticPremiumPct: Number.isFinite(internationalCny) && internationalCny > 0
-        ? (price / internationalCny - 1) * 100
-        : NaN
-    });
+  function normalizeQuote(raw) { return Core.normalizeQuote(raw);
   }
 
   function normalizeHistory(raw) {
@@ -197,50 +155,17 @@
     };
   }
 
-  function normalizePoints(points) {
-    if (!Array.isArray(points)) return [];
-    return points.map(function (point) {
-      return {
-        time: String(point.time || ""),
-        open: number(point.open, NaN),
-        close: number(point.close, NaN),
-        high: number(point.high, NaN),
-        low: number(point.low, NaN),
-        volume: number(point.volume, 0),
-        turnover: number(point.turnover, 0),
-        changePct: number(point.changePct, 0)
-      };
-    }).filter(function (point) {
-      return point.time && [point.open, point.close, point.high, point.low].every(Number.isFinite);
-    });
+  function normalizePoints(points) { return Core.normalizePoints(points);
   }
 
-  function effectiveDaily() {
-    var points = state.history.daily.slice();
-    if (!points.length || !state.quote || state.quote.priceCnyGram <= 0) return points;
-    var quoteDate = chinaDateKey(state.quote.asOf);
-    var last = points[points.length - 1];
-    var lastDate = String(last.time || "").slice(0, 10);
-    if (quoteDate && quoteDate >= lastDate) {
-      points.push({
-        time: quoteDate + " LIVE",
-        open: state.quote.openCnyGram,
-        close: state.quote.priceCnyGram,
-        high: state.quote.highCnyGram,
-        low: state.quote.lowCnyGram,
-        volume: state.quote.volume,
-        turnover: state.quote.turnover,
-        changePct: state.quote.changePct,
-        live: true
-      });
-    }
-    return points;
+  function effectiveDaily() { return Core.chartHistory(state.history.daily, state.quote);
   }
 
   function normalizeNews(raw) {
     var items = raw && Array.isArray(raw.items) ? raw.items : [];
     return {
       generatedAt: validDate(raw && raw.generatedAt || new Date(0).toISOString()),
+      failedSources: raw && Array.isArray(raw.failedSources) ? raw.failedSources.map(String) : [],
       items: items.map(function (item, index) {
         return {
           id: String(item.id || "news-" + index),
@@ -248,12 +173,12 @@
           title: String(item.title || "未命名消息"),
           summary: String(item.summary || ""),
           url: safeUrl(item.url),
-          publishedAt: validDate(item.publishedAt),
+          publishedAt: Core.timestamp(item.publishedAt),
           impact: ["bullish", "bearish", "mixed", "neutral"].includes(item.impact) ? item.impact : "neutral",
           weight: clamp(number(item.weight, 42), 0, 100),
           category: inferNewsCategory(item)
         };
-      })
+      }).filter(function(item){ return item.publishedAt && Core.ageHours(item.publishedAt) !== Infinity; }).sort(function(a,b){ return Date.parse(b.publishedAt)-Date.parse(a.publishedAt); })
     };
   }
 
@@ -271,13 +196,13 @@
       fetchJson("data/market-history.json?_=" + stamp),
       fetchJson("data/news.json?_=" + stamp)
     ]);
-    if (settled[0].status === "fulfilled") state.quote = normalizeQuote(settled[0].value);
+    if (settled[0].status === "fulfilled") state.quote = normalizeQuote(Object.assign({}, settled[0].value, { dataTier: "snapshot" }));
     if (settled[1].status === "fulfilled") state.history = normalizeHistory(settled[1].value);
     if (settled[2].status === "fulfilled") state.news = normalizeNews(settled[2].value);
   }
 
   async function fetchJson(url) {
-    var response = await fetch(url, { cache: "no-store" });
+    var response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(12000) });
     if (!response.ok) throw new Error("HTTP " + response.status);
     return response.json();
   }
@@ -286,7 +211,8 @@
     options = options || {};
     if (state.refreshing) return;
     state.refreshing = true;
-    state.pollRemaining = Math.max(10, number(state.config.refreshSeconds, 15));
+    var generation = ++state.quoteGeneration;
+    state.pollRemaining = Math.max(30, number(state.config.refreshSeconds, 60));
     $("refreshBtn").classList.add("loading");
     state.sourceHealth = [];
 
@@ -297,12 +223,13 @@
         nextQuote = manualQuote();
         state.sourceHealth.push({ name: "手动校准", ok: true });
       } else if (state.config.priceProvider === "snapshot") {
-        nextQuote = normalizeQuote(DATA.market || state.quote);
+        nextQuote = normalizeQuote(Object.assign({}, DATA.market || state.quote, { dataTier: "snapshot" }));
         nextQuote.fetchedAt = new Date().toISOString();
         state.sourceHealth.push({ name: "本地快照", ok: true });
       } else {
-        nextQuote = await fetchDomesticQuote();
+        nextQuote = await fetchDomesticQuote(generation);
       }
+      if (generation !== state.quoteGeneration) return;
       state.quote = normalizeQuote(nextQuote);
       state.lastPollAt = new Date();
       if (state.lastSeenPrice === null || Math.abs(state.quote.priceCnyGram - state.lastSeenPrice) > 0.0001) {
@@ -316,17 +243,19 @@
         showToast("行情刷新完成", quoteEventText(previousPrice, state.quote.priceCnyGram));
       }
     } catch (error) {
+      if (generation !== state.quoteGeneration) return;
       state.sourceHealth.push({ name: "行情链路", ok: false, error: error.message });
       state.lastPollAt = new Date();
       renderStatus();
       showToast("行情刷新失败", error.message || "已保留上一笔有效行情", "error");
     } finally {
+      if (generation !== state.quoteGeneration) return;
       state.refreshing = false;
       $("refreshBtn").classList.remove("loading");
     }
   }
 
-  async function fetchDomesticQuote() {
+  async function fetchDomesticQuote(generation) {
     var attempts = [
       ["东方财富 AU9999", fetchEastmoneyLiveQuote],
       ["新浪 SGE_AU9999", fetchSinaLiveQuote],
@@ -336,10 +265,15 @@
     for (var index = 0; index < attempts.length; index += 1) {
       try {
         var result = await attempts[index][1]();
-        if (index < 2) result = validateBrowserQuote(result);
+        if (index < 2) {
+          result = validateBrowserQuote(result);
+          if (Core.ageHours(result.asOf) > 36) throw new Error("行情时间过期或无效");
+        }
+        if (generation !== state.quoteGeneration) throw new Error("行情设置已改变");
         state.sourceHealth.push({ name: attempts[index][0], ok: true });
         return result;
       } catch (error) {
+        if (generation !== state.quoteGeneration) throw error;
         errors.push(attempts[index][0] + ": " + error.message);
         state.sourceHealth.push({ name: attempts[index][0], ok: false, error: error.message });
       }
@@ -357,20 +291,15 @@
   }
 
   function validateBrowserQuote(quote) {
-    var baseline = normalizeQuote(DATA.market || {});
-    if (!baseline.priceCnyGram || quoteAgeHours(baseline.asOf) > 36) return quote;
-    var official = baseline.validation && number(baseline.validation.officialPriceCnyGram, NaN);
-    var reference = Number.isFinite(official) ? official : baseline.priceCnyGram;
-    var differencePct = reference ? (quote.priceCnyGram / reference - 1) * 100 : 0;
-    if (Math.abs(differencePct) > 2.5) {
-      throw new Error("与官方校验快照偏差 " + differencePct.toFixed(2) + "%");
-    }
-    quote.validation = {
-      source: "上金所官方校验快照",
-      officialPriceCnyGram: reference,
-      differencePct: differencePct,
-      checkedAt: baseline.validation && baseline.validation.checkedAt || baseline.fetchedAt
-    };
+    if (!(quote.priceCnyGram > 0) || !Core.timestamp(quote.asOf) || Core.ageHours(quote.asOf) === Infinity) throw new Error("报价或时间无效");
+    var baseline = DATA.market || {}, check = baseline.validation;
+    if (!check || Core.ageHours(check.checkedAt) > 12 || Core.ageHours(baseline.asOf) > 12) return quote;
+    if (Math.abs(Date.parse(quote.asOf) - Date.parse(baseline.asOf)) > 8 * 3600000) return quote;
+    var official = Core.numeric(check.officialPriceCnyGram);
+    if (!(official > 0)) return quote;
+    var difference = (quote.priceCnyGram / official - 1) * 100;
+    if (Math.abs(difference) > 2.5) throw new Error("与同时间窗口官方校验价偏差较大");
+    quote.validation = Object.assign({}, check, { differencePct: difference });
     return quote;
   }
 
@@ -497,6 +426,7 @@
       delay: meta.delay,
       dataTier: "domestic-live",
       contracts: contracts,
+      usdCny: state.quote.usdCny, fxAsOf: state.quote.fxAsOf,
       internationalReference: state.quote.internationalReference || DATA.market && DATA.market.internationalReference
     };
   }
@@ -506,6 +436,7 @@
     var raw = await fetchJson("data/market-snapshot.json?_=" + Date.now());
     var quote = normalizeQuote(raw);
     quote.fetchedAt = new Date().toISOString();
+    quote.dataTier = "snapshot";
     return quote;
   }
 
@@ -597,13 +528,13 @@
 
   function eastmoneyTime(value) {
     var seconds = Number(value);
-    if (!Number.isFinite(seconds) || seconds <= 0) return new Date().toISOString();
+    if (!Number.isFinite(seconds) || seconds <= 0) return null;
     return new Date(seconds * 1000).toISOString();
   }
 
   function sinaTime(value) {
     var match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
-    if (!match) return new Date().toISOString();
+    if (!match) return null;
     return new Date(
       match[1] + "-" + match[2] + "-" + match[3] + "T" +
       match[4] + ":" + match[5] + ":" + match[6] + "+08:00"
@@ -615,7 +546,7 @@
   }
 
   function syncDynamicFactors() {
-    var history = effectiveDaily();
+    var history = state.history.daily;
     if (history.length >= 21) {
       var last = history[history.length - 1].close;
       var prior = history[Math.max(0, history.length - 21)].close;
@@ -641,67 +572,23 @@
   }
 
   function buildForecasts() {
-    var price = state.quote.priceCnyGram;
-    var score = factorScore();
-    var vol = Math.max(0.006, dailyVolatility());
-    var horizons = [
-      { label: "1 周", days: 7 },
-      { label: "1 个月", days: 30 },
-      { label: "6 个月", days: 180 },
-      { label: "1 年", days: 365 },
-      { label: "3 年", days: 1095 }
-    ];
-    var annualDrift = clamp(score / 100 * 0.18 + historyMomentum(60) * 0.32, -0.2, 0.24);
-    state.forecasts = horizons.map(function (horizon, index) {
-      var years = horizon.days / 365;
-      var center = price * Math.exp(annualDrift * years);
-      var uncertainty = clamp(vol * Math.sqrt(Math.min(horizon.days, 500)) * (1.45 + index * 0.09), 0.025, 0.42);
-      var confidence = clamp(
-        80 - index * 4 - uncertainty * 28 - (quoteAgeHours(state.quote.asOf) > 12 ? 8 : 0),
-        46,
-        82
-      );
-      return {
-        label: horizon.label,
-        days: horizon.days,
-        center: center,
-        low: center * (1 - uncertainty),
-        high: center * (1 + uncertainty),
-        confidence: confidence,
-        stance: center > price * 1.025 ? "偏强" : center < price * 0.975 ? "偏弱" : "震荡"
-      };
-    });
+    state.scenarioModel = Core.scenarioModel(state.quote.priceCnyGram, state.history.daily, factorScore());
+    state.forecasts = state.scenarioModel.points;
   }
 
-  function dailyVolatility() {
-    var points = effectiveDaily().slice(-90);
-    if (points.length < 10) return 0.012;
-    var returns = [];
-    for (var index = 1; index < points.length; index += 1) {
-      if (points[index - 1].close > 0) {
-        returns.push(Math.log(points[index].close / points[index - 1].close));
-      }
-    }
-    var mean = average(returns);
-    var variance = average(returns.map(function (value) { return Math.pow(value - mean, 2); }));
-    return Math.sqrt(variance);
+  function dailyVolatility() { return Core.volatility(state.history.daily);
   }
 
   function annualVolatility() {
     return dailyVolatility() * Math.sqrt(252) * 100;
   }
 
-  function historyMomentum(days) {
-    var points = effectiveDaily();
-    if (points.length < 2) return 0;
-    var end = points[points.length - 1].close;
-    var start = points[Math.max(0, points.length - 1 - days)].close;
-    return start > 0 ? end / start - 1 : 0;
+  function historyMomentum(days) { return Core.momentum(state.history.daily, days);
   }
 
   function computeRsi(days) {
-    var points = effectiveDaily().slice(-(days + 1));
-    if (points.length < 2) return 50;
+    var points = state.history.daily.slice(-(days + 1));
+    if (points.length < days + 1) return NaN;
     var gains = 0;
     var losses = 0;
     for (var index = 1; index < points.length; index += 1) {
@@ -709,26 +596,12 @@
       if (change >= 0) gains += change;
       else losses -= change;
     }
-    if (losses === 0) return 100;
+    if (losses === 0) return gains === 0 ? 50 : 100;
     var relativeStrength = (gains / days) / (losses / days);
     return 100 - 100 / (1 + relativeStrength);
   }
 
-  function portfolioStats() {
-    var portfolio = state.portfolio;
-    var marketValue = portfolio.grams * state.quote.priceCnyGram;
-    var unrealized = portfolio.grams * (state.quote.priceCnyGram - portfolio.avgCost);
-    var equity = portfolio.cash + marketValue;
-    var investedCost = portfolio.grams * portfolio.avgCost;
-    return {
-      marketValue: marketValue,
-      unrealized: unrealized,
-      equity: equity,
-      investedCost: investedCost,
-      pnlPct: investedCost ? unrealized / investedCost * 100 : 0,
-      totalReturn: equity - portfolio.initialCash,
-      allocation: equity > 0 ? marketValue / equity * 100 : 0
-    };
+  function portfolioStats() { return Core.portfolioStats(state.portfolio, state.quote.priceCnyGram);
   }
 
   function executionPrice(side) {
@@ -741,14 +614,9 @@
   }
 
   function riskScore() {
-    var stats = portfolioStats();
-    var volatility = clamp((annualVolatility() - 8) * 1.55, 0, 45);
-    var concentration = clamp(stats.allocation * 0.45, 0, 35);
-    var stale = quoteAgeHours(state.quote.asOf) > 24 ? 18 : quoteAgeHours(state.quote.asOf) > 2 ? 7 : 0;
-    var premium = Number.isFinite(state.quote.domesticPremiumPct)
-      ? clamp(Math.abs(state.quote.domesticPremiumPct) * 1.4, 0, 18)
-      : 4;
-    return Math.round(clamp(10 + volatility + concentration + stale + premium, 5, 96));
+    var stats = portfolioStats(), vol = annualVolatility();
+    var volatility = Number.isFinite(vol) ? clamp((vol - 8) * 1.55, 0, 45) : 18;
+    return Math.round(clamp(10 + volatility + clamp(stats.allocation * .45, 0, 35) + (Core.quoteState(state.quote).stale ? 18 : 0), 5, 96));
   }
 
   function renderAll(options) {
@@ -769,34 +637,19 @@
   }
 
   function renderStatus() {
-    var session = marketSession(new Date());
-    $("sessionLabel").textContent = session.label;
-    $("sessionDetail").textContent = session.detail;
-    $("liveBeacon").className = "live-beacon " + (session.open ? "open" : "closed");
-    $("quoteClock").textContent = formatTime(state.quote.asOf);
-    $("sideSource").textContent = shortSource(state.quote.source);
-    $("sideHealth").textContent = sourceHealthText();
-
-    var age = quoteAgeHours(state.quote.asOf);
+    var session = marketSession(new Date()), quality = Core.quoteState(state.quote);
+    setText("sessionLabel", session.label); setText("sessionDetail", "常规时段估计 · 节假日以交易所公告为准");
+    $("liveBeacon").className = "live-beacon " + (quality.key === "live" ? "open" : "closed");
+    setText("quoteClock", state.quote.asOf ? formatDateTime(state.quote.asOf) : "时间未知");
+    setText("sideSource", shortSource(state.quote.source)); setText("sideHealth", sourceHealthText());
     var banner = $("statusBanner");
-    var bannerText = $("statusBannerText");
-    if (state.refreshing) {
-      banner.classList.remove("hidden");
-      bannerText.textContent = "正在轮询国内 AU9999 多源行情";
-    } else if (age > 24) {
-      banner.classList.remove("hidden");
-      bannerText.textContent = "行情快照已超过 24 小时，请手动刷新或检查 GitHub Actions 数据任务";
-    } else if (state.quote.dataTier === "snapshot" && age > 1) {
-      banner.classList.remove("hidden");
-      bannerText.textContent = "当前为部署快照或延时行情，页面功能正常，但不应视作逐笔实时成交";
-    } else {
-      banner.classList.add("hidden");
-    }
-    $("pollLabel").textContent = state.refreshing
-      ? "正在刷新"
-      : "下次轮询 " + Math.ceil(state.pollRemaining) + "s";
-    var interval = Math.max(10, number(state.config.refreshSeconds, 15));
-    $("pollProgress").style.transform = "scaleX(" + clamp(state.pollRemaining / interval, 0, 1) + ")";
+    banner.classList.toggle("hidden", !quality.stale && !state.refreshing && quality.key === "live");
+    setText("statusBannerText", quality.stale
+      ? (state.quote.asOf ? "数据截至 " + formatDateTime(state.quote.asOf) + "，已过去 " + ageText(state.quote.asOf) + "。当前仅供历史观察。" : "尚无可核实的报价时点，请检查数据来源。")
+      : state.refreshing ? "正在核对公开行情；报价时间决定数据是否更新。" : "当前为延时行情或部署快照，报价时点见上方。");
+    setText("pollLabel", state.refreshing ? "正在刷新" : "下次核对 " + Math.ceil(state.pollRemaining) + "s");
+    $("pollProgress").style.transform = "scaleX(" + clamp(state.pollRemaining / Math.max(30, state.config.refreshSeconds), 0, 1) + ")";
+    setText("practiceContext", quality.label + (state.quote.asOf ? " · " + formatDateTime(state.quote.asOf) : ""));
   }
 
   function renderQuote(options) {
@@ -823,39 +676,16 @@
     $("lastChanged").textContent = state.lastPriceChangedAt
       ? relativeTime(state.lastPriceChangedAt)
       : "行情 " + formatDateTime(quote.asOf);
-    $("trustBadge").innerHTML =
-      '<svg><use href="#i-shield"></use></svg><span>' +
-      escapeHtml(
-        quote.validation
-          ? "上金所官方已交叉校验"
-          : quote.dataTier === "domestic-live"
-            ? "国内行情已连接"
-            : "已启用可信回退"
-      ) +
-      "</span>";
+    var quality = Core.quoteState(quote);
+    $("trustBadge").innerHTML = '<svg><use href="#i-clock"></use></svg><span>' + escapeHtml(quality.label) + '</span>';
+    $("priceEvent").textContent = quality.stale ? "保留原报价时点" : quoteEventText(options.previousPrice, quote.priceCnyGram);
+    $("lastChanged").textContent = quote.asOf ? formatDateTime(quote.asOf) : "时间未知";
   }
 
   function animatePrice(element, from, to, enabled) {
     cancelAnimationFrame(element.__animationFrame);
-    if (!enabled || !Number.isFinite(from) || Math.abs(to - from) < 0.001) {
-      element.textContent = toFixedPrice(to);
-      return;
-    }
-    var start = performance.now();
-    var duration = 560;
-    var className = to > from ? "tick-up" : "tick-down";
-    element.classList.add(className);
-    function step(now) {
-      var progress = clamp((now - start) / duration, 0, 1);
-      var eased = 1 - Math.pow(1 - progress, 3);
-      element.textContent = toFixedPrice(from + (to - from) * eased);
-      if (progress < 1) {
-        element.__animationFrame = requestAnimationFrame(step);
-      } else {
-        setTimeout(function () { element.classList.remove(className); }, 260);
-      }
-    }
-    element.__animationFrame = requestAnimationFrame(step);
+    element.textContent = to > 0 ? toFixedPrice(to) : "—";
+    if (enabled && Number.isFinite(from) && Math.abs(to-from) > .001) window.AurumUI.animate(element,[{opacity:.4,transform:"translateY(3px)"},{opacity:1,transform:"translateY(0)"}],240);
   }
 
   function renderTicker() {
@@ -870,7 +700,7 @@
       ["国际折算", Number.isFinite(quote.internationalCnyGram) ? toFixedPrice(quote.internationalCnyGram) : "--", "仅对照", ""],
       ["国内溢价", Number.isFinite(quote.domesticPremiumPct) ? signedPercent(quote.domesticPremiumPct) : "--", "vs 国际折算", directionClass(quote.domesticPremiumPct)]
     ];
-    var html = items.concat(items).map(function (item) {
+    var html = items.map(function (item) {
       return '<span class="ticker-item ' + item[3] + '"><i></i><span>' +
         escapeHtml(item[0]) + '</span><b>' + escapeHtml(item[1]) +
         '</b><strong>' + escapeHtml(item[2]) + "</strong></span>";
@@ -906,11 +736,12 @@
       "premiumValue",
       Number.isFinite(quote.domesticPremiumPct) ? signedPercent(quote.domesticPremiumPct) : "暂无对照"
     );
-    setText("pulseLegend", state.history.intraday.length > 5 ? "AU9999 5 分钟线" : "AU9999 日内区间轮廓");
+    $("sparkCanvas").setAttribute("aria-label", state.history.intraday.length > 5 ? "有效五分钟行情" : "最近二十个交易日的真实收盘价");
+    setText("pulseLegend", state.history.intraday.length > 5 ? "5 分钟线 · 截至 " + state.history.intraday[state.history.intraday.length - 1].time : state.history.daily.length > 5 ? "近 20 个交易日收盘 · 截至 " + state.history.daily[state.history.daily.length - 1].time : "暂无有效短周期数据");
   }
 
   function renderHistoryMetrics() {
-    var effective = effectiveDaily();
+    var effective = state.history.daily;
     var return20 = historyMomentum(20) * 100;
     var return60 = historyMomentum(60) * 100;
     var rsi = computeRsi(14);
@@ -926,7 +757,7 @@
     var trend = last > ma20 && ma20 > ma60 ? "多头排列" : last < ma20 && ma20 < ma60 ? "空头排列" : "区间整理";
     setText("trendState", trend);
     setText("historyQuality", state.history.daily.length
-      ? state.history.source + " · " + state.history.daily.length + " 个官方日线点 + 当前盘中价"
+      ? state.history.source + " · " + state.history.daily.length + " 个日线点 · 截至 " + state.history.daily[state.history.daily.length - 1].time
       : "历史快照不可用，未绘制伪造历史");
 
     var score = Math.round(clamp(return20 * 3.4 + (last > ma20 ? 16 : -12), -100, 100));
@@ -939,64 +770,42 @@
     var premiumScore = Number.isFinite(premium) ? Math.round(clamp(-premium * 8, -100, 100)) : 0;
     setText("premiumSignal", Number.isFinite(premium)
       ? (premium >= 0 ? "国内溢价 " : "国内折价 ") + Math.abs(premium).toFixed(2) + "%"
-      : "暂无国际折算");
-    setText("premiumExplain", Number.isFinite(premium) && Math.abs(premium) > 4 ? "偏离较大，注意回归风险" : "价差仅作对照，不生成国内主价");
-    setText("premiumScore", signedNumber(premiumScore));
+      : "暂不作跨时点比较");
+    setText("premiumExplain", Number.isFinite(premium) && Math.abs(premium) > 4 ? "偏离较大，注意回归风险" : state.quote.premiumNote);
+    setText("premiumScore", Number.isFinite(premium) ? signedNumber(premiumScore) : "—");
     $("premiumScore").className = "signal-score " + (premiumScore >= 0 ? "up-text" : "down-text");
 
     var risk = riskScore();
     setText("riskSignal", risk < 38 ? "风险偏低" : risk < 66 ? "风险中等" : "风险偏高");
-    setText("riskExplain", "综合波动、数据年龄、价差与账户仓位");
+    setText("riskExplain", "规则评分：波动、数据年龄与模拟仓位");
     setText("riskScore", risk + "/100");
     $("riskScore").className = "signal-score " + (risk < 45 ? "up-text" : risk > 65 ? "down-text" : "");
   }
 
   function renderForecasts() {
-    if (!state.forecasts.length) buildForecasts();
-    $("forecastCards").innerHTML = state.forecasts.map(function (forecast, index) {
-      return '<article class="forecast-card" style="--confidence:' +
-        (forecast.confidence / 100).toFixed(2) + ";animation-delay:" + index * 55 + 'ms">' +
-        '<div class="forecast-top"><span>' + escapeHtml(forecast.label) +
-        '</span><b>' + escapeHtml(forecast.stance) + '</b></div>' +
-        '<strong>' + toFixedPrice(forecast.center) + ' 元/g</strong>' +
-        '<p>' + toFixedPrice(forecast.low) + " - " + toFixedPrice(forecast.high) + '</p>' +
-        '<small>模型置信 ' + forecast.confidence.toFixed(0) + "% · 概率区间</small>" +
-        "</article>";
-    }).join("");
-
-    var score = factorScore();
-    var probabilities = scenarioProbabilities(score);
-    setText("bullProbability", probabilities.bull + "%");
-    setText("baseProbability", probabilities.base + "%");
-    setText("bearProbability", probabilities.bear + "%");
-    setText("factorTotal", signedNumber(Math.round(score)));
-    var oneMonth = state.forecasts[1] || state.forecasts[0];
-    var stance = score > 20 ? "偏强，等待回撤分批" : score < -20 ? "偏弱，优先控制仓位" : "震荡，执行网格与纪律";
-    setText("stanceTitle", stance);
-    setText("stanceSummary", forecastSummary(oneMonth, score));
-    var confidence = Math.round(average(state.forecasts.slice(0, 3).map(function (item) {
-      return item.confidence;
-    })));
-    $("confidenceRing").querySelector("b").textContent = confidence + "%";
-    $("actionList").innerHTML = strategyActions().map(function (action) {
-      return "<li>" + escapeHtml(action) + "</li>";
-    }).join("");
+    $("forecastCards").innerHTML = state.forecasts.length ? state.forecasts.map(function (f) {
+      return '<article class="forecast-card"><div class="forecast-top"><span>' + f.label + '</span><b>' + f.stance + '</b></div><strong>' + toFixedPrice(f.center) + '<small>元/克</small></strong><p>' + toFixedPrice(f.low) + ' — ' + toFixedPrice(f.high) + '</p><small>波动情景带 · 未经校准</small></article>';
+    }).join("") : '<div class="panel">有效日线不足 30 个，暂不推演情景。</div>';
+    setText("bullProbability", "上界"); setText("baseProbability", "路径"); setText("bearProbability", "下界");
+    var score = factorScore(); setText("factorTotal", signedNumber(Math.round(score)));
+    setText("stanceTitle", score > 20 ? "偏强假设，观察条件变化" : score < -20 ? "偏弱假设，关注承受范围" : "保持中性，比较不同路径");
+    setText("stanceSummary", state.forecasts.length ? forecastSummary(state.forecasts[1], score) : "补齐有效历史与报价后再作推演。");
+    $("confidenceRing").querySelector("b").textContent = "未校准";
+    $("actionList").innerHTML = strategyActions().map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("");
+    $("useStrategyBtn").disabled = !state.forecasts.length;
   }
 
   function forecastSummary(forecast, score) {
-    var direction = score > 15 ? "国内趋势与需求因子占优" : score < -15 ? "外部压力和技术动量偏弱" : "多空因子尚未形成一致方向";
-    return direction + "；1 个月基准中枢 " + money(forecast.center) +
-      "，概率区间 " + money(forecast.low) + " 至 " + money(forecast.high) + "。";
+    return "在当前假设下，1 个月基准路径为 " + money(forecast.center) + "，波动情景带为 " + money(forecast.low) + " 至 " + money(forecast.high) + "。它不代表命中概率。";
   }
 
   function strategyActions() {
-    var forecast = state.forecasts[1] || { low: state.quote.priceCnyGram * 0.96, high: state.quote.priceCnyGram * 1.04 };
-    var maxOrder = portfolioStats().equity * state.config.maxPosition / 100;
+    var quality = Core.quoteState(state.quote);
     return [
-      "首次试仓不超过总权益的 " + state.config.maxPosition + "%，约 " + cny(maxOrder) + "。",
-      "回落至 " + money((forecast.low + state.quote.priceCnyGram) / 2) + " 附近再分批，不追逐单次脉冲。",
-      "持仓后以 " + state.config.stopLoss + "% 为止损参考、" + state.config.takeProfit + "% 为止盈参考。",
-      "若行情源转为陈旧快照，暂停新增仓位，只保留观察和复盘。"
+      quality.stale ? "先核实报价时间；当前是历史输入，情景也以该时点为起点。" : "先核对来源与报价时点，再比较趋势和波动。",
+      "改变一项因子，观察各周期区间怎样变化；宏观因子默认中性。",
+      "模拟单笔上限设为权益的 " + state.config.maxPosition + "%，费用、价差与仓位一并计算。",
+      "记录假设与复盘条件；止损 " + state.config.stopLoss + "% 与止盈 " + state.config.takeProfit + "% 是自设提醒，不会自动成交。"
     ];
   }
 
@@ -1006,7 +815,7 @@
         escapeHtml(factor.name) + '</label><output id="out-' + factor.id + '">' +
         signedNumber(factor.value) + '</output></div><input id="factor-' + factor.id +
         '" type="range" min="-100" max="100" step="1" value="' + factor.value +
-        '" data-factor="' + factor.id + '"><small>' + escapeHtml(factor.note) + "</small></div>";
+        '" data-factor="' + factor.id + '"><small>' + escapeHtml((factor.id === "sgeMomentum" ? "历史计算 · " : factor.id === "premium" ? "有效同窗参考 / 可调整 · " : "手动假设 · ") + factor.note) + "</small></div>";
     }).join("");
     document.querySelectorAll("[data-factor]").forEach(function (input) {
       input.addEventListener("input", function () {
@@ -1046,122 +855,49 @@
     setText("maxOrderValue", cny(stats.equity * state.config.maxPosition / 100));
     setText("stopPrice", portfolio.avgCost ? money(portfolio.avgCost * (1 - state.config.stopLoss / 100)) : "--");
     setText("takePrice", portfolio.avgCost ? money(portfolio.avgCost * (1 + state.config.takeProfit / 100)) : "--");
-    setText("breakEvenPrice", portfolio.avgCost ? money(portfolio.avgCost) : "--");
+    var sellRatio = state.quote.priceCnyGram ? executionPrice("sell") / state.quote.priceCnyGram : 0;
+    var netRatio = sellRatio * (1 - Math.max(0, number($("feeRate").value,0))/100);
+    setText("breakEvenPrice", portfolio.avgCost && netRatio > 0 ? money(portfolio.avgCost / netRatio) : "--");
     setText("tradeCount", portfolio.trades.length + " 笔成交");
 
-    $("tradeRows").innerHTML = portfolio.trades.length
-      ? portfolio.trades.map(function (trade) {
-        return "<tr><td>" + escapeHtml(formatDateTime(trade.createdAt)) +
-          '</td><td><span class="trade-side ' + trade.side + '">' +
-          (trade.side === "buy" ? "买入" : "卖出") + "</span></td><td>" +
-          number(trade.grams, 0).toFixed(2) + " g</td><td>" +
-          money(number(trade.price, 0)) + "</td><td>" + cny(number(trade.fee, 0)) +
-          "</td><td>" + cny(number(trade.value, 0)) + "</td><td>" +
-          escapeHtml(trade.note || "-") + "</td></tr>";
-      }).join("")
-      : '<tr class="empty-row"><td colspan="7">暂无模拟成交。可以先用 1g 或 5g 测试完整交易流程。</td></tr>';
+    $("tradeRows").innerHTML = portfolio.trades.length ? portfolio.trades.slice(0,200).map(function(t) {
+      var mode=t.dataMode === "historical-practice" ? "历史练习" : t.dataMode === "manual" ? "假设价格" : t.dataMode ? "行情练习" : "旧版记录";
+      return "<tr><td>"+escapeHtml(formatDateTime(t.createdAt))+"</td><td><span class='trade-side "+t.side+"'>"+(t.side==="buy"?"买入":"卖出")+"</span></td><td>"+number(t.grams,0).toFixed(2)+"g</td><td>"+money(t.price)+"</td><td>"+cnyPrecise(t.fee)+"</td><td>"+cnyPrecise(t.value)+"</td><td>"+escapeHtml(t.note||"—")+"</td><td>"+escapeHtml(t.quoteAsOf?formatDateTime(t.quoteAsOf):"旧版未记录")+"</td><td>"+mode+"</td></tr>";
+    }).join("") : '<tr class="empty-row"><td colspan="9">暂无模拟成交。可以先用 1g 或 5g 测试完整交易流程。</td></tr>';
+    if(portfolio.trades.length>200)setText("tradeCount",portfolio.trades.length+" 笔成交 · 展示最近 200 笔，导出保留全部");
   }
 
   function renderOrderPreview() {
-    var grams = Math.max(0, number($("tradeGrams").value, 0));
-    var rate = Math.max(0, number($("feeRate").value, 0)) / 100;
-    var price = executionPrice(state.tradeSide);
-    var value = grams * price;
-    var fee = value * rate;
-    var stats = portfolioStats();
-    var projectedMarket = state.tradeSide === "buy"
-      ? stats.marketValue + value
-      : Math.max(0, stats.marketValue - value);
-    var projectedEquity = Math.max(1, stats.equity - fee);
-    var projectedAllocation = projectedMarket / projectedEquity * 100;
-    setText("ticketPrice", money(price));
-    setText("executionPrice", money(price));
-    setText("estimatedFee", cnyPrecise(fee));
-    setText("orderValue", cny(value + fee));
-    setText("postPosition", projectedAllocation.toFixed(1) + "%");
-    setText("tradeButtonAmount", cny(value + fee));
-    var checks = orderRiskChecks(grams, value + fee);
-    $("riskChecks").innerHTML = checks.map(function (check) {
-      return '<div class="risk-check ' + (check.ok ? "" : "fail") +
-        '"><span><i></i> ' + escapeHtml(check.label) +
-        "</span><b>" + escapeHtml(check.value) + "</b></div>";
-    }).join("");
+    var o = currentOrder();
+    $("orderValue").previousElementSibling.textContent = state.tradeSide === "buy" ? "预计支付" : "预计净收款";
+    setText("ticketPrice", money(o.price)); setText("executionPrice", money(o.price));
+    setText("estimatedFee", cnyPrecise(o.fee)); setText("orderValue", cnyPrecise(o.total));
+    setText("postPosition", o.valid && Number.isFinite(o.projectedAllocation) ? o.projectedAllocation.toFixed(1) + "%" : "--");
+    setText("tradeButtonAmount", cnyPrecise(o.total));
+    $("riskChecks").innerHTML = o.checks.map(function (c) { return '<div class="risk-check ' + (c.ok ? '' : 'fail') + '"><span><i></i> ' + escapeHtml(c.label) + '</span><b>' + escapeHtml(c.value) + '</b></div>'; }).join("");
+    $("tradeBtn").disabled = !o.valid;
+    setText("tradeError", o.valid ? (o.historical ? "历史价格练习；成交将保留原报价时点。" : "") : (o.checks.find(function(c) { return !c.ok; }).label + "：" + o.checks.find(function(c) { return !c.ok; }).value));
   }
 
-  function orderRiskChecks(grams, total) {
-    var stats = portfolioStats();
-    var maxOrder = stats.equity * state.config.maxPosition / 100;
-    return [
-      {
-        ok: grams > 0,
-        label: "克数校验",
-        value: grams > 0 ? grams.toFixed(2) + "g" : "无效"
-      },
-      {
-        ok: state.tradeSide === "sell" || total <= maxOrder,
-        label: "单笔仓位上限",
-        value: cny(maxOrder)
-      },
-      {
-        ok: state.tradeSide === "buy" ? total <= state.portfolio.cash : grams <= state.portfolio.grams,
-        label: state.tradeSide === "buy" ? "可用现金" : "可卖持仓",
-        value: state.tradeSide === "buy" ? cny(state.portfolio.cash) : state.portfolio.grams.toFixed(2) + "g"
-      }
-    ];
+  function orderInput() {
+    return { side: state.tradeSide, grams: $("tradeGrams").value, feePct: $("feeRate").value, spreadPct: $("tradeSpread").value, note: $("tradeNote").value, historical: $("historicalPractice").checked };
+  }
+
+  function currentOrder() {
+    return Core.order(state.portfolio, state.quote, state.config, orderInput());
+  }
+
+  function orderRiskChecks() { return currentOrder().checks;
   }
 
   function executeTrade() {
-    var grams = number($("tradeGrams").value, 0);
-    var feeRate = Math.max(0, number($("feeRate").value, 0)) / 100;
-    var note = $("tradeNote").value.trim();
-    var price = executionPrice(state.tradeSide);
-    var value = grams * price;
-    var fee = value * feeRate;
-    var total = value + fee;
-    var checks = orderRiskChecks(grams, total);
-    var failed = checks.find(function (check) { return !check.ok; });
-    if (failed) {
-      $("tradeError").textContent = failed.label + "未通过，请调整订单。";
-      return;
-    }
-    var portfolio = state.portfolio;
-    if (state.tradeSide === "buy") {
-      var previousCost = portfolio.grams * portfolio.avgCost;
-      var nextGrams = portfolio.grams + grams;
-      portfolio.cash -= total;
-      portfolio.grams = nextGrams;
-      portfolio.avgCost = (previousCost + total) / nextGrams;
-    } else {
-      portfolio.cash += value - fee;
-      portfolio.realized += (price - portfolio.avgCost) * grams - fee;
-      portfolio.grams -= grams;
-      if (portfolio.grams <= 0.000001) {
-        portfolio.grams = 0;
-        portfolio.avgCost = 0;
-      }
-    }
-    portfolio.totalFees += fee;
-    portfolio.trades.unshift({
-      id: Date.now() + "-" + Math.random().toString(36).slice(2),
-      side: state.tradeSide,
-      grams: grams,
-      price: price,
-      value: value,
-      fee: fee,
-      note: note,
-      createdAt: new Date().toISOString()
-    });
-    portfolio.trades = portfolio.trades.slice(0, 200);
-    savePortfolio();
-    $("tradeNote").value = "";
-    $("tradeError").textContent = "";
-    renderPortfolio();
-    renderOrderPreview();
-    renderHistoryMetrics();
-    renderDecisionContext();
-    drawAllocationChart();
-    showToast("模拟订单已成交", (state.tradeSide === "buy" ? "买入 " : "卖出 ") +
-      grams.toFixed(2) + "g · " + money(price));
+    try {
+      var next = Core.execute(state.portfolio, state.quote, state.config, orderInput());
+      savePortfolio(next); state.portfolio = next;
+      $("tradeNote").value = "";
+      renderPortfolio(); renderOrderPreview(); renderHistoryMetrics(); renderDecisionContext(); drawAllocationChart();
+      showToast("练习已记录", "成交、费用与报价时点已保存到本机。");
+    } catch (error) { setText("tradeError", error.message); showToast("订单未保存", error.message, "error"); }
   }
 
   function renderIntelligence() {
@@ -1171,7 +907,7 @@
       if (state.newsFilter === "high") return item.weight >= 60;
       return item.category === state.newsFilter;
     }).slice(0, 14);
-    $("newsFreshness").textContent = "快照 " + relativeTime(new Date(state.news.generatedAt));
+    $("newsFreshness").textContent = "官方资讯截至 " + (state.news.items.length ? formatDateTime(state.news.items[0].publishedAt) : "暂无有效条目") + (state.news.failedSources.length ? " · 部分源暂不可用" : "");
     $("newsList").innerHTML = filtered.length
       ? filtered.map(renderNewsItem).join("")
       : '<div class="empty-row">当前筛选下没有高相关消息。</div>';
@@ -1186,11 +922,7 @@
 
   function mergedNews() {
     var generated = marketObservationNews();
-    var relevant = state.news.items.filter(function (item) {
-      var text = (item.title + " " + item.summary).toLowerCase();
-      return item.category === "domestic" ||
-        /fomc|monetary|interest rate|inflation|cpi|ppi|gold|treasury|dollar|federal funds|economic projection|黄金|人民币|外汇|利率|通胀/.test(text);
-    });
+    var relevant = state.news.items;
     var seen = new Set();
     return generated.concat(relevant).filter(function (item) {
       var key = item.url + "|" + item.title;
@@ -1210,7 +942,7 @@
       {
         id: "market-au9999",
         source: "AURUM 盘面解析",
-        title: "AU9999 当前 " + money(quote.priceCnyGram) + "，日内振幅 " +
+        title: "AU9999 报价记录 " + money(quote.priceCnyGram) + "，日内振幅 " +
           ((quote.highCnyGram - quote.lowCnyGram) / quote.previousCnyGram * 100).toFixed(2) + "%",
         summary: "依据国内公开行情生成的结构化盘面观察，不是交易所公告。",
         url: quote.sourceUrl,
@@ -1243,25 +975,26 @@
         weight: 66,
         category: "domestic"
       }
-    ];
+    ].filter(function (item) { return item.publishedAt && Core.ageHours(item.publishedAt) !== Infinity; });
   }
 
   function renderNewsItem(item) {
     var time = new Date(item.publishedAt);
     var label = {
-      bullish: "利多",
-      bearish: "利空",
-      mixed: "双向",
+      bullish: "规则偏多",
+      bearish: "规则偏空",
+      mixed: "待核实",
       neutral: "中性"
     }[item.impact] || "中性";
     return '<a class="news-item" href="' + safeUrl(item.url) +
       '" target="_blank" rel="noreferrer"><time>' + escapeHtml(formatShortDate(time)) +
       "</time><div><strong>" + escapeHtml(item.title) + "</strong><p>" +
-      escapeHtml(item.summary) + "</p></div><span class=\"news-meta\"><b class=\"impact-tag " +
+      escapeHtml(item.source + " · " + item.summary) + "</p></div><span class=\"news-meta\"><b class=\"impact-tag " +
       item.impact + '">' + label + "</b><svg><use href=\"#i-external\"></use></svg></span></a>";
   }
 
   function renderImpactMap(items) {
+    items = items.filter(function(item){ return Core.ageHours(item.publishedAt) <= 14 * 24; });
     var score = items.reduce(function (sum, item) {
       var direction = item.impact === "bullish" ? 1 : item.impact === "bearish" ? -1 : 0;
       return sum + direction * item.weight;
@@ -1325,23 +1058,24 @@
 
   function renderLocalAdvice() {
     state.aiReportMode = "local";
-    var forecast = state.forecasts[1] || { low: 0, high: 0, center: 0 };
+    if (!state.forecasts.length) { $("aiHeadline").textContent="有效输入不足"; $("aiOutput").innerHTML="<h3>先补齐研究依据</h3><p>需要有效报价和至少 30 个日线点，才能生成情景摘要。</p>"; return; }
+    var forecast = state.forecasts[1];
     var stats = portfolioStats();
     var actions = strategyActions();
     var stance = factorScore() > 20 ? "谨慎偏多" : factorScore() < -20 ? "防守偏空" : "中性震荡";
-    $("aiHeadline").textContent = "本地规则报告 · " + stance;
+    $("aiHeadline").textContent = "本地研究笔记 · " + stance;
     $("aiOutput").innerHTML =
-      "<h3>核心判断</h3><p>当前 AU9999 为 <strong>" + money(state.quote.priceCnyGram) +
+      "<h3>输入与假设</h3><p>报价时点 " + escapeHtml(state.quote.asOf ? formatDateTime(state.quote.asOf) : "未知") + "，AU9999 为 <strong>" + money(state.quote.priceCnyGram) +
       "</strong>，综合因子为 <strong>" + signedNumber(Math.round(factorScore())) +
-      "</strong>，策略倾向 <strong>" + stance + "</strong>。</p>" +
+      "</strong>，假设倾向 <strong>" + stance + "</strong>。</p>" +
       '<div class="report-grid"><div><span>1 月中枢</span><strong>' + money(forecast.center) +
-      '</strong></div><div><span>概率区间</span><strong>' + money(forecast.low) + " - " +
+      '</strong></div><div><span>波动情景带</span><strong>' + money(forecast.low) + " - " +
       money(forecast.high) + '</strong></div><div><span>当前仓位</span><strong>' +
       stats.allocation.toFixed(1) + "%</strong></div></div>" +
-      "<h3>执行措施</h3><ol>" + actions.map(function (action) {
+      "<h3>观察与练习</h3><ol>" + actions.map(function (action) {
         return "<li>" + escapeHtml(action) + "</li>";
       }).join("") + "</ol>" +
-      "<h3>风险提示</h3><p>公开行情可能延迟；预测是概率情景，不是收益承诺。真实交易前应复核交易终端报价、流动性与个人风险承受能力。</p>";
+      "<h3>风险提示</h3><p>公开行情可能延迟；预测是假设情景，不是收益承诺。真实交易前应复核交易终端报价、流动性与个人风险承受能力。</p>";
   }
 
   async function generateAdvice() {
@@ -1357,8 +1091,10 @@
     renderTyping();
     $("generateAdvice").disabled = true;
     try {
+      var inputContext = aiPayload();
       var response = await fetch(state.config.aiEndpoint.trim(), {
         method: "POST",
+        signal: AbortSignal.timeout(30000),
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + state.config.aiApiKey.trim()
@@ -1368,11 +1104,11 @@
           messages: [
             {
               role: "system",
-              content: "你是谨慎的国内黄金市场研究助手。必须优先使用 AU9999 人民币/克、真实历史、国内因素、数据年龄和用户模拟仓位。输出明确的概率、条件、风险和分步措施，不承诺收益。"
+              content: "你是谨慎的国内黄金市场研究助手。必须优先使用 AU9999 人民币/克、真实历史、国内因素、数据年龄和用户模拟仓位。禁止编造概率、置信度、实时宏观值或买卖指令。区分已知事实与手动假设，引用输入时间，输出待核实事项与复盘条件。"
             },
             {
               role: "user",
-              content: JSON.stringify(aiPayload(), null, 2)
+              content: JSON.stringify(inputContext, null, 2)
             }
           ]
         })
@@ -1386,7 +1122,7 @@
       if (!text) throw new Error("模型返回内容为空");
       state.aiReportMode = "external";
       renderExternalAdvice(text);
-      $("aiHeadline").textContent = state.config.aiProvider + " · 实时决策报告";
+      $("aiHeadline").textContent = state.config.aiProvider + " · 输入截至 " + formatDateTime(inputContext.quote.asOf);
       showToast("AI 决策报告已生成", "模型只使用当前页面数据进行推理。");
     } catch (error) {
       state.aiReportMode = "local";
@@ -1468,6 +1204,7 @@
   }
 
   function drawSparkChart() {
+    if ($( "sparkCanvas" ).closest("[hidden]")) return;
     var canvas = $("sparkCanvas");
     var setup = setupCanvas(canvas, 154);
     var ctx = setup.ctx;
@@ -1476,17 +1213,11 @@
     var values;
     if (state.history.intraday.length > 5) {
       values = state.history.intraday.slice(-120).map(function (point) { return point.close; });
+    } else if (state.history.daily.length > 5) {
+      values = state.history.daily.slice(-20).map(function(point){ return point.close; });
     } else {
-      var quote = state.quote;
-      values = [
-        quote.openCnyGram,
-        (quote.openCnyGram + quote.lowCnyGram) / 2,
-        quote.lowCnyGram,
-        (quote.lowCnyGram + quote.highCnyGram) / 2,
-        quote.highCnyGram,
-        (quote.highCnyGram + quote.priceCnyGram) / 2,
-        quote.priceCnyGram
-      ];
+      drawEmptyCanvas(ctx, width, height, "暂无有效短周期数据");
+      return;
     }
     var min = Math.min.apply(null, values);
     var max = Math.max.apply(null, values);
@@ -1508,18 +1239,19 @@
     ctx.closePath();
     ctx.fillStyle = gradient;
     ctx.fill();
-    drawSmoothLine(ctx, points, "#e8ba5d", 1.7);
+    drawSmoothLine(ctx, points, "#a48345", 1.7);
     var last = points[points.length - 1];
     ctx.beginPath();
     ctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#f4d68b";
-    ctx.shadowColor = "#e8ba5d";
+    ctx.fillStyle = "#ad9054";
+    ctx.shadowColor = "#a48345";
     ctx.shadowBlur = 10;
     ctx.fill();
     ctx.shadowBlur = 0;
   }
 
   function drawPriceChart() {
+    if ($( "priceCanvas" ).closest("[hidden]")) return;
     var canvas = $("priceCanvas");
     var wrap = $("priceChartWrap");
     var height = wrap.clientHeight || 390;
@@ -1535,7 +1267,7 @@
     }
 
     var pad = { top: 22, right: 58, bottom: 34, left: 16 };
-    var showForecast = state.chartIndicators.forecast;
+    var showForecast = state.chartIndicators.forecast && state.scenarioModel && state.scenarioModel.ready;
     var splitX = showForecast ? width * 0.79 : width - pad.right;
     var plotBottom = height - pad.bottom;
     var closes = daily.map(function (point) { return point.close; });
@@ -1580,8 +1312,8 @@
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = "#84662f";
-      ctx.font = "8px sans-serif";
-      ctx.fillText("FORECAST", splitX + 8, pad.top + 12);
+      ctx.font = "10px Noto Sans SC, sans-serif";
+      ctx.fillText("SCENARIO", splitX + 8, pad.top + 12);
       drawForecastBand(ctx, forecast, xForecast, y);
     }
 
@@ -1600,25 +1332,25 @@
     ctx.closePath();
     ctx.fillStyle = area;
     ctx.fill();
-    drawSmoothLine(ctx, pricePoints, "#e8ba5d", 1.65);
+    drawSmoothLine(ctx, pricePoints, "#a48345", 1.65);
 
     if (state.chartIndicators.ma20) {
-      drawSeriesLine(ctx, ma20, xHistory, y, "#51d3a2", 1.05);
+      drawSeriesLine(ctx, ma20, xHistory, y, "#5e9179", 1.05);
     }
     if (state.chartIndicators.ma60) {
-      drawSeriesLine(ctx, ma60, xHistory, y, "#f0a94c", 1.05);
+      drawSeriesLine(ctx, ma60, xHistory, y, "#be9364", 1.05);
     }
 
     var last = pricePoints[pricePoints.length - 1];
     ctx.beginPath();
     ctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#f4d68b";
+    ctx.fillStyle = "#ad9054";
     ctx.fill();
     drawChartHover(ctx, pad, plotBottom);
   }
 
   function drawGrid(ctx, width, height, pad, min, max, y) {
-    ctx.font = "8px SFMono-Regular, Consolas, monospace";
+    ctx.font = "10px Manrope, sans-serif";
     ctx.textAlign = "left";
     for (var index = 0; index <= 4; index += 1) {
       var value = min + (max - min) * (1 - index / 4);
@@ -1635,20 +1367,9 @@
   }
 
   function buildChartForecast(start, days) {
-    var target = state.forecasts[1] ? state.forecasts[1].center : start;
-    var vol = dailyVolatility();
-    var points = [];
-    for (var index = 0; index <= days; index += 1) {
-      var progress = index / days;
-      var center = start + (target - start) * progress;
-      var uncertainty = start * vol * Math.sqrt(Math.max(index, 1)) * 1.25;
-      points.push({
-        center: center,
-        low: center - uncertainty,
-        high: center + uncertainty
-      });
-    }
-    return points;
+    var m = state.scenarioModel;
+    if (!m || !m.ready) return [];
+    return Array.from({ length: days + 1 }, function (_, i) { return Core.scenarioAt(start, i, m.vol, m.drift); });
   }
 
   function drawForecastBand(ctx, forecast, x, y) {
@@ -1671,7 +1392,7 @@
       if (index === 0) ctx.moveTo(x(index), y(point.center));
       else ctx.lineTo(x(index), y(point.center));
     });
-    ctx.strokeStyle = "rgba(244, 214, 139, .72)";
+    ctx.strokeStyle = "rgba(163, 130, 65, .72)";
     ctx.lineWidth = 1.2;
     ctx.stroke();
     ctx.setLineDash([]);
@@ -1712,7 +1433,7 @@
     ctx.arc(nearest.x, nearest.y, 4, 0, Math.PI * 2);
     ctx.fillStyle = "#080a08";
     ctx.fill();
-    ctx.strokeStyle = "#f4d68b";
+    ctx.strokeStyle = "#ad9054";
     ctx.lineWidth = 2;
     ctx.stroke();
     renderChartTooltip(nearest);
@@ -1734,19 +1455,20 @@
   }
 
   function drawForecastChart() {
+    if ($( "forecastCanvas" ).closest("[hidden]")) return;
     var canvas = $("forecastCanvas");
     var setup = setupCanvas(canvas, 320);
     var ctx = setup.ctx;
     var width = setup.width;
     var height = setup.height;
-    if (!state.forecasts.length) return;
+    if (!state.forecasts.length) { drawEmptyCanvas(ctx, width, height, "有效输入不足，暂不推演"); return; }
     var pad = { top: 28, right: 48, bottom: 42, left: 44 };
-    var points = [{ label: "当前", center: state.quote.priceCnyGram, low: state.quote.priceCnyGram, high: state.quote.priceCnyGram }]
+    var points = [{ label: "起点", days: 0, center: state.quote.priceCnyGram, low: state.quote.priceCnyGram, high: state.quote.priceCnyGram }]
       .concat(state.forecasts);
     var min = Math.min.apply(null, points.map(function (point) { return point.low; })) * 0.97;
     var max = Math.max.apply(null, points.map(function (point) { return point.high; })) * 1.03;
     var x = function (index) {
-      return pad.left + index / (points.length - 1) * (width - pad.left - pad.right);
+      return pad.left + Math.sqrt(points[index].days / 1095) * (width - pad.left - pad.right);
     };
     var y = function (value) {
       return pad.top + (max - value) / (max - min) * (height - pad.top - pad.bottom);
@@ -1760,7 +1482,7 @@
       ctx.lineTo(width - pad.right, gy);
       ctx.stroke();
       ctx.fillStyle = "#697064";
-      ctx.font = "8px SFMono-Regular, Consolas, monospace";
+      ctx.font = "10px Manrope, sans-serif";
       ctx.textAlign = "right";
       ctx.fillText(value.toFixed(0), pad.left - 8, gy + 3);
     }
@@ -1784,22 +1506,23 @@
       if (index === 0) ctx.moveTo(x(index), y(point.center));
       else ctx.lineTo(x(index), y(point.center));
     });
-    ctx.strokeStyle = "#e8ba5d";
+    ctx.strokeStyle = "#a48345";
     ctx.lineWidth = 1.7;
     ctx.stroke();
     points.forEach(function (point, index) {
       ctx.beginPath();
       ctx.arc(x(index), y(point.center), 3, 0, Math.PI * 2);
-      ctx.fillStyle = index === 0 ? "#f4f1e8" : "#e8ba5d";
+      ctx.fillStyle = index === 0 ? "#80986b" : "#a48345";
       ctx.fill();
-      ctx.fillStyle = "#92988b";
-      ctx.font = "8px sans-serif";
+      ctx.fillStyle = "#617363";
+      ctx.font = "10px Noto Sans SC, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(point.label, x(index), height - 18);
     });
   }
 
   function drawAllocationChart() {
+    if ($( "allocationCanvas" ).closest("[hidden]")) return;
     var canvas = $("allocationCanvas");
     var setup = setupCanvas(canvas, 250);
     var ctx = setup.ctx;
@@ -1812,13 +1535,13 @@
     ctx.lineWidth = 18;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = "#282d25";
+    ctx.strokeStyle = "#dfe7d4";
     ctx.stroke();
     var fraction = clamp(stats.allocation / 100, 0, 1);
     if (fraction > 0) {
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * fraction);
-      ctx.strokeStyle = "#e8ba5d";
+      ctx.strokeStyle = "#a48345";
       ctx.lineCap = "round";
       ctx.shadowColor = "rgba(232, 186, 93, .25)";
       ctx.shadowBlur = 10;
@@ -1827,7 +1550,7 @@
       ctx.lineCap = "butt";
     }
     ctx.fillStyle = "#697064";
-    ctx.font = "8px sans-serif";
+    ctx.font = "10px Noto Sans SC, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("现金 " + Math.max(0, 100 - stats.allocation).toFixed(0) + "%", centerX, centerY + radius + 32);
   }
@@ -1859,6 +1582,27 @@
   }
 
   function bindEvents() {
+    $("historicalPractice").addEventListener("change", renderOrderPreview);
+    $("backupAccount").onclick = function () { download("aurum-account-" + new Date().toISOString().slice(0,10) + ".json", JSON.stringify({app:"AURUM",version:1,exportedAt:new Date().toISOString(),portfolio:state.portfolio, unverifiedOriginal:portfolioReadFailed ? portfolioSignature : undefined}, null, 2), "application/json"); };
+    $("restoreAccount").onclick = function () { $("accountFile").click(); };
+    $("accountFile").onchange = async function (e) {
+      var file = e.target.files[0]; if (!file) return;
+      try {
+        if (file.size > 20 * 1024 * 1024) throw new Error("账户文件超过 20MB");
+        var data = JSON.parse(await file.text()), next = Core.validatePortfolio(data.portfolio || data);
+        if (!window.confirm("用备份替换本机模拟账户？现有记录将被替换，请确认已备份。")) return;
+        savePortfolio(next, true); state.portfolio = next; renderAll(); showToast("账户已恢复", next.trades.length + " 笔练习记录。");
+      } catch (error) { showToast("恢复失败", error.message, "error"); }
+      finally { e.target.value = ""; }
+    };
+    document.addEventListener("keydown", function(e) {
+      var dialog = document.querySelector(".settings-drawer.open,.confirm-modal.open");
+      if (!dialog || e.key !== "Tab") return;
+      var all = Array.from(dialog.querySelectorAll("button,input,select,a[href]")).filter(function(el) { return !el.disabled && el.getClientRects().length; });
+      var first = all[0], last = all[all.length-1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
     $("refreshBtn").addEventListener("click", function () {
       refreshQuote({ manual: true });
     });
@@ -1866,7 +1610,7 @@
       $("statusBanner").classList.add("hidden");
     });
     $("jumpTrade").addEventListener("click", function () {
-      $("trading").scrollIntoView({ behavior: "smooth" });
+      window.AurumUI.go("trading");
     });
     document.querySelectorAll("#chartRanges button").forEach(function (button) {
       button.addEventListener("click", function () {
@@ -1942,7 +1686,7 @@
     $("copyAdvice").addEventListener("click", copyAdvice);
     $("useStrategyBtn").addEventListener("click", function () {
       $("tradeGrams").value = suggestedGrams().toFixed(2);
-      $("trading").scrollIntoView({ behavior: "smooth" });
+      window.AurumUI.go("trading");
       renderOrderPreview();
       showToast("策略参数已带入", "请在模拟订单中复核克数和费用后再确认。");
     });
@@ -1980,24 +1724,35 @@
   }
 
   function suggestedGrams() {
-    var maxValue = portfolioStats().equity * state.config.maxPosition / 100;
-    var divisor = Math.max(executionPrice("buy"), 1);
-    return Math.max(0.01, Math.floor(maxValue / divisor * 100) / 100);
+    var budget = Math.min(portfolioStats().equity * state.config.maxPosition / 100, state.portfolio.cash);
+    var fee = Math.max(0, number($("feeRate").value, 0)) / 100;
+    return Math.max(0, Math.floor((budget - .02) / Math.max(executionPrice("buy") * (1 + fee), 1) * 100) / 100);
+  }
+
+  var dialogFocus = null;
+
+  function lockSurface(dialog, opening) {
+    if (opening) { dialogFocus = document.activeElement; $("surface").inert = true; dialog.inert = false; dialog.setAttribute("aria-hidden", "false"); }
+    else { dialog.inert = true; dialog.setAttribute("aria-hidden", "true"); if (!document.querySelector(".settings-drawer.open,.confirm-modal.open")) { $("surface").inert = false; if (dialogFocus && dialogFocus.isConnected) dialogFocus.focus({preventScroll:true}); } }
   }
 
   function openSettings() {
     syncSettingsForm();
+    lockSurface($("settingsDrawer"), true);
     $("settingsDrawer").classList.add("open");
     $("settingsDrawer").setAttribute("aria-hidden", "false");
     $("drawerBackdrop").classList.add("open");
     document.body.classList.add("drawer-open");
+    requestAnimationFrame(function(){ $("closeSettings").focus({preventScroll:true}); });
   }
 
   function closeSettings() {
+    if (!$("settingsDrawer").classList.contains("open")) return;
     $("settingsDrawer").classList.remove("open");
     $("settingsDrawer").setAttribute("aria-hidden", "true");
     $("drawerBackdrop").classList.remove("open");
     document.body.classList.remove("drawer-open");
+    lockSurface($("settingsDrawer"), false);
   }
 
   function syncSettingsForm() {
@@ -2020,10 +1775,15 @@
   }
 
   function applySettings() {
+    if ($( "priceProvider" ).value === "manual" && !(Core.numeric($("manualPrice").value)>0)) { showToast("请输入手动价格", "手动假设需大于零。", "error"); return; }
+    try { var url=new URL($("aiEndpoint").value.trim()||DEFAULT_CONFIG.aiEndpoint); if(url.protocol!=="https:" && !(url.protocol==="http:" && ["localhost","127.0.0.1","[::1]"].includes(url.hostname))) throw new Error("protocol"); }
+    catch(error) { showToast("接口地址无效", "请使用 HTTPS 地址或本机开发接口。", "error"); return; }
+    var lower=Core.numeric($("alertLower").value,0),upper=Core.numeric($("alertUpper").value,0);
+    if(lower>0 && upper>0 && lower>=upper){showToast("预警范围无效","下方预警需小于上方预警。","error");return;}
     state.config = {
       priceProvider: $("priceProvider").value,
       manualPrice: Math.max(0, number($("manualPrice").value, 0)),
-      refreshSeconds: clamp(number($("refreshSeconds").value, 15), 10, 3600),
+      refreshSeconds: clamp(number($("refreshSeconds").value, 60), 30, 3600),
       purity: clamp(number($("purity").value, 1), 0.1, 1),
       productPremium: clamp(number($("productPremium").value, 0), -50, 200),
       maxPosition: clamp(number($("maxPosition").value, 15), 1, 100),
@@ -2038,6 +1798,8 @@
       saveApiKey: $("saveApiKey").checked
     };
     saveConfig();
+    ++state.quoteGeneration;
+    state.refreshing = false;
     closeSettings();
     startPolling();
     renderAll();
@@ -2046,35 +1808,30 @@
   }
 
   function restoreDefaults() {
-    state.config = Object.assign({}, DEFAULT_CONFIG);
-    saveConfig();
-    syncSettingsForm();
-    showToast("已恢复默认参数", "点击“保存并应用”后生效。");
+    var before = state.config; state.config = Object.assign({}, DEFAULT_CONFIG); syncSettingsForm(); state.config = before;
+    showToast("已填入默认参数", "保存并应用后生效。");
   }
 
   function openResetModal() {
+    lockSurface($("confirmModal"), true);
     $("confirmBackdrop").classList.add("open");
     $("confirmModal").classList.add("open");
     document.body.classList.add("modal-open");
+    requestAnimationFrame(function(){ $("cancelReset").focus({preventScroll:true}); });
   }
 
   function closeResetModal() {
+    if (!$("confirmModal").classList.contains("open")) return;
     $("confirmBackdrop").classList.remove("open");
     $("confirmModal").classList.remove("open");
     document.body.classList.remove("modal-open");
+    lockSurface($("confirmModal"), false);
   }
 
   function resetPortfolio() {
-    state.portfolio = {
-      cash: 100000,
-      grams: 0,
-      avgCost: 0,
-      realized: 0,
-      totalFees: 0,
-      initialCash: 100000,
-      trades: []
-    };
-    savePortfolio();
+    var next = Core.emptyPortfolio();
+    try { savePortfolio(next, true); state.portfolio = next; }
+    catch (error) { showToast("重置未保存", error.message, "error"); return; }
     closeResetModal();
     renderPortfolio();
     renderOrderPreview();
@@ -2085,36 +1842,20 @@
   }
 
   function exportTrades() {
-    var rows = [["时间", "方向", "克数", "成交价_元每克", "手续费", "成交金额", "备注"]]
-      .concat(state.portfolio.trades.map(function (trade) {
-        return [
-          trade.createdAt,
-          trade.side === "buy" ? "买入" : "卖出",
-          trade.grams,
-          trade.price,
-          trade.fee,
-          trade.value,
-          trade.note || ""
-        ];
-      }));
-    var csv = "\ufeff" + rows.map(function (row) {
-      return row.map(function (cell) {
-        return '"' + String(cell).replace(/"/g, '""') + '"';
-      }).join(",");
-    }).join("\n");
-    var blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
-    var anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "aurum-simulated-trades-" + new Date().toISOString().slice(0, 10) + ".csv";
-    anchor.click();
-    URL.revokeObjectURL(url);
-    showToast("模拟账单已导出", state.portfolio.trades.length + " 笔成交记录。");
+    var rows = [["时间", "方向", "克数", "成交价_元每克", "手续费", "成交金额", "备注", "报价时点", "数据模式"]].concat(state.portfolio.trades.map(function (t) {
+      return [t.createdAt, t.side === "buy" ? "买入" : "卖出", t.grams, t.price, t.fee, t.value, t.note || "", t.quoteAsOf || "旧版未记录", t.dataMode || "旧版记录"];
+    }));
+    download("aurum-practice-" + new Date().toISOString().slice(0,10) + ".csv", "\ufeff" + rows.map(function (row) { return row.map(Core.csvCell).join(","); }).join("\n"), "text/csv;charset=utf-8");
+  }
+
+  function download(name, content, type) {
+    var url = URL.createObjectURL(new Blob([content], {type:type})), a = document.createElement("a");
+    a.href = url; a.download = name; a.click(); setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
   }
 
   function startPolling() {
     if (state.pollTimer) clearInterval(state.pollTimer);
-    var interval = Math.max(10, number(state.config.refreshSeconds, 15));
+    var interval = Math.max(30, number(state.config.refreshSeconds, 60));
     state.pollRemaining = interval;
     state.pollTimer = setInterval(function () {
       state.pollRemaining -= 1;
@@ -2128,6 +1869,7 @@
   }
 
   function renderAlerts() {
+    if (Core.quoteState(state.quote).stale) return;
     var price = state.quote.priceCnyGram;
     var upper = number(state.config.alertUpper, 0);
     var lower = number(state.config.alertLower, 0);
@@ -2144,26 +1886,12 @@
   }
 
   function setupObservers() {
-    var revealObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08 });
-    document.querySelectorAll(".reveal").forEach(function (element) {
-      revealObserver.observe(element);
-    });
-
-    var sectionObserver = new IntersectionObserver(function (entries) {
-      var visible = entries.filter(function (entry) { return entry.isIntersecting; })
-        .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; })[0];
-      if (!visible) return;
-      setActiveNav(visible.target.id);
-    }, { rootMargin: "-20% 0px -58% 0px", threshold: [0.05, 0.2, 0.5] });
-    document.querySelectorAll("[data-observe]").forEach(function (section) {
-      sectionObserver.observe(section);
+    window.addEventListener("aurum:chapter", function () { requestAnimationFrame(drawAllCharts); });
+    document.fonts && document.fonts.ready.then(drawAllCharts);
+    window.addEventListener("storage", function (event) {
+      if (event.key !== PORTFOLIO_KEY) return;
+      try { state.portfolio = event.newValue ? Core.validatePortfolio(JSON.parse(event.newValue)) : Core.emptyPortfolio(); portfolioSignature = event.newValue; renderAll(); showToast("账户已同步", "已读取另一个页面保存的记录。"); }
+      catch (error) { showToast("账户同步失败", "其他页面写入了无效账户，当前页面不会覆盖它。", "error"); }
     });
   }
 
@@ -2188,12 +1916,6 @@
     }, 4300);
   }
 
-  function scenarioProbabilities(score) {
-    var bull = Math.round(clamp(33 + score * 0.18, 12, 68));
-    var bear = Math.round(clamp(33 - score * 0.18, 12, 68));
-    var base = 100 - bull - bear;
-    return { bull: bull, base: base, bear: bear };
-  }
 
   function movingAverage(points, index, windowSize) {
     if (index < windowSize - 1) return NaN;
@@ -2216,9 +1938,9 @@
       (minutes >= 13 * 60 + 30 && minutes <= 15 * 60 + 30));
     var nightOpen = (weekday >= 1 && weekday <= 5 && minutes >= 20 * 60) ||
       (weekday >= 2 && weekday <= 6 && minutes <= 2 * 60 + 30);
-    if (dayOpen) return { open: true, label: "日盘交易中", detail: "上海黄金交易所 · AU9999" };
-    if (nightOpen) return { open: true, label: "夜盘交易中", detail: "上海黄金交易所 · AU9999" };
-    return { open: false, label: "当前休市", detail: "行情不变可能是休市或暂无新成交" };
+    if (dayOpen) return { open: true, label: "常规日盘时段", detail: "上海黄金交易所 · AU9999" };
+    if (nightOpen) return { open: true, label: "常规夜盘时段", detail: "上海黄金交易所 · AU9999" };
+    return { open: false, label: "常规非交易时段", detail: "行情不变可能是休市或暂无新成交" };
   }
 
   function chinaParts(date) {
@@ -2241,17 +1963,12 @@
     };
   }
 
-  function dataTierLabel(quote) {
-    if (quote.dataTier === "domestic-live") return "国内公开刷新";
-    if (quote.dataTier === "official-delayed") return "上金所官方延时";
-    if (quote.dataTier === "manual") return "手动校准";
-    return "部署快照";
+  function dataTierLabel(quote) { return Core.quoteState(quote).label;
   }
 
   function sourceHealthText() {
-    if (!state.sourceHealth.length) return "多源自动切换";
-    var success = state.sourceHealth.find(function (item) { return item.ok; });
-    return success ? success.name + " 已连接" : "保留上一笔有效行情";
+    var source = state.sourceHealth.find(function (item) { return item.ok; });
+    return (source && source.name !== Core.quoteState(state.quote).label ? source.name + " · " : "") + Core.quoteState(state.quote).label;
   }
 
   function quoteEventText(previous, current) {
@@ -2266,10 +1983,7 @@
     return String(source || "国内行情").replace(/浏览器直连/g, "").replace(/国内公开行情/g, "").trim();
   }
 
-  function quoteAgeHours(value) {
-    var timestamp = new Date(value).getTime();
-    if (!Number.isFinite(timestamp)) return Infinity;
-    return Math.max(0, (Date.now() - timestamp) / 3600000);
+  function quoteAgeHours(value) { return Core.ageHours(value);
   }
 
   function ageText(value) {
@@ -2292,9 +2006,11 @@
   }
 
   function formatDateTime(value) {
+    if (!Core.timestamp(value)) return "时间未知";
     try {
       return new Intl.DateTimeFormat("zh-CN", {
         timeZone: "Asia/Shanghai",
+        year: "numeric",
         month: "2-digit",
         day: "2-digit",
         hour: "2-digit",
@@ -2325,6 +2041,7 @@
     try {
       return new Intl.DateTimeFormat("zh-CN", {
         timeZone: "Asia/Shanghai",
+        year: "numeric",
         month: "2-digit",
         day: "2-digit",
         hour: "2-digit",
@@ -2354,7 +2071,7 @@
 
   function validDate(value) {
     var date = new Date(value || 0);
-    return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
   }
 
   function number(value, fallback) {
@@ -2406,7 +2123,8 @@
     return new Intl.NumberFormat("zh-CN", {
       style: "currency",
       currency: "CNY",
-      maximumFractionDigits: 0
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(number(value, 0));
   }
 
@@ -2481,6 +2199,7 @@
     buildForecasts();
     renderAll();
     startPolling();
+    if (storageNotice) showToast("账户读取提示", storageNotice, "error");
     await loadStaticData();
     syncDynamicFactors();
     buildForecasts();
@@ -2490,3 +2209,4 @@
 
   init();
 })();
+
