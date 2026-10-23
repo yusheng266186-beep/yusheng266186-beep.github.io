@@ -89,8 +89,10 @@
     lastPriceChangedAt: null,
     lastSeenPrice: null,
     chartRange: 260,
-    chartIndicators: { ma20: true, ma60: true, forecast: true },
+    chartIndicators: { ma20: true, ma60: true, forecast: false },
     chartHover: null,
+    historySelectedTime: null,
+    chartView: null,
     chartPoints: [],
     tradeSide: "buy",
     newsFilter: "all",
@@ -170,9 +172,6 @@
   function normalizePoints(points) { return Core.normalizePoints(points);
   }
 
-  function effectiveDaily() { return Core.chartHistory(state.history.daily, state.quote);
-  }
-
   function normalizeNews(raw) {
     var items = raw && Array.isArray(raw.items) ? raw.items : [];
     return {
@@ -222,10 +221,14 @@
   async function refreshQuote(options) {
     options = options || {};
     if (state.refreshing) return;
+    if (state.config.priceProvider === "domestic" && navigator.onLine === false) {
+      renderStatus(); if (options.manual) showToast("当前离线", "保留本机行情与记录，联网后再核对报价。"); return;
+    }
     state.refreshing = true;
     var generation = ++state.quoteGeneration;
     state.pollRemaining = Math.max(30, number(state.config.refreshSeconds, 60));
     $("refreshBtn").classList.add("loading");
+    renderStatus();
     state.sourceHealth = [];
 
     var previousPrice = state.quote.priceCnyGram;
@@ -259,11 +262,12 @@
       state.sourceHealth.push({ name: "行情链路", ok: false, error: error.message });
       state.lastPollAt = new Date();
       renderStatus();
-      showToast("行情刷新失败", error.message || "已保留上一笔有效行情", "error");
+      if (options.manual) showToast("行情刷新失败", error.message || "已保留上一笔有效行情", "error");
     } finally {
       if (generation !== state.quoteGeneration) return;
       state.refreshing = false;
       $("refreshBtn").classList.remove("loading");
+      renderStatus();
     }
   }
 
@@ -470,6 +474,7 @@
       source: "用户手动校准克价",
       sourceUrl: "https://www.sge.com.cn/sjzx/yshqbg",
       dataTier: "manual",
+      observed:{previous:false,open:false,range:false,change:false,changeAmount:false,volume:false,turnover:false},
       contracts: []
     });
   }
@@ -619,12 +624,12 @@
   }
 
   function executionPrice(side) {
-    var base = state.quote.priceCnyGram;
-    var purity = clamp(number(state.config.purity, 1), 0.1, 1);
-    var productPremium = number(state.config.productPremium, 0) / 100;
-    var spread = Math.max(0, number($("tradeSpread") && $("tradeSpread").value, 0.1)) / 100;
-    var adjusted = base * purity * (1 + productPremium);
-    return side === "buy" ? adjusted * (1 + spread / 2) : adjusted * (1 - spread / 2);
+    return Core.order(state.portfolio,state.quote,state.config,{side:side,grams:1,feePct:$("feeRate").value,spreadPct:$("tradeSpread").value}).price;
+  }
+
+  function renderProductEstimate() {
+    var draft=$("settingsDrawer").classList.contains("open"),purity=number(draft?$("purity").value:state.config.purity,1),premium=number(draft?$("productPremium").value:state.config.productPremium,0);
+    setText("productEstimate",state.quote.priceCnyGram>0?money(state.quote.priceCnyGram*purity*(1+premium/100)):"等待有效主价");
   }
 
   function riskScore() {
@@ -653,30 +658,34 @@
 
   function renderStatus() {
     var session = marketSession(new Date()), quality = Core.quoteState(state.quote);
+    var offline = navigator.onLine === false;
+    $("refreshBtn").disabled = state.refreshing;
+    $("refreshBtn").setAttribute("aria-busy",String(state.refreshing));
+    $("refreshBtn").setAttribute("aria-label",state.refreshing?"正在核对行情":"刷新行情");
     setText("sessionLabel", session.label); setText("sessionDetail", "常规时段估计 · 节假日以交易所公告为准");
     $("liveBeacon").className = "live-beacon " + (quality.key === "live" ? "open" : "closed");
     setText("quoteClock", state.quote.asOf ? formatDateTime(state.quote.asOf) : "时间未知");
     setText("sideSource", shortSource(state.quote.source)); setText("sideHealth", sourceHealthText());
     var banner = $("statusBanner");
-    banner.classList.toggle("hidden", !quality.stale && !state.refreshing && quality.key === "live");
-    setText("statusBannerText", quality.stale
+    banner.classList.toggle("hidden", !offline && !quality.stale && !state.refreshing && quality.key === "live");
+    setText("statusBannerText", offline ? "当前离线，保留本机行情和记录。联网后重新核对来源与报价时点。" : quality.stale
       ? (state.quote.asOf ? "数据截至 " + formatDateTime(state.quote.asOf) + "，已过去 " + ageText(state.quote.asOf) + "。当前仅供历史观察。" : "尚无可核实的报价时点，请检查数据来源。")
       : state.refreshing ? "正在核对公开行情；报价时间决定数据是否更新。" : "当前为延时行情或部署快照，报价时点见上方。");
-    setText("pollLabel", state.refreshing ? "正在刷新" : "下次核对 " + Math.ceil(state.pollRemaining) + "s");
+    setText("pollLabel", state.refreshing ? "正在刷新" : offline ? "离线 · 本机记录" : state.config.priceProvider !== "domestic" ? "按需核对" : "下次核对 " + Math.ceil(state.pollRemaining) + "s");
     $("pollProgress").style.transform = "scaleX(" + clamp(state.pollRemaining / Math.max(30, state.config.refreshSeconds), 0, 1) + ")";
     setText("practiceContext", quality.label + (state.quote.asOf ? " · " + formatDateTime(state.quote.asOf) : ""));
   }
 
   function renderQuote(options) {
-    var quote = state.quote;
+    var quote = state.quote, observed=quote.observed || {};
     var previousDisplayed = number(options.previousPrice, quote.priceCnyGram);
     animatePrice($("mainPrice"), previousDisplayed, quote.priceCnyGram, !!options.animatePrice);
-    setText("openPrice", money(quote.openCnyGram));
-    setText("highPrice", money(quote.highCnyGram));
-    setText("lowPrice", money(quote.lowCnyGram));
-    setText("previousPrice", money(quote.previousCnyGram));
-    setText("changeValue", signedPrice(quote.changeCnyGram));
-    setText("changePercent", signedPercent(quote.changePct));
+    setText("openPrice", observed.open?money(quote.openCnyGram):"—");
+    setText("highPrice", observed.range?money(quote.highCnyGram):"—");
+    setText("lowPrice", observed.range?money(quote.lowCnyGram):"—");
+    setText("previousPrice", observed.previous?money(quote.previousCnyGram):"—");
+    setText("changeValue",observed.changeAmount?signedPrice(quote.changeCnyGram):"—");
+    setText("changePercent",observed.change?signedPercent(quote.changePct):"—");
     setText("sourceName", shortSource(quote.source));
     setText("dataAge", "数据年龄 " + ageText(quote.asOf));
     $("sourceLink").href = safeUrl(quote.sourceUrl);
@@ -685,7 +694,7 @@
       quote.dataTier === "domestic-live" && quoteAgeHours(quote.asOf) < 1 ? "live" :
       quoteAgeHours(quote.asOf) > 12 ? "stale" : ""
     );
-    $("changeChip").className = "change-chip " + directionClass(quote.changePct);
+    $("changeChip").className = "change-chip " + (observed.change?directionClass(quote.changePct):"neutral");
     $("sourceDot").style.background = quoteAgeHours(quote.asOf) > 12 ? "var(--amber)" : "var(--green)";
     $("priceEvent").textContent = quoteEventText(options.previousPrice, quote.priceCnyGram);
     $("lastChanged").textContent = state.lastPriceChangedAt
@@ -695,6 +704,7 @@
     $("trustBadge").innerHTML = '<svg><use href="#i-clock"></use></svg><span>' + escapeHtml(quality.label) + '</span>';
     $("priceEvent").textContent = quality.stale ? "保留原报价时点" : quoteEventText(options.previousPrice, quote.priceCnyGram);
     $("lastChanged").textContent = quote.asOf ? formatDateTime(quote.asOf) : "时间未知";
+    renderProductEstimate();
   }
 
   function animatePrice(element, from, to, enabled) {
@@ -741,12 +751,10 @@
         ' <small>元/g</small></strong></span><b class="' +
         (pct >= 0 ? "up-text" : "down-text") + '">' + signedPercent(pct) + "</b></div>";
     }).join("");
-    var amplitude = quote.priceCnyGram
-      ? (quote.highCnyGram - quote.lowCnyGram) / quote.previousCnyGram * 100
-      : 0;
-    setText("amplitudeValue", amplitude.toFixed(2) + "%");
-    setText("volumeValue", compactNumber(quote.volume));
-    setText("turnoverValue", compactCurrency(quote.turnover));
+    var known=quote.observed || {},amplitude=known.range&&known.previous?(quote.highCnyGram-quote.lowCnyGram)/quote.previousCnyGram*100:NaN;
+    setText("amplitudeValue",Number.isFinite(amplitude)?amplitude.toFixed(2)+"%":"—");
+    setText("volumeValue",known.volume?compactNumber(quote.volume):"—");
+    setText("turnoverValue",known.turnover?compactCurrency(quote.turnover):"—");
     setText(
       "premiumValue",
       Number.isFinite(quote.domesticPremiumPct) ? signedPercent(quote.domesticPremiumPct) : "暂无对照"
@@ -765,11 +773,11 @@
     var last = effective.length
       ? effective[effective.length - 1].close
       : state.quote.priceCnyGram;
-    setMetricClass("return20", signedPercent(return20), return20);
-    setMetricClass("return60", signedPercent(return60), return60);
-    setText("annualVol", annualVolatility().toFixed(1) + "%");
-    setText("rsiValue", rsi.toFixed(1) + (rsi >= 70 ? " 偏热" : rsi <= 30 ? " 偏冷" : " 中性"));
-    var trend = last > ma20 && ma20 > ma60 ? "多头排列" : last < ma20 && ma20 < ma60 ? "空头排列" : "区间整理";
+    setMetricClass("return20", Number.isFinite(return20)?signedPercent(return20):"—", return20);
+    setMetricClass("return60", Number.isFinite(return60)?signedPercent(return60):"—", return60);
+    var vol=annualVolatility();setText("annualVol",Number.isFinite(vol)?vol.toFixed(1)+"%":"—");
+    setText("rsiValue", Number.isFinite(rsi)?rsi.toFixed(1) + (rsi >= 70 ? " 偏热" : rsi <= 30 ? " 偏冷" : " 中性"):"—");
+    var trend = !Number.isFinite(ma60)?"样本不足":last > ma20 && ma20 > ma60 ? "多头排列" : last < ma20 && ma20 < ma60 ? "空头排列" : "区间整理";
     setText("trendState", trend);
     setText("historyQuality", state.history.daily.length
       ? state.history.source + " · " + state.history.daily.length + " 个日线点 · 截至 " + state.history.daily[state.history.daily.length - 1].time
@@ -777,8 +785,8 @@
 
     var score = Math.round(clamp(return20 * 3.4 + (last > ma20 ? 16 : -12), -100, 100));
     setText("momentumSignal", trend);
-    setText("momentumExplain", "20 日 " + signedPercent(return20) + " · RSI " + rsi.toFixed(0));
-    setText("momentumScore", signedNumber(score));
+    setText("momentumExplain", Number.isFinite(return20)&&Number.isFinite(rsi)?"20 日 " + signedPercent(return20) + " · RSI " + rsi.toFixed(0):"有效日线不足，暂不评分");
+    setText("momentumScore", Number.isFinite(score)?signedNumber(score):"—");
     $("momentumScore").className = "signal-score " + (score >= 0 ? "up-text" : "down-text");
 
     var premium = state.quote.domesticPremiumPct;
@@ -941,6 +949,12 @@
       return "<tr><td>"+escapeHtml(formatDateTime(t.createdAt))+"</td><td><span class='trade-side "+t.side+"'>"+(t.side==="buy"?"买入":"卖出")+"</span></td><td>"+number(t.grams,0).toFixed(2)+"g</td><td>"+money(t.price)+"</td><td>"+cnyPrecise(t.fee)+"</td><td>"+cnyPrecise(t.value)+"</td><td>"+escapeHtml(t.note||"—")+(t.scenarioBasis ? '<small class="ledger-basis">情景依据 · '+escapeHtml(String(t.scenarioBasis))+'</small>' : '')+"</td><td>"+escapeHtml(t.quoteAsOf?formatDateTime(t.quoteAsOf):"旧版未记录")+"</td><td>"+mode+"</td></tr>";
     }).join("") : '<tr class="empty-row"><td colspan="9"><div class="ledger-empty"><span class="empty-mark" aria-hidden="true">↗</span><strong>第一笔记录，从一个清晰假设开始。</strong><p>设置数量、核对费用与仓位，每次练习都会保留价格时点。</p><a href="#orderTicket" class="text-link">回到模拟委托 ↗</a></div></td></tr>';
     if(portfolio.trades.length>200)setText("tradeCount",portfolio.trades.length+" 笔成交 · 展示最近 200 笔，导出保留全部");
+    if (portfolio.grams>0 && !(state.quote.priceCnyGram>0)) {
+      ["equityValue","equityDelta","unrealizedValue","unrealizedPct","maxOrderValue","stopPrice","takePrice","breakEvenPrice"].forEach(function(id){setText(id,"—");});
+      setText("goldAllocation","待估值");setText("positionUse","等待报价");setText("equityComposition","持仓等待有效报价估值");
+      setText("cashRatio","总权益等待估值");
+      setText("allocationNote","持仓克数和成本继续保留；有效主价恢复后再计算市值与仓位。");setText("riskGrade","待估值");
+    }
   }
 
   function renderOrderPreview() {
@@ -1122,8 +1136,10 @@
 
   function reportContextKey() {
     return JSON.stringify({ price: state.quote.priceCnyGram, asOf: state.quote.asOf,
+      quoteFields:[state.quote.previousCnyGram,state.quote.openCnyGram,state.quote.highCnyGram,state.quote.lowCnyGram,state.quote.domesticPremiumPct,state.quote.dataTier,state.quote.source,state.quote.observed],
       horizon: state.forecastHorizon, factors: state.factors.map(function(f){return [f.id,f.value];}),
       cash: state.portfolio.cash, grams: state.portfolio.grams, cost: state.portfolio.avgCost,
+      accountSummary:[state.portfolio.realized,state.portfolio.totalFees,state.portfolio.trades.length],
       risk: [state.config.maxPosition,state.config.stopLoss,state.config.takeProfit],
       history: [state.history.daily.length,state.history.daily.slice(-1)[0]], prompt: state.promptType,
       news: mergedNews().slice(0,8).map(function(n){return [n.title,n.publishedAt];}) });
@@ -1234,7 +1250,7 @@
       selectedHorizon: state.forecasts[state.forecastHorizon],
       forecasts: state.forecasts,
       factors: state.factors,
-      portfolio: Object.assign({}, state.portfolio, portfolioStats()),
+      portfolio: Object.assign({cash:state.portfolio.cash,grams:state.portfolio.grams,avgCost:state.portfolio.avgCost,realized:state.portfolio.realized,totalFees:state.portfolio.totalFees,initialCash:state.portfolio.initialCash,tradeCount:state.portfolio.trades.length}, portfolioStats()),
       riskRules: {
         maxPositionPct: state.config.maxPosition,
         stopLossPct: state.config.stopLoss,
@@ -1261,14 +1277,10 @@
     $("aiOutput").innerHTML = blocks.join("");
   }
 
-  function copyAdvice() {
-    var text = $("aiOutput").innerText.trim();
-    if (!text) return;
-    navigator.clipboard.writeText(text).then(function () {
-      showToast("报告已复制", "可以粘贴到研究笔记中。");
-    }).catch(function () {
-      showToast("复制失败", "浏览器未授予剪贴板权限。", "error");
-    });
+  async function copyAdvice() {
+    var text = $("aiOutput").innerText.trim(); if (!text) return;
+    try { if (!navigator.clipboard?.writeText) throw Error("unavailable"); await navigator.clipboard.writeText(text); showToast("报告已复制", "可以粘贴到研究笔记中。"); }
+    catch { showToast("暂时无法复制", "可使用“保存笔记”导出文本，或直接选择报告内容。", "error"); }
   }
 
   function drawAllCharts() {
@@ -1347,17 +1359,22 @@
     var setup = setupCanvas(canvas, height);
     var ctx = setup.ctx;
     var width = setup.width;
-    var allDaily = effectiveDaily();
-    var daily = allDaily.slice(-state.chartRange);
+    var allDaily = state.history.daily;
+    var view = Core.historyWindow(allDaily,state.chartRange), daily = view.points;
+    renderHistoryWindow(view);
+    document.querySelectorAll("[data-history-legend]").forEach(function(el){el.hidden=!state.chartIndicators[el.dataset.historyLegend];});
+    canvas.setAttribute("aria-label","AU9999 记录收盘与均线图；逐日数值可通过下方滑杆读取。");
     state.chartPoints = [];
-    if (daily.length < 2) {
+    if (daily.length < 1) {
       drawEmptyCanvas(ctx, width, height, "真实历史数据暂不可用");
-      return;
+      state.chartView = null; setupCanvas($("priceOverlay"),height); renderHistoryInspection(); return;
     }
 
     var pad = { top: 22, right: 58, bottom: 34, left: 16 };
+    var reference = Core.quoteReference(state.quote,view.last.time);
     var showForecast = state.chartIndicators.forecast && state.scenarioModel && state.scenarioModel.ready;
     var splitX = showForecast ? width * 0.79 : width - pad.right;
+    var historyEnd = splitX - (reference ? 22 : 0);
     var plotBottom = height - pad.bottom;
     var closes = daily.map(function (point) { return point.close; });
     var ma20 = daily.map(function (_, index) {
@@ -1372,7 +1389,8 @@
     var values = closes.concat(
       state.chartIndicators.ma20 ? ma20.filter(Number.isFinite) : [],
       state.chartIndicators.ma60 ? ma60.filter(Number.isFinite) : [],
-      showForecast ? forecast.flatMap(function (point) { return [point.low, point.high]; }) : []
+      showForecast ? forecast.flatMap(function (point) { return [point.low, point.high]; }) : [],
+      reference ? [reference.price] : []
     );
     var min = Math.min.apply(null, values);
     var max = Math.max.apply(null, values);
@@ -1383,10 +1401,10 @@
       return pad.top + (max - value) / (max - min) * (plotBottom - pad.top);
     };
     var xHistory = function (index) {
-      return pad.left + index / Math.max(daily.length - 1, 1) * (splitX - pad.left);
+      return pad.left + index / Math.max(daily.length - 1, 1) * (historyEnd - pad.left);
     };
     var xForecast = function (index) {
-      return splitX + index / Math.max(forecast.length - 1, 1) * (width - pad.right - splitX);
+      return historyEnd + index / Math.max(forecast.length - 1, 1) * (width - pad.right - historyEnd);
     };
 
     drawGrid(ctx, width, height, pad, min, max, y);
@@ -1402,7 +1420,7 @@
       ctx.setLineDash([]);
       ctx.fillStyle = "#ccb57d";
       ctx.font = "11px Noto Sans SC, sans-serif";
-      ctx.fillText("SCENARIO", splitX + 8, pad.top + 12);
+      ctx.fillText("30 日假设", splitX + 8, pad.top + 12);
       drawForecastBand(ctx, forecast, xForecast, y);
     }
 
@@ -1421,7 +1439,7 @@
     ctx.closePath();
     ctx.fillStyle = area;
     ctx.fill();
-    drawSmoothLine(ctx, pricePoints, "#dcc080", 1.65);
+    drawSeriesLine(ctx, closes, xHistory, y, "#dcc080", 1.65);
 
     if (state.chartIndicators.ma20) {
       drawSeriesLine(ctx, ma20, xHistory, y, "#9cb7a7", 1.05);
@@ -1435,7 +1453,22 @@
     ctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
     ctx.fillStyle = "#ecd398";
     ctx.fill();
-    drawChartHover(ctx, pad, plotBottom);
+    if (reference) {
+      ctx.setLineDash([3,4]);ctx.strokeStyle="rgba(213,192,141,.6)";ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(splitX,y(reference.price));ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(splitX,y(reference.price),4,0,Math.PI*2);ctx.fillStyle="#0b120d";ctx.fill();ctx.strokeStyle="#edcf90";ctx.stroke();
+    }
+    ctx.font="10px Inter,sans-serif";ctx.fillStyle="#aab59d";
+    var dateLabels=[];
+    [0,daily.length-1,Math.floor((daily.length-1)/2)].forEach(function(i) {
+      var label=width<480?daily[i].time.slice(5,10):daily[i].time.slice(0,10), half=ctx.measureText(label).width/2;
+      var cx=clamp(xHistory(i),pad.left+half,historyEnd-half);
+      if (dateLabels.some(function(b){return cx-half<b.right+12&&cx+half>b.left-12;})) return;
+      dateLabels.push({left:cx-half,right:cx+half});ctx.textAlign="center";ctx.fillText(label,cx,height-12);
+    });
+    state.chartView={view:view,pad:pad,plotBottom:plotBottom,height:height};
+    setText("historyReferenceNote",reference ? "空心点为独立参考报价 "+money(reference.price)+" · "+formatDateTime(reference.asOf)+" · "+shortSource(reference.source)+"；不计入正式收盘、均线或回撤。" : "图表保留已记录收盘；当前没有时间匹配的有效参考报价点。");
+    drawHistoryInspection();
   }
 
   function drawGrid(ctx, width, height, pad, min, max, y) {
@@ -1506,41 +1539,50 @@
     ctx.globalAlpha = 1;
   }
 
-  function drawChartHover(ctx, pad, plotBottom) {
-    if (!state.chartHover || !state.chartPoints.length) return;
-    var nearest = state.chartPoints.reduce(function (best, point) {
-      return Math.abs(point.x - state.chartHover.x) < Math.abs(best.x - state.chartHover.x) ? point : best;
-    }, state.chartPoints[0]);
-    ctx.strokeStyle = "rgba(244, 241, 232, .22)";
-    ctx.setLineDash([3, 4]);
-    ctx.beginPath();
-    ctx.moveTo(nearest.x, pad.top);
-    ctx.lineTo(nearest.x, plotBottom);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.beginPath();
-    ctx.arc(nearest.x, nearest.y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = "#080a08";
-    ctx.fill();
-    ctx.strokeStyle = "#ecd398";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    renderChartTooltip(nearest);
+  function renderHistoryWindow(view) {
+    var labels={20:"近一个月",60:"近三个月",120:"近六个月",260:"近一年"};
+    setText("historyWindowLabel",labels[state.chartRange]+" · "+view.count+" 个记录交易日");
+    setMetricClass("historyWindowChange",Number.isFinite(view.changePct)?signedPercent(view.changePct):"—",view.changePct);
+    setText("historyWindowDates",view.first ? view.first.time+" — "+view.last.time : "等待有效日线");
+    setText("historyWindowExtremes",view.first?toFixedPrice(view.minClose)+" — "+toFixedPrice(view.maxClose):"—");
+    setText("historyWindowDrawdown",Number.isFinite(view.maxDrawdownPct)?(view.maxDrawdownPct>0?"−":"")+view.maxDrawdownPct.toFixed(2)+"%":"—");
+    $("exportHistory").disabled=!view.count;
   }
-
-  function renderChartTooltip(point) {
-    var tooltip = $("chartTooltip");
-    var data = point.data;
-    tooltip.innerHTML = "<span>" + escapeHtml(data.time) + "</span><strong>" +
-      money(data.close) + "</strong><small>开 " + toFixedPrice(data.open) +
-      " · 高 " + toFixedPrice(data.high) + " · 低 " + toFixedPrice(data.low) + "</small>";
-    tooltip.classList.add("visible");
-    tooltip.setAttribute("aria-hidden", "false");
-    var wrapWidth = $("priceChartWrap").clientWidth;
-    var left = point.x + 12;
-    if (left + 170 > wrapWidth) left = point.x - 170;
-    tooltip.style.left = Math.max(6, left) + "px";
-    tooltip.style.top = Math.max(8, point.y - 66) + "px";
+  function inspectionIndex() {
+    if (!state.chartPoints.length) return -1;
+    if (state.chartHover) {
+      var best=0;state.chartPoints.forEach(function(p,i){if(Math.abs(p.x-state.chartHover.x)<Math.abs(state.chartPoints[best].x-state.chartHover.x))best=i;});return best;
+    }
+    var index=state.chartPoints.findIndex(function(p){return p.data.time===state.historySelectedTime;});
+    return index<0?state.chartPoints.length-1:index;
+  }
+  function renderHistoryInspection() {
+    var index=inspectionIndex(),point=state.chartPoints[index],input=$("historyCursor"),ready=!!point;
+    input.disabled=!ready; input.max=Math.max(0,state.chartPoints.length-1);input.value=Math.max(0,index);
+    $("inspectPrev").disabled=!ready||index===0;$("inspectNext").disabled=!ready||index===state.chartPoints.length-1;
+    ["inspectOpen","inspectHigh","inspectLow","inspectClose","inspectChange"].forEach(function(id){if(!ready)setText(id,"—");});
+    if(!ready){setText("inspectDate","等待有效日线");input.removeAttribute("aria-valuetext");setText("historyReferenceNote","有效日线不足，暂不显示历史参考。");return;}
+    var p=point.data,source=state.history.daily,indexAll=source.findIndex(function(row){return row.time===p.time;});
+    var previous=source[indexAll-1],change=previous?(p.close/previous.close-1)*100:NaN;
+    setText("inspectDate",p.time);$("inspectDate").dateTime=p.time;
+    setText("inspectClose",money(p.close));setText("inspectOpen",toFixedPrice(p.open));setText("inspectHigh",toFixedPrice(p.high));setText("inspectLow",toFixedPrice(p.low));
+    setMetricClass("inspectChange",Number.isFinite(change)?signedPercent(change):"—",change);
+    input.setAttribute("aria-valuetext",p.time+"，收盘 "+toFixedPrice(p.close)+" 元每克");
+    input.style.setProperty("--cursor-fill",(state.chartPoints.length>1?index/(state.chartPoints.length-1)*100:0)+"%");
+  }
+  function drawHistoryInspection() {
+    if(!state.chartView){renderHistoryInspection();return;}
+    var setup=setupCanvas($("priceOverlay"),state.chartView.height),ctx=setup.ctx,index=inspectionIndex(),point=state.chartPoints[index];
+    if(point){
+      ctx.strokeStyle="rgba(232,215,177,.32)";ctx.lineWidth=1;ctx.setLineDash([3,5]);
+      ctx.beginPath();ctx.moveTo(point.x,state.chartView.pad.top);ctx.lineTo(point.x,state.chartView.plotBottom);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(point.x,point.y,4,0,Math.PI*2);ctx.fillStyle="#0c130e";ctx.fill();ctx.strokeStyle="#f0d59b";ctx.lineWidth=2;ctx.stroke();
+    }
+    renderHistoryInspection();
+  }
+  function chooseHistoryIndex(index) {
+    if(!state.chartPoints.length)return;
+    index=clamp(Math.round(index),0,state.chartPoints.length-1);state.chartHover=null;state.historySelectedTime=state.chartPoints[index].data.time;drawHistoryInspection();
   }
 
   function drawForecastChart() {
@@ -1640,6 +1682,8 @@
     var ctx = setup.ctx;
     var width = setup.width;
     var height = setup.height;
+    if(state.portfolio.grams>0 && !(state.quote.priceCnyGram>0)) {canvas.setAttribute("aria-label","等待有效报价，暂不计算账户占比。");return;}
+    canvas.setAttribute("aria-label","模拟账户黄金与现金占比");
     var stats = portfolioStats();
     var centerX = width / 2;
     var centerY = height / 2 + 4;
@@ -1736,7 +1780,7 @@
     });
     $("historicalPractice").addEventListener("change", renderOrderPreview);
     $("fillOrderCapacity").addEventListener("click", function() {
-      $("tradeGrams").value = (state.tradeSide === "buy" ? suggestedGrams() : Math.floor(state.portfolio.grams*100)/100).toFixed(2);
+      $("tradeGrams").value = (state.tradeSide === "buy" ? suggestedGrams() : Core.orderCapacity(state.portfolio,state.quote,state.config,{side:"sell"})).toFixed(2);
       renderOrderPreview(); $("tradeGrams").focus({preventScroll:true});
     });
     $("clearPracticeScenario").addEventListener("click", function() { $("practiceScenario").hidden = true; state.practiceBasis = null; });
@@ -1771,34 +1815,29 @@
     });
     document.querySelectorAll("#chartRanges button").forEach(function (button) {
       button.addEventListener("click", function () {
-        document.querySelectorAll("#chartRanges button").forEach(function (item) {
-          item.classList.remove("active");
-        });
-        button.classList.add("active");
-        state.chartRange = number(button.dataset.range, 260);
-        state.chartHover = null;
-        $("chartTooltip").classList.remove("visible");
-        drawPriceChart();
+        document.querySelectorAll("#chartRanges button").forEach(function(item){item.classList.toggle("active",item===button);item.setAttribute("aria-pressed",String(item===button));});
+        state.chartRange=number(button.dataset.range,260);state.chartHover=null;drawPriceChart();
       });
     });
-    document.querySelectorAll("[data-indicator]").forEach(function (input) {
-      input.addEventListener("change", function () {
-        state.chartIndicators[input.dataset.indicator] = input.checked;
-        drawPriceChart();
-      });
+    document.querySelectorAll("[data-indicator]").forEach(function(input){input.addEventListener("change",function(){state.chartIndicators[input.dataset.indicator]=input.checked;drawPriceChart();});});
+    $("priceChartWrap").addEventListener("pointermove",function(event){
+      if(event.pointerType==="touch")return;
+      var rect=$("priceCanvas").getBoundingClientRect();state.chartHover={x:event.clientX-rect.left};
+      if(!state.hoverFrame)state.hoverFrame=requestAnimationFrame(function(){state.hoverFrame=0;drawHistoryInspection();});
+    },{passive:true});
+    $("priceChartWrap").addEventListener("pointerleave",function(){
+      if(state.hoverFrame)cancelAnimationFrame(state.hoverFrame);state.hoverFrame=0;state.chartHover=null;drawHistoryInspection();
     });
-    $("priceChartWrap").addEventListener("mousemove", function (event) {
-      var rect = $("priceCanvas").getBoundingClientRect();
-      state.chartHover = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-      if (!state.hoverFrame) state.hoverFrame = requestAnimationFrame(function () { state.hoverFrame = 0; drawPriceChart(); });
+    $("priceChartWrap").addEventListener("click",function(event){
+      var rect=$("priceCanvas").getBoundingClientRect();state.chartHover={x:event.clientX-rect.left};chooseHistoryIndex(inspectionIndex());
     });
-    $("priceChartWrap").addEventListener("mouseleave", function () {
-      if (state.hoverFrame) cancelAnimationFrame(state.hoverFrame);
-      state.hoverFrame = 0;
-      state.chartHover = null;
-      $("chartTooltip").classList.remove("visible");
-      $("chartTooltip").setAttribute("aria-hidden", "true");
-      drawPriceChart();
+    $("historyCursor").addEventListener("input",function(){chooseHistoryIndex(Number(this.value));});
+    $("inspectPrev").addEventListener("click",function(){chooseHistoryIndex(inspectionIndex()-1);});
+    $("inspectNext").addEventListener("click",function(){chooseHistoryIndex(inspectionIndex()+1);});
+    $("exportHistory").addEventListener("click",function(){
+      var rows=Core.historyWindow(state.history.daily,state.chartRange).points;if(!rows.length)return;
+      var csv=[["日期","开盘_元每克","最高_元每克","最低_元每克","收盘_元每克","成交量","成交额"]].concat(rows.map(function(p){return[p.time,p.open,p.high,p.low,p.close,p.volume,p.turnover];}));
+      download("aurum-daily-"+rows[0].time+"-"+rows[rows.length-1].time+".csv","\ufeff"+csv.map(function(row){return row.map(Core.csvCell).join(",");}).join("\n"),"text/csv;charset=utf-8");
     });
     document.querySelectorAll(".order-tabs button").forEach(function (button) {
       button.addEventListener("click", function () {
@@ -1853,6 +1892,11 @@
     });
     $("generateAdvice").addEventListener("click", generateAdvice);
     $("copyAdvice").addEventListener("click", copyAdvice);
+    $("saveAdvice").addEventListener("click",function(){
+      if(state.aiReportMode === "loading"){showToast("笔记仍在生成", "请等待本次生成结束后保存。");return;}
+      var text=$("aiOutput").innerText.trim();if(!text)return;
+      download("aurum-research-"+new Date().toISOString().slice(0,10)+".txt","AURUM · "+$("aiHeadline").textContent+"\n\n"+text,"text/plain;charset=utf-8");
+    });
     $("useStrategyBtn").addEventListener("click", function () {
       var f = state.forecasts[state.forecastHorizon]; if (!f) return;
       setTradeSide("buy");
@@ -1873,6 +1917,7 @@
     $("drawerBackdrop").addEventListener("click", closeSettings);
     $("saveSettings").addEventListener("click", applySettings);
     $("restoreDefaults").addEventListener("click", restoreDefaults);
+    ["purity","productPremium"].forEach(function(id){$(id).addEventListener("input",renderProductEstimate);});
     var chartViewportKey = window.innerWidth + ":" + window.devicePixelRatio;
     window.addEventListener("resize", function () {
       var nextKey = window.innerWidth + ":" + window.devicePixelRatio;
@@ -1905,9 +1950,7 @@
   }
 
   function suggestedGrams() {
-    var budget = Math.min(portfolioStats().equity * state.config.maxPosition / 100, state.portfolio.cash);
-    var fee = Math.max(0, number($("feeRate").value, 0)) / 100;
-    return Math.max(0, Math.floor((budget - .02) / Math.max(executionPrice("buy") * (1 + fee), 1) * 100) / 100);
+    return Core.orderCapacity(state.portfolio,state.quote,state.config,{side:"buy",feePct:$("feeRate").value,spreadPct:$("tradeSpread").value});
   }
 
   var dialogFocus = null;
@@ -1920,7 +1963,7 @@
   function openSettings() {
     syncSettingsForm();
     lockSurface($("settingsDrawer"), true);
-    $("settingsDrawer").classList.add("open");
+    $("settingsDrawer").classList.add("open"); renderProductEstimate();
     $("settingsDrawer").setAttribute("aria-hidden", "false");
     $("drawerBackdrop").classList.add("open");
     document.body.classList.add("drawer-open");
@@ -1989,7 +2032,7 @@
   }
 
   function restoreDefaults() {
-    var before = state.config; state.config = Object.assign({}, DEFAULT_CONFIG); syncSettingsForm(); state.config = before;
+    var before = state.config; state.config = Object.assign({}, DEFAULT_CONFIG); syncSettingsForm(); state.config = before; renderProductEstimate();
     showToast("已填入默认参数", "保存并应用后生效。");
   }
 
@@ -2039,6 +2082,8 @@
     var interval = Math.max(30, number(state.config.refreshSeconds, 60));
     state.pollRemaining = interval;
     state.pollTimer = setInterval(function () {
+      if (document.hidden) return;
+      if (navigator.onLine === false || state.config.priceProvider !== "domestic") {renderStatus();return;}
       state.pollRemaining -= 1;
       if (state.pollRemaining <= 0) {
         state.pollRemaining = interval;
@@ -2069,9 +2114,16 @@
   function setupObservers() {
     window.addEventListener("aurum:chapter", function () { requestAnimationFrame(drawAllCharts); });
     document.fonts && document.fonts.ready.then(drawAllCharts);
+    window.addEventListener("offline",renderStatus);
+    window.addEventListener("online",function(){!document.hidden && state.config.priceProvider === "domestic"?refreshQuote():renderStatus();});
+    document.addEventListener("visibilitychange",function(){
+      if(document.hidden)return;
+      if(state.config.priceProvider === "domestic" && (!state.lastPollAt || Date.now()-state.lastPollAt.getTime()>state.config.refreshSeconds*1000))refreshQuote();
+      else renderStatus();
+    });
     window.addEventListener("storage", function (event) {
       if (event.key !== PORTFOLIO_KEY) return;
-      try { state.portfolio = event.newValue ? Core.validatePortfolio(JSON.parse(event.newValue)) : Core.emptyPortfolio(); portfolioSignature = event.newValue; renderAll(); showToast("账户已同步", "已读取另一个页面保存的记录。"); }
+      try { state.portfolio = event.newValue ? Core.validatePortfolio(JSON.parse(event.newValue)) : Core.emptyPortfolio(); portfolioSignature = event.newValue; portfolioReadFailed = false; storageNotice = ""; renderAll(); showToast("账户已同步", "已读取另一个页面保存的记录。"); }
       catch (error) { showToast("账户同步失败", "其他页面写入了无效账户，当前页面不会覆盖它。", "error"); }
     });
   }
@@ -2327,19 +2379,19 @@
     var parsed = number(value, 0);
     if (parsed >= 100000000) return (parsed / 100000000).toFixed(2) + " 亿";
     if (parsed >= 10000) return (parsed / 10000).toFixed(2) + " 万";
-    return parsed > 0 ? parsed.toFixed(0) : "--";
+    return parsed >= 0 ? parsed.toFixed(0) : "--";
   }
 
   function compactCurrency(value) {
     var parsed = number(value, 0);
     if (parsed >= 100000000) return "¥" + (parsed / 100000000).toFixed(2) + " 亿";
     if (parsed >= 10000) return "¥" + (parsed / 10000).toFixed(1) + " 万";
-    return parsed > 0 ? cny(parsed) : "--";
+    return parsed >= 0 ? cny(parsed) : "--";
   }
 
   function setText(id, value) {
     var element = $(id);
-    if (element) element.textContent = value;
+    if (element && element.textContent !== String(value)) element.textContent = value;
   }
 
   function setMetricClass(id, value, direction) {
@@ -2388,7 +2440,7 @@
         renderAll(); window.AurumUI.go("forecast");
         showToast("已载入这组研究假设", "按当前报价重新计算，原手记仍保留当时的数值。");
       },
-      getQuote: function () { return {price:state.quote.priceCnyGram, asOf:state.quote.asOf}; },
+      getQuote: function () { return {price:state.quote.priceCnyGram, asOf:state.quote.asOf, dataTier:state.quote.dataTier}; },
       getSnapshot: function () {
         var f = state.forecasts[state.forecastHorizon];
         if (!f) throw Error("有效历史与报价不足，暂时无法记录情景。");

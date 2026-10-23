@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   const Store = window.AurumJournalStore, $ = id => document.getElementById(id);
-  let options, pending = null, trigger = null, removed = null, showingAll = false;
+  let options, pending = null, trigger = null, removed = null, showingAll = false, mode = "capture";
   const money = n => new Intl.NumberFormat("zh-CN", {minimumFractionDigits:2, maximumFractionDigits:2}).format(n);
   const time = value => new Date(value).toLocaleString("zh-CN", {month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", hour12:false});
   function node(tag, className, content) {
@@ -51,7 +51,7 @@
     }
     const quote = options.getQuote();
     const nodes = items.slice(0, showingAll ? items.length : 3).map(item => {
-      const change = Store.changeSince(item, quote), comparisonText = change === null ? "等待更晚的有效报价" : (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
+      const change = Store.changeSince(item, quote), comparisonText = item.dataTier === "manual" || quote.dataTier === "manual" ? "手动价格仅用于假设" : change === null ? "等待更晚的有效报价" : (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
       const signature = JSON.stringify(item), existing = rows.get(item.id);
       if (existing?.entrySignature === signature) { existing.querySelector(".journal-change").textContent = comparisonText; return existing; }
       const row = node("details", "journal-entry"); row.dataset.entryId = item.id; row.entrySignature = signature; row.open = !!existing?.open;
@@ -71,14 +71,23 @@
       const tier = item.dataTier === "snapshot" ? "部署快照" : item.dataTier === "manual" ? "手动报价" : "公开行情记录";
       content.append(metrics, node("p", "journal-provenance", tier + " · 报价截至 " + new Date(item.quoteAsOf).toLocaleString("zh-CN", {hour12:false}) + " · " + item.source), factors,
         node("p", "journal-caption", "这是当时的研究快照。报价变化不代表情景预测准确率。"));
+      const until=new Date(Date.parse(item.quoteAsOf)+item.days*86400000);
+      if (Number.isFinite(until.getTime())) content.append(node("p","journal-caption","观察期参考至 "+until.toLocaleDateString("zh-CN")+"，以原报价时点为起点。"));
+      if (item.review) {
+        const review=node("div","journal-review-note");
+        review.append(node("span","","回看 · "+time(item.review.updatedAt)),node("p","",item.review.note));content.append(review);
+      }
+      const actions=node("div","journal-entry-actions");
       const replay = node("button", "text-button journal-replay", "用这组假设重新推演 ↗"); replay.type = "button";
-      replay.onclick = () => options.applySnapshot(item); content.append(replay);
+      replay.onclick = () => options.applySnapshot(item); actions.append(replay);
+      const reviewButton=node("button","text-button journal-review",item.review?"更新回看":"写一次回看");reviewButton.type="button";
+      reviewButton.onclick=()=>presentDialog(item,true);actions.append(reviewButton);
       const remove = node("button", "text-button journal-remove", "移除此条手记"); remove.type = "button";
       remove.onclick = () => {
         try { removed = Store.remove(localStorage, item.id); render(); }
         catch (error) { options.notify("无法移除手记", error.message, "error"); }
       };
-      content.append(remove);
+      actions.append(remove);content.append(actions);
       row.append(summary, content); return row;
     });
     if (items.length > 3) {
@@ -89,12 +98,20 @@
   }
   function open() {
     try {
-      pending = Store.snapshot(options.getSnapshot(), Date.now(), crypto.randomUUID());
-      trigger = document.activeElement;
-      $("journalCaptureMeta").textContent = pending.horizon + " · 中枢 " + money(pending.center) + " 元/克 · 报价 " + money(pending.price);
-      $("journalNote").value = ""; $("journalError").textContent = "";
-      $("journalDialog").showModal(); document.body.classList.add("journal-open"); $("journalNote").focus();
+      presentDialog(Store.snapshot(options.getSnapshot(), Date.now(), crypto.randomUUID()),false);
     } catch (error) { options.notify("暂时无法记录", error.message, "error"); }
+  }
+  function presentDialog(item,isReview) {
+    mode=isReview?"review":"capture";pending=item;trigger=document.activeElement;
+    $("journalDialogTitle").textContent=isReview?"回看当时，留下新的理解。":"记录这一刻的判断。";
+    $("journalNotePrompt").textContent=isReview?"哪些变化，值得写下来？":"此刻，你在观察什么？";
+    $("journalNoteHint").textContent=isReview?"必填 · 最多 560 字":"选填 · 最多 280 字";
+    $("journalCaptureMeta").textContent=item.horizon+" · 记录时中枢 "+money(item.center)+" 元/克 · 主价 "+money(item.price);
+    $("journalNote").maxLength=isReview?560:280;$("journalNote").required=isReview;
+    $("journalNote").value=isReview?item.review?.note || "":"";$("journalError").textContent="";
+    $("journalSaveHint").textContent=isReview?"回看单独保存，原始报价、理由和情景继续保留。":"记录时的报价、周期、区间与全部假设将一并保存到本机。";
+    $("journalSave").textContent=isReview?"保存这次回看 ↗":"保存并查看手记 ↗";
+    $("journalDialog").showModal();document.body.classList.add("journal-open");$("journalNote").focus();
   }
   function init(config) {
     options = config;
@@ -104,10 +121,14 @@
     $("journalForm").addEventListener("submit", event => {
       event.preventDefault(); if (!pending) return;
       try {
-        Store.append(localStorage, {...pending, note: $("journalNote").value});
-        $("journalDialog").close(); render(); options.navigate("intelligence");
-        requestAnimationFrame(() => $("journalSection").scrollIntoView({behavior:"instant", block:"start"}));
-        options.notify("观察已保存到本机", "报价时点、情景区间和全部假设已一同留存。");
+        const id=pending.id,isReview=mode === "review";
+        if(isReview)Store.review(localStorage,id,$("journalNote").value);else Store.append(localStorage, {...pending, note: $("journalNote").value});
+        $("journalDialog").close(); render(); options.navigate("journalSection");
+        requestAnimationFrame(() => {
+          const row=[...$("journalList").querySelectorAll(".journal-entry")].find(row=>row.dataset.entryId===id);
+          if(row){if(isReview)row.open=true;row.querySelector("summary").focus({preventScroll:true});}
+        });
+        options.notify(isReview?"这次回看已保存":"观察已保存到本机",isReview?"原始研究快照与后续理解已分别留存。":"报价时点、情景区间和全部假设已一同留存。");
       } catch (error) { $("journalError").textContent = error.message || "本机存储不可用，手记尚未保存。"; }
     });
     $("exportJournal").addEventListener("click", exportJournal);
@@ -118,7 +139,7 @@
       try {
         if (file.size > 1000000) throw Error("请选择小于 1 MB 的 AURUM 手记 JSON 备份。");
         const result = Store.restore(localStorage,await file.text());
-        render(); options.notify("手记备份已合并", "新增 "+result.added+" 条，跳过 "+result.skipped+" 条重复记录。");
+        render(); options.notify("手记备份已合并", "新增 "+result.added+" 条，更新 "+result.updated+" 条回看，跳过 "+result.skipped+" 条重复记录。");
       } catch (error) { $("journalImportError").textContent = error.message || "恢复失败，原手记未覆盖。"; }
       finally { event.target.value = ""; }
     });

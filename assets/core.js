@@ -32,6 +32,7 @@
   function normalizeQuote(raw, now = Date.now()) {
     raw = raw && typeof raw === "object" ? raw : {};
     const price = numeric(raw.priceCnyGram, 0), previous = numeric(raw.previousCnyGram, price);
+    const known = raw.observed && typeof raw.observed === "object" ? raw.observed : {};
     const q = Object.assign({}, raw, {
       priceCnyGram: price > 0 ? price : 0, previousCnyGram: previous > 0 ? previous : price,
       openCnyGram: numeric(raw.openCnyGram) > 0 ? numeric(raw.openCnyGram) : price, highCnyGram: numeric(raw.highCnyGram) > 0 ? numeric(raw.highCnyGram) : price,
@@ -43,7 +44,13 @@
       sourceUrl: String(raw.sourceUrl || "https://www.sge.com.cn/sjzx/yshqbg"),
       volume: numeric(raw.volume, 0), turnover: numeric(raw.turnover, 0),
       contracts: Array.isArray(raw.contracts) ? raw.contracts.filter(c => numeric(c.latest) > 0) : [],
-      internationalCnyGram: NaN, domesticPremiumPct: NaN
+      internationalCnyGram: NaN, domesticPremiumPct: NaN,
+      observed:{previous:known.previous !== false && numeric(raw.previousCnyGram)>0,
+        open:known.open !== false && numeric(raw.openCnyGram)>0,
+        range:known.range !== false && numeric(raw.highCnyGram)>0 && numeric(raw.lowCnyGram)>0 && numeric(raw.highCnyGram)>=numeric(raw.lowCnyGram),
+        changeAmount:known.changeAmount !== false && (numeric(raw.previousCnyGram)>0 || Number.isFinite(numeric(raw.changeCnyGram))),
+        change:known.change !== false && (numeric(raw.previousCnyGram)>0 || Number.isFinite(numeric(raw.changePct))),
+        volume:known.volume !== false && numeric(raw.volume)>=0,turnover:known.turnover !== false && numeric(raw.turnover)>=0}
     });
     const intl = raw.internationalReference || {}, fxTime = raw.fxAsOf || intl.fxAsOf;
     const synchronous = ageHours(q.asOf, now) <= 36 && ageHours(intl.asOf, now) <= 36 &&
@@ -75,19 +82,24 @@
     const t = timestamp(v);
     return t ? new Date(Date.parse(t) + 8 * 3600000).toISOString().slice(0, 10) : "";
   }
-  function chartHistory(daily, quote) {
-    const points = daily.map(p => Object.assign({}, p));
-    const day = chinaDate(quote.asOf), last = points[points.length - 1];
-    if (!last || !day || day < last.time.slice(0, 10) || !(quote.priceCnyGram > 0)) return points;
-    const live = { time: day + " LIVE", open: quote.openCnyGram, close: quote.priceCnyGram,
-      high: quote.highCnyGram, low: quote.lowCnyGram, volume: quote.volume, changePct: quote.changePct, live: true };
-    if (day === last.time.slice(0, 10)) points[points.length - 1] = live;
-    else points.push(live);
-    return points;
-  }
   function momentum(points, days) {
     if (points.length <= days) return NaN;
     return points[points.length - 1].close / points[points.length - 1 - days].close - 1;
+  }
+  function historyWindow(daily, count = 260) {
+    const size = Number.isInteger(count) && count > 0 ? count : 260;
+    const points = normalizePoints(daily).slice(-size), first = points[0], last = points[points.length-1];
+    let peak = first?.close || 0, drawdown = 0;
+    for (const point of points) { peak = Math.max(peak,point.close); drawdown = Math.max(drawdown,(peak-point.close)/peak*100); }
+    return { points, first, last, count:points.length,
+      changePct:points.length>1 ? (last.close/first.close-1)*100 : NaN,
+      minClose:points.length ? Math.min(...points.map(p=>p.close)) : NaN,
+      maxClose:points.length ? Math.max(...points.map(p=>p.close)) : NaN,
+      maxDrawdownPct:points.length>1 ? drawdown : NaN };
+  }
+  function quoteReference(quote, lastDay, now = Date.now()) {
+    if (!quote || quote.dataTier === "manual" || quoteState(quote,now).stale || !lastDay || chinaDate(quote.asOf) < lastDay.slice(0,10)) return null;
+    return {price:quote.priceCnyGram,asOf:quote.asOf,source:quote.source,dataTier:quote.dataTier};
   }
   function volatility(points) {
     const rows = points.slice(-91), returns = [];
@@ -137,15 +149,14 @@
   function order(p, q, config, input, now = Date.now()) {
     const side = input.side === "sell" ? "sell" : "buy", grams = numeric(input.grams),
       feePct = numeric(input.feePct), spreadPct = numeric(input.spreadPct),
-      purity = numeric(config.purity, 1), premium = numeric(config.productPremium, 0),
       maxPosition = numeric(config.maxPosition, 15);
-    const price = q.priceCnyGram * purity * (1 + premium / 100) * (1 + (side === "buy" ? 1 : -1) * spreadPct / 200);
+    const price = q.priceCnyGram * (1 + (side === "buy" ? 1 : -1) * spreadPct / 200);
     const value = money(grams * price), fee = money(value * feePct / 100),
       total = money(side === "buy" ? value + fee : value - fee), stats = portfolioStats(p, q.priceCnyGram);
     const mode = quoteState(q, now), historical = mode.stale || q.dataTier === "manual";
     const checks = [
       { ok: Number.isFinite(grams) && grams > 0 && Math.abs(grams * 100 - Math.round(grams * 100)) < 1e-6, label: "交易克数", value: "至少 0.01g，精确到 0.01g" },
-      { ok: feePct >= 0 && feePct <= 5 && spreadPct >= 0 && spreadPct <= 10 && price > 0 && purity > 0 && purity <= 1 && premium >= -50 && premium <= 200 && maxPosition >= 1 && maxPosition <= 100, label: "价格与费用", value: "手续费 0—5%，价差 0—10%" },
+      { ok: feePct >= 0 && feePct <= 5 && spreadPct >= 0 && spreadPct <= 10 && price > 0 && maxPosition >= 1 && maxPosition <= 100, label: "价格与费用", value: "手续费 0—5%，价差 0—10%" },
       { ok: q.priceCnyGram > 0 && (!historical || input.historical === true), label: "行情时效", value: historical ? "需开启历史价格练习" : mode.label },
       { ok: side === "sell" || total <= money(stats.equity * maxPosition / 100), label: "单笔上限", value: money(stats.equity * maxPosition / 100).toFixed(2) + " 元" },
       { ok: side === "buy" ? total <= p.cash : grams <= p.grams, label: side === "buy" ? "可用现金" : "可卖持仓", value: side === "buy" ? p.cash.toFixed(2) + " 元" : p.grams.toFixed(2) + "g" }
@@ -154,6 +165,19 @@
       projectedCash = p.cash + (side === "buy" ? -total : total), projectedEquity = projectedCash + projectedGrams * q.priceCnyGram;
     return { side, grams, price, value, fee, total, historical, checks, valid: checks.every(c => c.ok),
       projectedAllocation: projectedEquity > 0 ? projectedGrams * q.priceCnyGram / projectedEquity * 100 : 0 };
+  }
+  function orderCapacity(p,q,config,input) {
+    if (input.side === "sell") return Math.floor(p.grams*100+1e-7)/100;
+    const fee=numeric(input.feePct),spread=numeric(input.spreadPct),max=numeric(config.maxPosition,15),price=q.priceCnyGram*(1+spread/200);
+    if (!(price>0) || fee<0 || fee>5 || spread<0 || spread>10 || max<1 || max>100 || !Number.isFinite(fee)) return 0;
+    const budget=Math.min(p.cash,money(portfolioStats(p,q.priceCnyGram).equity*max/100));
+    let low=0,high=Math.min(Number.MAX_SAFE_INTEGER,Math.ceil(budget/(price*(1+fee/100))*100)+2);
+    if (!Number.isFinite(high) || high<=0) return 0;
+    while(low<high) {
+      const mid=low+Math.ceil((high-low)/2),value=money(mid/100*price),total=money(value+money(value*fee/100));
+      if(total<=budget)low=mid;else high=mid-1;
+    }
+    return low/100;
   }
   function execute(p, q, config, input, now = Date.now()) {
     const o = order(p, q, config, input, now), failure = o.checks.find(c => !c.ok);
@@ -170,7 +194,7 @@
     next.totalFees = money(p.totalFees + o.fee);
     next.trades.unshift({ id: String(now) + "-" + p.trades.length, side: o.side, grams: o.grams, price: o.price,
       value: o.value, fee: o.fee, note: String(input.note || "").slice(0, 1000), createdAt: new Date(now).toISOString(),
-      quoteAsOf: q.asOf, dataMode: o.historical ? "historical-practice" : q.dataTier });
+      quoteAsOf: q.asOf, dataMode: o.historical ? "historical-practice" : q.dataTier, instrument:"AU9999" });
     return next;
   }
   function csvCell(value) {
@@ -178,6 +202,6 @@
     if (typeof value === "string" && /^[\s]*[=+\-@\t\r]/.test(s)) s = "'" + s;
     return '"' + s.replace(/"/g, '""') + '"';
   }
-  return { numeric, money, timestamp, ageHours, quoteState, normalizeQuote, normalizePoints, chinaDate, chartHistory,
-    momentum, volatility, scenarioAt, scenarioModel, emptyPortfolio, validatePortfolio, portfolioStats, order, execute, csvCell };
+  return { numeric, money, timestamp, ageHours, quoteState, normalizeQuote, normalizePoints, chinaDate,
+    momentum, historyWindow, quoteReference, volatility, scenarioAt, scenarioModel, emptyPortfolio, validatePortfolio, portfolioStats, order, orderCapacity, execute, csvCell };
 });

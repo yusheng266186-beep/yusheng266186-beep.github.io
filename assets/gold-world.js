@@ -13,6 +13,7 @@
   const wayfinder = document.querySelector(".scene-wayfinder");
   let progressNow = -1, drawCount = 0;
   let reduced = media.matches, paused = document.hidden, chapter = host.dataset.scene || "overview";
+  function readingOverlay() { return document.body.matches(".drawer-open,.modal-open,.journal-open"); }
   let scrollTarget = 0, scrollNow = 0, pointer = [0, 0], pointerNow = [0, 0], width = 1, height = 1;
   let pose = Helix.cameraAt(chapter, 0, 0);
   const profiling = new URLSearchParams(location.search).has("perf");
@@ -223,6 +224,7 @@
   }
   function cleanup() {
     disposed = true; if (frame) cancelAnimationFrame(frame);
+    overlayObserver.disconnect();
     if (restoreFrame) cancelAnimationFrame(restoreFrame); environmentData = null;
     clearTimeout(preparationTimer); preparationWorker?.terminate(); preparationWorker = null;
     geometry?.dispose(); material?.dispose(); normalMap?.dispose(); roughnessMap?.dispose(); environment?.dispose(); renderer?.dispose();
@@ -246,14 +248,22 @@
   });
   addEventListener("resize", resize, { passive: true }); addEventListener("scroll", onScroll, { passive: true });
   addEventListener("pointermove", e => {
-    if (e.pointerType !== "touch" && !touch.matches && !document.body.classList.contains("drawer-open")) pointer = [(e.clientX / innerWidth - .5) * 2, (.5 - e.clientY / innerHeight) * 2];
+    if (e.pointerType !== "touch" && !touch.matches && !readingOverlay()) pointer = [(e.clientX / innerWidth - .5) * 2, (.5 - e.clientY / innerHeight) * 2];
   }, { passive: true });
   document.addEventListener("pointerleave", () => { pointer = [0, 0]; });
-  document.addEventListener("visibilitychange", () => { paused = document.hidden; if (paused && frame) cancelAnimationFrame(frame); frame = 0; governor.reset(); sampleLast = sampleStart = 0; frameTimes = []; wake(); });
+  function syncReadingState() {
+    const next = document.hidden || readingOverlay();
+    if (next === paused) return;
+    paused=next; if (frame) cancelAnimationFrame(frame); frame=0;
+    governor.reset(); sampleLast=sampleStart=0;frameTimes=[];pointer=[0,0];wake();
+  }
+  const overlayObserver=new MutationObserver(syncReadingState);
+  overlayObserver.observe(document.body,{attributes:true,attributeFilter:["class"]});
+  document.addEventListener("visibilitychange",syncReadingState);
   addEventListener("aurum:motion", e => setMotion(e.detail));
   media.addEventListener("change", () => setMotion(media.matches || document.body.classList.contains("light-motion")));
   addEventListener("pagehide", e => { if (e.persisted) { paused = true; if (frame) cancelAnimationFrame(frame); frame = 0; } else cleanup(); });
-  addEventListener("pageshow", e => { if (e.persisted) { paused = document.hidden; wake(); } });
+  addEventListener("pageshow", e => { if (e.persisted) { paused = document.hidden || readingOverlay(); wake(); } });
   window.AurumWorld = { setChapter, setMotion };
   if (!document.querySelector(".chapter-nav")) {
     const button = document.getElementById("motionToggle");
