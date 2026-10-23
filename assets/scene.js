@@ -24,6 +24,7 @@
   }
   let initialized = false, anchorFrame = 0;
   const positions = new Map();
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   function resolveDestination(fragment) {
     let id; try { id = decodeURIComponent(String(fragment || "overview").replace(/^#/,"")); } catch { id = "overview"; }
     if (pages.includes(id)) return {id,page:id,target:null};
@@ -44,8 +45,8 @@
     QA("[data-page]").forEach(el => { el.hidden = el.dataset.page !== id; });
     synchronizeNav();
     if (updateURL && location.hash !== "#" + destination.id) history.pushState(null, "", "#" + destination.id);
+    if (changed || (initialized && !target)) scrollTo({ top: options.restore && !target ? positions.get(id) || 0 : 0, behavior: "instant" });
     if (changed) {
-      scrollTo({ top: options.restore && !target ? positions.get(id) || 0 : 0, behavior: "instant" });
       QA("#" + id + " > .section-heading").slice(0, 4).forEach((el, i) => {
         animate(el, [{ opacity: .25, transform: "translateY("+direction*18+"px)" }, { opacity: 1, transform: "translateY(0)" }], 620, false, i*45);
       });
