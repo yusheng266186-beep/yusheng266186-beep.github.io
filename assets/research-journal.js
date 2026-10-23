@@ -10,7 +10,7 @@
   function positive(value) { return typeof value === "number" && Number.isFinite(value) && value > 0; }
   function date(value) { return typeof value === "string" && Number.isFinite(Date.parse(value)); }
   function snapshot(input, now = Date.now(), id = String(now)) {
-    if (!input || !positive(input.price) || !date(input.quoteAsOf) || !positive(input.days) || !text(input.horizon, 20) ||
+    if (!Number.isFinite(now) || !text(id, 80) || !input || !positive(input.price) || !date(input.quoteAsOf) || !positive(input.days) || !text(input.horizon, 20) ||
         ![input.low, input.center, input.high].every(positive) || input.low > input.center || input.center > input.high) {
       throw Error("有效报价、报价时点或情景输入不足，暂时无法记录。");
     }
@@ -28,10 +28,11 @@
     if (!data || data.version !== 1 || !Array.isArray(data.items) || data.items.length > limit) throw Error("手记格式无效，原记录未覆盖。");
     const ids = new Set();
     return data.items.map(item => {
-      if (!date(item.createdAt) || !item.id || ids.has(item.id)) throw Error("手记记录无效，原记录未覆盖。");
-      ids.add(item.id);
-      return snapshot(item, Date.parse(item.createdAt), item.id);
-    });
+      if (!item || !date(item.createdAt) || !item.id) throw Error("手记记录无效，原记录未覆盖。");
+      const validated = snapshot(item, Date.parse(item.createdAt), item.id);
+      if (ids.has(validated.id)) throw Error("手记记录重复，原记录未覆盖。");
+      ids.add(validated.id); return validated;
+    }).sort((a,b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   }
   function read(storage) { return parse(storage.getItem(key)); }
   function append(storage, item) {
@@ -39,7 +40,7 @@
     if (items.length >= limit) throw Error("已保存 50 条手记，请先导出，再移除不需要的记录。");
     if (items.some(saved => saved.id === item.id)) throw Error("这条手记已保存。");
     const validated = snapshot(item, Date.parse(item.createdAt), item.id);
-    const next = [validated, ...items];
+    const next = [validated, ...items].sort((a,b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
     storage.setItem(key, JSON.stringify({version: 1, items: next}));
     return next;
   }
@@ -52,5 +53,22 @@
     storage.setItem(key, JSON.stringify({version:1, items:next}));
     return items.find(item => item.id === id) || null;
   }
-  return { key, limit, snapshot, parse, read, append, remove, changeSince };
+  function restore(storage, raw) {
+    if (typeof raw !== "string" || raw.length > 1000000) throw Error("请选择小于 1 MB 的 AURUM 手记 JSON 备份。");
+    const incoming = parse(raw), current = read(storage), byId = new Map(current.map(item => [item.id,item]));
+    let added = 0, skipped = 0;
+    for (const item of incoming) {
+      const existing = byId.get(item.id);
+      if (existing) {
+        if (JSON.stringify(existing) !== JSON.stringify(item)) throw Error("备份中有同编号、内容不同的手记，未覆盖任何记录。");
+        skipped++; continue;
+      }
+      byId.set(item.id,item); added++;
+    }
+    if (byId.size > limit) throw Error("合并后超过 50 条，请先导出并整理本机记录。");
+    const items = [...byId.values()].sort((a,b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+    if (added) storage.setItem(key, JSON.stringify({version:1,items}));
+    return {added,skipped,items};
+  }
+  return { key, limit, snapshot, parse, read, append, remove, restore, changeSince };
 });

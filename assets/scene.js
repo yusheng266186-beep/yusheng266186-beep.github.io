@@ -22,21 +22,31 @@
     bead.style.width = active.offsetWidth + "px"; bead.style.transform = "translateX(" + x + "px)";
     animate(bead, [{ transform: old === "none" ? bead.style.transform : old }, { transform: "translateX(" + x + "px) scaleX(1)", offset: .7 }, { transform: bead.style.transform }], 260, false);
   }
-  function go(id, updateURL = true) {
-    if (id === "decision" || id === "methodology") { const target = id; go(id === "decision" ? "intelligence" : "forecast", updateURL); requestAnimationFrame(() => { const el = Q("#" + target); if (el?.tagName === "DETAILS") el.open = true; el?.scrollIntoView({ behavior: enabled() ? "smooth" : "auto" }); }); return; }
-    if (!pages.includes(id)) id = "overview";
+  let initialized = false, anchorFrame = 0;
+  const positions = new Map();
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  function resolveDestination(fragment) {
+    let id; try { id = decodeURIComponent(String(fragment || "overview").replace(/^#/,"")); } catch { id = "overview"; }
+    if (pages.includes(id)) return {id,page:id,target:null};
+    const target = document.getElementById(id), page = target?.closest("[data-page]")?.dataset.page;
+    return page ? {id,page,target} : {id:"overview",page:"overview",target:null};
+  }
+  function go(fragment, updateURL = true, options = {}) {
+    const destination = resolveDestination(fragment), id = destination.page, target = destination.target;
     const changed = current !== id, direction = pages.indexOf(id) >= pages.indexOf(current) ? 1 : -1;
+    if (changed && initialized) positions.set(current,scrollY);
     if (changed) { animations.forEach(a => a.cancel()); release(); }
+    if (anchorFrame) cancelAnimationFrame(anchorFrame);
     current = id; document.body.dataset.chapter = id;
-    window.AurumWorld?.setChapter(id);
+    if (changed || !initialized) window.AurumWorld?.setChapter(id);
     Q("#chapterNumber").textContent = String(pages.indexOf(id) + 1).padStart(2,"0");
     const context = Q("#marketContext"), contextHost = Q(id === "overview" ? "#overviewContext" : "#mainContent");
     if (context && contextHost && context.parentElement !== contextHost) contextHost.prepend(context);
     QA("[data-page]").forEach(el => { el.hidden = el.dataset.page !== id; });
     synchronizeNav();
-    if (updateURL && location.hash !== "#" + id) history.pushState(null, "", "#" + id);
+    if (updateURL && location.hash !== "#" + destination.id) history.pushState(null, "", "#" + destination.id);
+    if (changed || (initialized && !target)) scrollTo({ top: options.restore && !target ? positions.get(id) || 0 : 0, behavior: "instant" });
     if (changed) {
-      scrollTo({ top: 0, behavior: "instant" });
       QA("#" + id + " > .section-heading").slice(0, 4).forEach((el, i) => {
         animate(el, [{ opacity: .25, transform: "translateY("+direction*18+"px)" }, { opacity: 1, transform: "translateY(0)" }], 620, false, i*45);
       });
@@ -44,22 +54,29 @@
         animate(el,[{opacity:.3,transform:"translateY(16px)"},{opacity:1,transform:"translateY(0)"}],520,false,55+i*45);
       });
       window.dispatchEvent(new CustomEvent("aurum:chapter", { detail: id }));
+      if (options.focus !== false && !target) {
+        const heading = Q("#"+id+" h1"); heading?.setAttribute("tabindex","-1"); heading?.focus({preventScroll:true});
+      }
     }
+    if (target) {
+      // Reveal an anchor's complete hierarchy before measuring its position.
+      for (let el = target; el && el !== document.body; el = el.parentElement) if (el.tagName === "DETAILS") el.open = true;
+      anchorFrame = requestAnimationFrame(() => {
+        anchorFrame = 0;
+        target.scrollIntoView({behavior: initialized && updateURL && !changed && enabled() ? "smooth" : "auto",block:"start"});
+        if (options.focus !== false) { target.setAttribute("tabindex","-1"); target.focus({preventScroll:true}); }
+      });
+    }
+    initialized = true;
   }
   document.addEventListener("click", e => {
+    if (e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     const a = e.target.closest("a[href^='#'],[data-go]");
-    if (!a || a.classList.contains("skip-link")) return;
+    if (!a || a.classList.contains("skip-link") || a.hasAttribute("download") || a.target === "_blank") return;
     const id = a.dataset.go || a.getAttribute("href").slice(1);
-    if (pages.includes(id) || ["decision", "methodology"].includes(id)) { e.preventDefault(); go(id); }
-    else {
-      const target = document.getElementById(id), section = target?.closest("[data-page]");
-      if (!target || !section) return;
-      e.preventDefault();
-      if (section.dataset.page !== current) go(section.dataset.page);
-      if (target.tagName === "DETAILS") target.open = true;
-      target.scrollIntoView({behavior:enabled()?"smooth":"auto",block:"start"});
-      target.setAttribute("tabindex","-1");target.focus({preventScroll:true});
-    }
+    const destination = resolveDestination(id);
+    if (destination.id !== id) return;
+    e.preventDefault(); go(id);
   });
   document.addEventListener("keydown", e => {
     const link = e.target.closest(".nav-item");
@@ -106,9 +123,14 @@
   addEventListener("resize", () => {
     if (innerWidth === navWidth || navFrame) return;
     navFrame = requestAnimationFrame(() => { navFrame = 0; navWidth = innerWidth; synchronizeNav(); });
-  }); addEventListener("popstate", () => go(location.hash.slice(1), false)); addEventListener("hashchange", () => go(location.hash.slice(1), false));
+  }); let historyFrame = 0;
+  function followHistory() {
+    if (historyFrame) cancelAnimationFrame(historyFrame);
+    historyFrame = requestAnimationFrame(() => { historyFrame = 0; go(location.hash.slice(1),false,{restore:true}); });
+  }
+  addEventListener("popstate",followHistory); addEventListener("hashchange",followHistory);
   document.fonts?.ready.then(synchronizeNav);
-  go(location.hash.slice(1) || "overview", false);
+  go(location.hash.slice(1) || "overview", false, {focus:false});
   animate(Q(".hero-title"), [{ opacity: .1, transform: "translateY(20px)" }, { opacity: 1, transform: "translateY(0)" }], 780);
   window.AurumUI = { go, animate, synchronizeNav, motionEnabled: enabled };
 })();

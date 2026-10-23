@@ -32,3 +32,30 @@ test('comparison requires a later timestamp, not merely a new fetch',()=>{
   assert.equal(J.changeSince(item,{price:900,asOf:null}),null);
   assert.ok(J.changeSince(item,{price:900,asOf:'2026-10-23T11:00:00Z'})>0);
 });
+test('backups merge chronologically, skip duplicates, and round-trip exact observations',()=>{
+  const storage=memory(),a=J.snapshot(input,now,'a'),b=J.snapshot({...input,note:'later'},now+1000,'b');
+  J.append(storage,a);
+  const raw=JSON.stringify({version:1,items:[a,b]});
+  const result=J.restore(storage,raw);
+  assert.equal(result.added,1);assert.equal(result.skipped,1);
+  assert.deepEqual(J.read(storage),[b,a]);
+  assert.equal(J.restore(storage,raw).added,0);
+});
+test('conflicting or malformed backups never partially replace local observations',()=>{
+  const storage=memory(),a=J.snapshot(input,now,'a');J.append(storage,a);const original=storage.getItem();
+  for(const raw of ['invalid',JSON.stringify({version:1,items:[J.snapshot(input,now,'b'),{...a,note:'conflict'}]}),JSON.stringify({version:1,items:[a,{...a,id:' a '} ]})]) {
+    assert.throws(()=>J.restore(storage,raw));assert.equal(storage.getItem(),original);
+  }
+});
+test('oversized merged backups and failed storage writes do not report successful recovery',()=>{
+  const storage=memory(),items=Array.from({length:50},(_,i)=>J.snapshot(input,now+i,'local-'+i));
+  storage.setItem('',JSON.stringify({version:1,items}));const original=storage.getItem();
+  assert.throws(()=>J.restore(storage,JSON.stringify({version:1,items:[J.snapshot(input,now,'new')]})),/50/);
+  assert.equal(storage.getItem(),original);
+  assert.throws(()=>J.restore({getItem:()=>null,setItem:()=>{throw Error('quota');}},JSON.stringify({version:1,items:[items[0]]})),/quota/);
+});
+test('undoing an older observation preserves the original timeline order',()=>{
+  const storage=memory(),a=J.snapshot(input,now,'a'),b=J.snapshot(input,now+1000,'b');
+  J.append(storage,a);J.append(storage,b);const removed=J.remove(storage,'a');J.append(storage,removed);
+  assert.deepEqual(J.read(storage).map(item=>item.id),['b','a']);
+});
