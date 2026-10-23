@@ -59,3 +59,24 @@ test('undoing an older observation preserves the original timeline order',()=>{
   J.append(storage,a);J.append(storage,b);const removed=J.remove(storage,'a');J.append(storage,removed);
   assert.deepEqual(J.read(storage).map(item=>item.id),['b','a']);
 });
+test('later reflection preserves the original snapshot and survives backup round-trip',()=>{
+  const storage=memory(),item=J.snapshot(input,now,'a');J.append(storage,item);
+  J.review(storage,'a','Revisited the original assumption',now+1000);
+  const saved=J.read(storage)[0];assert.deepEqual({...saved,review:null},item);
+  assert.equal(saved.review.note,'Revisited the original assumption');
+  const recovered=memory();J.restore(recovered,storage.getItem());assert.deepEqual(J.read(recovered),[saved]);
+});
+test('restoring old backups retains later reflection and merging newer reflection updates only that field',()=>{
+  const storage=memory(),item=J.snapshot(input,now,'a');J.append(storage,item);const originalBackup=storage.getItem();
+  J.review(storage,'a','First review',now+1000);assert.equal(J.restore(storage,originalBackup).skipped,1);
+  assert.equal(J.read(storage)[0].review.note,'First review');
+  const newer=memory();J.append(newer,item);J.review(newer,'a','Later review',now+2000);
+  assert.equal(J.restore(storage,newer.getItem()).updated,1);assert.equal(J.read(storage)[0].review.note,'Later review');
+  const raw=storage.getItem();assert.throws(()=>J.review(storage,'missing','note',now));assert.equal(storage.getItem(),raw);
+});
+test('manual prices and future observations cannot become later market comparisons',()=>{
+  const item=J.snapshot(input,now,'a'),quote={price:900,asOf:'2026-10-23T13:00:00Z',dataTier:'domestic-live'};
+  assert.equal(J.changeSince(item,{...quote,dataTier:'manual'},now+7200000),null);
+  assert.equal(J.changeSince({...item,dataTier:'manual'},quote,now+7200000),null);
+  assert.equal(J.changeSince(item,quote,now),null);
+});
