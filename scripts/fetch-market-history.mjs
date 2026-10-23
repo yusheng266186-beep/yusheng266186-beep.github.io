@@ -6,9 +6,14 @@ const outputPath = path.resolve("data/market-history.json");
 const sourceUrl = "https://quote.eastmoney.com/q/118.AU9999.html";
 
 try {
+  const dailyObservedAt=new Date().toISOString();
   const dailyResult = await fetchDailyHistory();
   const previous = await readExisting();
-  const daily = Core.normalizePoints([...(previous?.daily || []), ...dailyResult.points]);
+  const prior=Core.closedDaily(previous?.daily || [],previous?.generatedAt);
+  const incoming=Core.closedDaily(dailyResult.points.map(point=>({...point,observedAt:dailyObservedAt})),dailyObservedAt);
+  const daily = Core.normalizePoints([...prior.closed,...incoming.closed]);
+  const keptDays=new Set(daily.map(point=>point.time));
+  const excludedUnclosedDays=[...new Set([...(previous?.excludedUnclosedDays || []),...prior.pending.map(point=>point.time),...incoming.pending.map(point=>point.time)])].filter(day=>!keptDays.has(day));
   const intraday = await fetchKlinesWithRetry({ interval: 5, limit: 576 }).catch((error) => {
     console.warn(`Intraday history unavailable: ${error.message}`);
     return [];
@@ -27,6 +32,7 @@ try {
     source: dailyResult.source,
     sourceUrl: dailyResult.sourceUrl,
     historyType: "public-market-snapshot",
+    excludedUnclosedDays,
     daily,
     intraday
   };

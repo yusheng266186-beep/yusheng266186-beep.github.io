@@ -54,3 +54,26 @@ test('unknown market fields stay unknown across normalization and legitimate zer
   for(const key of ['previous','open','range','change','changeAmount','volume','turnover'])assert.equal(again.observed[key],false);
   assert.equal(C.normalizeQuote({...quote,volume:0},now).observed.volume,true);
 });
+const dailyPoint=(time,close=900)=>({time,open:close,close,high:close+1,low:close-1});
+test('Friday night bars labelled Monday never enter completed daily calculations',()=>{
+  const captured='2026-10-23T21:00:00+08:00',saturday=Date.parse('2026-10-24T08:00:00+08:00');
+  const view=C.closedDaily([dailyPoint('2026-10-23'),dailyPoint('2026-10-26')],captured,saturday);
+  assert.deepEqual(view.closed.map(p=>p.time),['2026-10-23']);assert.deepEqual(view.pending.map(p=>p.time),['2026-10-26']);
+});
+test('a stale unfinished capture cannot become a completed close merely because the calendar advances',()=>{
+  const captured='2026-10-23T21:00:00+08:00',monday=Date.parse('2026-10-26T16:00:00+08:00');
+  const pending=C.closedDaily([dailyPoint('2026-10-26')],captured,Date.parse('2026-10-24T08:00:00+08:00')).pending;
+  assert.equal(C.closedDaily(pending,'2026-10-26T16:00:00+08:00',monday).closed.length,0);
+  assert.equal(C.closedDaily([dailyPoint('2026-10-26')],'2026-10-26T16:00:00+08:00',monday).closed.length,1);
+});
+test('the capture time must itself follow the daily close and cannot be replaced by a later file timestamp',()=>{
+  const after=Date.parse('2026-10-23T16:00:00+08:00');
+  assert.equal(C.closedDaily([{...dailyPoint('2026-10-23'),observedAt:'2026-10-23T15:29:59+08:00'}],'2026-10-23T16:00:00+08:00',after).closed.length,0);
+  assert.equal(C.closedDaily([dailyPoint('2026-10-23')],'2026-10-23T15:30:01+08:00',after).closed.length,1);
+});
+test('missing capture times, future captures, weekends, and intraday rows are not completed daily records',()=>{
+  const after=Date.parse('2026-10-24T16:00:00+08:00'),point=dailyPoint('2026-10-23');
+  assert.equal(C.closedDaily([point],null,after).closed.length,0);
+  assert.equal(C.closedDaily([point],'2026-10-26T16:00:00+08:00',after).closed.length,0);
+  assert.equal(C.closedDaily([dailyPoint('2026-10-24'),dailyPoint('2026-10-23 20:00')],'2026-10-24T16:00:00+08:00',after).closed.length,0);
+});

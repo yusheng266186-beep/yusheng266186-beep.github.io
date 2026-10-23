@@ -97,6 +97,17 @@
       maxClose:points.length ? Math.max(...points.map(p=>p.close)) : NaN,
       maxDrawdownPct:points.length>1 ? drawdown : NaN };
   }
+  function closedDaily(points,asOf,now=Date.now()) {
+    const capturedAt=timestamp(asOf),closed=[],pending=[];
+    for(const point of normalizePoints(points)) {
+      const capture=Object.prototype.hasOwnProperty.call(point,"observedAt")?timestamp(point.observedAt):capturedAt;
+      const end=Date.parse(point.time.slice(0,10)+"T15:30:00+08:00");
+      const weekday=new Date(point.time.slice(0,10)+"T00:00:00Z").getUTCDay();
+      if(point.time.length!==10 || weekday===0 || weekday===6 || !capture || Date.parse(capture)>now+300000 || now<end || Date.parse(capture)<end) {pending.push({...point,observedAt:capture});continue;}
+      closed.push({...point,observedAt:capture});
+    }
+    return {closed,pending};
+  }
   function quoteReference(quote, lastDay, now = Date.now()) {
     if (!quote || quote.dataTier === "manual" || quoteState(quote,now).stale || !lastDay || chinaDate(quote.asOf) < lastDay.slice(0,10)) return null;
     return {price:quote.priceCnyGram,asOf:quote.asOf,source:quote.source,dataTier:quote.dataTier};
@@ -203,5 +214,5 @@
     return '"' + s.replace(/"/g, '""') + '"';
   }
   return { numeric, money, timestamp, ageHours, quoteState, normalizeQuote, normalizePoints, chinaDate,
-    momentum, historyWindow, quoteReference, volatility, scenarioAt, scenarioModel, emptyPortfolio, validatePortfolio, portfolioStats, order, orderCapacity, execute, csvCell };
+    momentum, historyWindow, closedDaily, quoteReference, volatility, scenarioAt, scenarioModel, emptyPortfolio, validatePortfolio, portfolioStats, order, orderCapacity, execute, csvCell };
 });

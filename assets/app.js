@@ -160,11 +160,14 @@
 
   function normalizeHistory(raw) {
     var history = raw && typeof raw === "object" ? raw : {};
+    var verified=Core.closedDaily(history.daily,history.generatedAt);
+    var unconfirmed=Array.from(new Set((Array.isArray(history.excludedUnclosedDays)?history.excludedUnclosedDays:[]).concat(verified.pending.map(function(p){return p.time;}))));
     return {
       source: history.source || "尚未加载历史数据",
       sourceUrl: history.sourceUrl || "https://www.sge.com.cn/sjzx/quotation_daily_new",
       generatedAt: validDate(history.generatedAt || new Date(0).toISOString()),
-      daily: normalizePoints(history.daily),
+      daily: verified.closed,
+      excludedUnclosedDays:unconfirmed,
       intraday: normalizePoints(history.intraday)
     };
   }
@@ -780,7 +783,7 @@
     var trend = !Number.isFinite(ma60)?"样本不足":last > ma20 && ma20 > ma60 ? "多头排列" : last < ma20 && ma20 < ma60 ? "空头排列" : "区间整理";
     setText("trendState", trend);
     setText("historyQuality", state.history.daily.length
-      ? state.history.source + " · " + state.history.daily.length + " 个日线点 · 截至 " + state.history.daily[state.history.daily.length - 1].time
+      ? state.history.source + " · " + state.history.daily.length + " 个日线点 · 截至 " + state.history.daily[state.history.daily.length - 1].time + (state.history.excludedUnclosedDays.length?" · "+state.history.excludedUnclosedDays.length+" 条未确认收盘记录未计入":"")
       : "历史快照不可用，未绘制伪造历史");
 
     var score = Math.round(clamp(return20 * 3.4 + (last > ma20 ? 16 : -12), -100, 100));
