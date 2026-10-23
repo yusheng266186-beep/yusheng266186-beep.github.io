@@ -6,10 +6,10 @@
   const reduce = matchMedia("(prefers-reduced-motion: reduce)"), phone = matchMedia("(max-width: 979px)");
   const animations = new Map(); let current = "overview", held = null;
   function enabled() { return !reduce.matches && !document.body.classList.contains("light-motion"); }
-  function animate(el, frames, duration = 420, spring = false) {
+  function animate(el, frames, duration = 420, spring = false, delay = 0) {
     if (!el || !enabled() || !el.animate) return;
     animations.get(el)?.cancel();
-    const a = el.animate(frames, { duration, easing: spring ? "cubic-bezier(.2,.85,.25,1.1)" : "cubic-bezier(.16,1,.3,1)", fill: "both" });
+    const a = el.animate(frames, { duration, delay, easing: spring ? "cubic-bezier(.2,.85,.25,1.1)" : "cubic-bezier(.16,1,.3,1)", fill: "both" });
     animations.set(el, a);
     a.finished.then(() => { if (animations.get(el) === a) animations.delete(el); a.cancel(); }, () => { if (animations.get(el) === a) animations.delete(el); });
     return a;
@@ -25,7 +25,8 @@
   function go(id, updateURL = true) {
     if (id === "decision" || id === "methodology") { const target = id; go(id === "decision" ? "intelligence" : "forecast", updateURL); requestAnimationFrame(() => Q("#" + target)?.scrollIntoView({ behavior: enabled() ? "smooth" : "auto" })); return; }
     if (!pages.includes(id)) id = "overview";
-    const changed = current !== id;
+    const changed = current !== id, direction = pages.indexOf(id) >= pages.indexOf(current) ? 1 : -1;
+    if (changed) { animations.forEach(a => a.cancel()); release(); }
     current = id; document.body.dataset.chapter = id;
     window.AurumWorld?.setChapter(id);
     Q("#chapterNumber").textContent = String(pages.indexOf(id) + 1).padStart(2,"0");
@@ -35,11 +36,14 @@
     synchronizeNav();
     if (updateURL && location.hash !== "#" + id) history.pushState(null, "", "#" + id);
     if (changed) {
-      scrollTo({ top: 0, behavior: "auto" });
+      scrollTo({ top: 0, behavior: "instant" });
       const page = Q("[data-page='" + id + "']");
-      animate(page, [{ opacity: .2, transform: "translateY(12px)" }, { opacity: 1, transform: "translateY(0)" }], phone.matches ? 420 : 560);
+      animate(page, [{ opacity: .25 }, { opacity: 1 }], phone.matches ? 350 : 480);
       QA("#" + id + " > .section-heading").slice(0, 4).forEach((el, i) => {
-        if (enabled()) { const a = el.animate([{ opacity: .2, transform: "translateY(25px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 760, delay: i * 70, easing: "cubic-bezier(.16,1,.3,1)" }); a.finished.then(() => a.cancel(), () => {}); }
+        animate(el, [{ opacity: .25, transform: "translateY("+direction*18+"px)" }, { opacity: 1, transform: "translateY(0)" }], 620, false, i*45);
+      });
+      QA("#"+id+" .account-strip>div,#"+id+" .forecast-card").forEach((el,i) => {
+        animate(el,[{opacity:.3,transform:"translateY(16px)"},{opacity:1,transform:"translateY(0)"}],520,false,55+i*45);
       });
       window.dispatchEvent(new CustomEvent("aurum:chapter", { detail: id }));
     }
@@ -49,6 +53,14 @@
     if (!a || a.classList.contains("skip-link")) return;
     const id = a.dataset.go || a.getAttribute("href").slice(1);
     if (pages.includes(id) || ["decision", "methodology"].includes(id)) { e.preventDefault(); go(id); }
+    else {
+      const target = document.getElementById(id), section = target?.closest("[data-page]");
+      if (!target || !section) return;
+      e.preventDefault();
+      if (section.dataset.page !== current) go(section.dataset.page);
+      target.scrollIntoView({behavior:enabled()?"smooth":"auto",block:"start"});
+      target.setAttribute("tabindex","-1");target.focus({preventScroll:true});
+    }
   });
   document.addEventListener("keydown", e => {
     const link = e.target.closest(".nav-item");
@@ -92,6 +104,9 @@
     });
   }, { threshold: .06 });
   QA(".panel.reveal,.source-grid,.signal-grid").forEach(el => revealObserver.observe(el));
+  addEventListener("aurum:horizon", () => {
+    animate(Q("#scenarioFocus"),[{opacity:.45,transform:"translateY(6px)"},{opacity:1,transform:"translateY(0)"}],260);
+  });
   syncMotion();
   addEventListener("resize", synchronizeNav); addEventListener("popstate", () => go(location.hash.slice(1), false)); addEventListener("hashchange", () => go(location.hash.slice(1), false));
   document.fonts?.ready.then(synchronizeNav);

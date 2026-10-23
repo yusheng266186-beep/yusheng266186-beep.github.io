@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/cinematic.css"><link rel="preload" as="image" href="assets/gold-sculpture-master.png" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/cinematic.css"><link rel="preload" as="font" type="font/woff2" href="assets/fonts/space-grotesk.woff2" crossorigin><link rel="preload" as="image" href="assets/gold-sculpture-master.png" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
       <symbol id="i-grid" viewBox="0 0 24 24">
         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
         <rect x="14" y="3" width="7" height="7" rx="1"></rect>
@@ -165,24 +165,24 @@
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">03 / SCENARIOS</span>
-                <h2>在变化中，看见可能。</h2>
+                <h1>在变化中，看见可能。</h1>
                 <p>调整假设，观察可能的路径。区间由历史波动推演，尚未经回测校准。</p>
               </div>
               <span class="model-chip" id="forecastModel">本地情景模型 · 假设可见</span>
             </div>
 
-            <div class="model-note"><span class="status-dot"></span> 基于报价时点推演；输入过期时，结果也仅是历史情景。<a href="#methodology">了解计算方法 ↗</a></div><div class="forecast-strip" id="forecastCards"></div>
+            <div class="model-note"><span class="status-dot"></span> 基于报价时点推演；输入过期时，结果也仅是历史情景。<a href="#methodology">了解计算方法 ↗</a></div><div class="horizon-heading"><span>选择一个观察周期</span><span>价格中枢 / 元·克</span></div><div class="forecast-strip" id="forecastCards" role="group" aria-label="观察周期"></div>
 
             <div class="forecast-layout">
               <article class="panel forecast-chart-panel reveal">
                 <div class="panel-heading compact">
                   <div>
                     <span class="eyebrow">SCENARIO CONE</span>
-                    <h2>跨周期情景路径</h2>
+                    <h2>给假设，一条可见的路径。</h2>
                   </div>
                   <span class="chart-disclaimer">非置信区间 · 横轴为平方根时间刻度</span>
                 </div>
-                <div class="forecast-canvas-wrap">
+                <div class="scenario-focus" id="scenarioFocus" aria-live="polite"></div><div class="forecast-canvas-wrap">
                   <canvas role="img" aria-label="不同观察期的基准路径与情景带；完整数值见上方情景卡片" id="forecastCanvas" width="920" height="430"></canvas>
                 </div>
                 <div class="scenario-legend">
@@ -198,7 +198,7 @@
                     <span class="eyebrow">ACTION BRIEF</span>
                     <h2>条件与观察清单</h2>
                   </div>
-                  <span class="confidence-ring" id="confidenceRing"><b>未校准</b><small>情景模型</small></span>
+                  <span class="confidence-ring" id="confidenceRing"><b>未校准</b><small>不代表概率</small></span>
                 </div>
                 <div class="stance-block" id="stanceBlock">
                   <span>当前倾向</span>
@@ -224,7 +224,7 @@
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">04 / PRACTICE</span>
-                <h2>让判断，经得起验证。</h2>
+                <h1>让判断，经得起验证。</h1>
                 <p>从 10 万元虚拟资金开始，理解仓位、费用与盈亏。账户沿用保存在本机的记录。</p>
               </div>
               <div class="heading-actions">
@@ -236,19 +236,19 @@
             </div>
 
             <div class="account-strip reveal" id="accountStrip">
-              <div><span>总权益</span><strong id="equityValue">--</strong><small id="equityDelta">初始资金 ¥100,000</small></div>
-              <div><span>可用现金</span><strong id="cashValue">--</strong><small id="cashRatio">--</small></div>
-              <div><span>黄金持仓</span><strong id="holdingValue">--</strong><small id="holdingCost">--</small></div>
-              <div><span>浮动盈亏</span><strong id="unrealizedValue">--</strong><small id="unrealizedPct">--</small></div>
-              <div><span>已实现盈亏</span><strong id="realizedValue">--</strong><small>已扣模拟手续费</small></div>
+              <div class="equity-card"><div class="metric-heading"><span>账户总权益</span><span class="metric-code">PAPER ACCOUNT</span></div><strong id="equityValue">--</strong><small id="equityDelta">初始资金 ¥100,000</small><div class="equity-composition"><div><span><i></i>现金</span><span><i></i>黄金</span></div><div class="composition-track" aria-hidden="true"><i id="equityAllocationBar"></i></div><small id="equityComposition">等待账户数据</small></div></div>
+              <div><div class="metric-heading"><span>可用现金</span><span class="metric-code">CASH</span></div><strong id="cashValue">--</strong><small id="cashRatio">--</small></div>
+              <div><div class="metric-heading"><span>黄金持仓</span><span class="metric-code">GOLD / g</span></div><strong id="holdingValue">--</strong><small id="holdingCost">--</small></div>
+              <div><div class="metric-heading"><span>浮动盈亏</span><span class="metric-code">UNREALIZED</span></div><strong id="unrealizedValue">--</strong><small id="unrealizedPct">--</small></div>
+              <div><div class="metric-heading"><span>已实现盈亏</span><span class="metric-code">REALIZED</span></div><strong id="realizedValue">--</strong><small>已扣模拟手续费</small></div>
             </div>
 
             <div class="practice-mode panel"><div><span class="eyebrow">PRICE CONTEXT</span><strong id="practiceContext">正在核对报价时间</strong><p>过期、手动价格需明确开启历史练习；成交记录保留报价时点。</p></div><label class="practice-toggle"><input type="checkbox" id="historicalPractice">使用历史 / 假设价格练习</label></div><div class="trade-layout">
-              <article class="panel order-ticket reveal">
+              <article class="panel order-ticket reveal" id="orderTicket">
                 <div class="panel-heading compact">
                   <div>
                     <span class="eyebrow">ORDER TICKET</span>
-                    <h2>AU9999 模拟订单</h2>
+                    <h2>AU9999 · 模拟委托</h2>
                   </div>
                   <span class="ticket-price" id="ticketPrice">--</span>
                 </div>
@@ -257,7 +257,7 @@
                   <button type="button" data-side="sell">卖出</button>
                 </div>
                 <div class="order-form">
-                  <label>
+                  <label class="quantity-field">
                     <span>交易克数</span>
                     <div class="input-shell"><input id="tradeGrams" type="number" min="0.01" step="0.01" value="10" /><b>g</b></div>
                   </label>
@@ -291,7 +291,7 @@
                 <div class="panel-heading compact">
                   <div>
                     <span class="eyebrow">PORTFOLIO RISK</span>
-                    <h2>仓位与成本，一目了然</h2>
+                    <h2>仓位与风险边界</h2>
                   </div>
                   <span class="risk-grade" id="riskGrade">LOW</span>
                 </div>
@@ -303,7 +303,7 @@
                   <div><span>仓位利用</span><strong id="positionUse">0%</strong></div>
                   <i><b id="positionBar"></b></i>
                 </div>
-                <div class="risk-boundaries">
+                <p class="allocation-note" id="allocationNote">查看现金与黄金的分配。</p><div class="risk-boundaries">
                   <div><span>自设单笔上限</span><strong id="maxOrderValue">--</strong></div>
                   <div><span>止损参考</span><strong id="stopPrice">--</strong></div>
                   <div><span>止盈参考</span><strong id="takePrice">--</strong></div>
@@ -332,7 +332,7 @@
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">05 / RESEARCH</span>
-                <h2>读懂，涌动的力量。</h2>
+                <h1>读懂，涌动的力量。</h1>
                 <p>把盘面观察、官方资讯与个人假设分开阅读，找到值得继续核实的线索。</p>
               </div>
               <div class="news-filters" id="newsFilters">
@@ -366,7 +366,7 @@
                 <div class="panel-heading compact">
                   <div>
                     <span class="eyebrow">MARKET &amp; OFFICIAL FEED</span>
-                    <h2>盘面观察与官方资讯</h2>
+                    <h2>盘面与官方线索</h2>
                   </div>
                   <span id="newsFreshness">更新中</span>
                 </div>

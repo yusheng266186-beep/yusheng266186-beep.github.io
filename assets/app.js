@@ -71,6 +71,7 @@
     news: normalizeNews(DATA.news),
     factors: DEFAULT_FACTORS.map(function (item) { return Object.assign({}, item); }),
     forecasts: [],
+    forecastHorizon: 1,
     sourceHealth: [],
     refreshing: false,
     quoteGeneration: 0,
@@ -783,9 +784,15 @@
   }
 
   function renderForecasts() {
-    $("forecastCards").innerHTML = state.forecasts.length ? state.forecasts.map(function (f) {
-      return '<article class="forecast-card"><div class="forecast-top"><span>' + f.label + '</span><b>' + f.stance + '</b></div><strong>' + toFixedPrice(f.center) + '<small>元/克</small></strong><p>' + toFixedPrice(f.low) + ' — ' + toFixedPrice(f.high) + '</p><small>波动情景带 · 未经校准</small></article>';
+    var scrollLeft = $("forecastCards").scrollLeft;
+    $("forecastCards").innerHTML = state.forecasts.length ? state.forecasts.map(function (f, index) {
+      var selected = index === state.forecastHorizon;
+      var marker = clamp((f.center-f.low)/Math.max(.01,f.high-f.low)*100,0,100);
+      return '<button type="button" class="forecast-card' + (selected ? ' selected' : '') + '" data-horizon="'+index+'" aria-pressed="'+selected+'"><span class="forecast-top"><span>' + f.label + '</span><b>' + f.stance + '</b></span><strong>' + toFixedPrice(f.center) + '</strong><span class="forecast-range"><span>'+toFixedPrice(f.low)+'</span><span>'+toFixedPrice(f.high)+'</span></span><span class="forecast-rail" aria-hidden="true"><i style="left:'+marker+'%"></i></span><small>'+(selected?'当前观察周期':'查看这一周期')+'</small></button>';
     }).join("") : '<div class="panel">有效日线不足 30 个，暂不推演情景。</div>';
+    $("forecastCards").scrollLeft = scrollLeft;
+    var focus = state.forecasts[state.forecastHorizon];
+    $("scenarioFocus").innerHTML = focus ? '<div><span>当前观察 · '+focus.label+'</span><strong>'+toFixedPrice(focus.center)+'<small>元 / 克</small></strong></div><p>波动情景带 <b>'+toFixedPrice(focus.low)+' — '+toFixedPrice(focus.high)+'</b><small>假设区间 · 未经概率校准</small></p>' : '';
     setText("bullProbability", "上界"); setText("baseProbability", "路径"); setText("bearProbability", "下界");
     var score = factorScore(); setText("factorTotal", signedNumber(Math.round(score)));
     setText("stanceTitle", score > 20 ? "偏强假设，观察条件变化" : score < -20 ? "偏弱假设，关注承受范围" : "保持中性，比较不同路径");
@@ -847,6 +854,9 @@
     setMetricClass("unrealizedPct", signedPercent(stats.pnlPct), stats.pnlPct);
     setMetricClass("realizedValue", signedCny(portfolio.realized), portfolio.realized);
     setText("goldAllocation", stats.allocation.toFixed(0) + "%");
+    $("equityAllocationBar").style.width = clamp(stats.allocation,0,100) + "%";
+    setText("equityComposition", "现金 " + Math.max(0,100-stats.allocation).toFixed(1) + "% · 黄金 " + stats.allocation.toFixed(1) + "%");
+    setText("allocationNote", portfolio.grams ? "当前持仓 " + portfolio.grams.toFixed(2) + "g，参考成本 " + money(portfolio.avgCost) + "。" : "目前全部为现金。设置数量后，可先查看订单将怎样改变仓位。");
     setText("positionUse", stats.allocation.toFixed(1) + "%");
     $("positionBar").style.width = clamp(stats.allocation, 0, 100) + "%";
     var risk = riskScore();
@@ -863,7 +873,7 @@
     $("tradeRows").innerHTML = portfolio.trades.length ? portfolio.trades.slice(0,200).map(function(t) {
       var mode=t.dataMode === "historical-practice" ? "历史练习" : t.dataMode === "manual" ? "假设价格" : t.dataMode ? "行情练习" : "旧版记录";
       return "<tr><td>"+escapeHtml(formatDateTime(t.createdAt))+"</td><td><span class='trade-side "+t.side+"'>"+(t.side==="buy"?"买入":"卖出")+"</span></td><td>"+number(t.grams,0).toFixed(2)+"g</td><td>"+money(t.price)+"</td><td>"+cnyPrecise(t.fee)+"</td><td>"+cnyPrecise(t.value)+"</td><td>"+escapeHtml(t.note||"—")+"</td><td>"+escapeHtml(t.quoteAsOf?formatDateTime(t.quoteAsOf):"旧版未记录")+"</td><td>"+mode+"</td></tr>";
-    }).join("") : '<tr class="empty-row"><td colspan="9">暂无模拟成交。可以先用 1g 或 5g 测试完整交易流程。</td></tr>';
+    }).join("") : '<tr class="empty-row"><td colspan="9"><div class="ledger-empty"><span class="empty-mark" aria-hidden="true">↗</span><strong>第一笔记录，从一个清晰假设开始。</strong><p>设置数量、核对费用与仓位，每次练习都会保留价格时点。</p><a href="#orderTicket" class="text-link">回到模拟委托 ↗</a></div></td></tr>';
     if(portfolio.trades.length>200)setText("tradeCount",portfolio.trades.length+" 笔成交 · 展示最近 200 笔，导出保留全部");
   }
 
@@ -1350,7 +1360,7 @@
   }
 
   function drawGrid(ctx, width, height, pad, min, max, y) {
-    ctx.font = "11px Manrope, sans-serif";
+    ctx.font = "11px IBM Plex Mono, sans-serif";
     ctx.textAlign = "left";
     for (var index = 0; index <= 4; index += 1) {
       var value = min + (max - min) * (1 - index / 4);
@@ -1482,7 +1492,7 @@
       ctx.lineTo(width - pad.right, gy);
       ctx.stroke();
       ctx.fillStyle = "#a7b29b";
-      ctx.font = "11px Manrope, sans-serif";
+      ctx.font = "11px IBM Plex Mono, sans-serif";
       ctx.textAlign = "right";
       ctx.fillText(value.toFixed(0), pad.left - 8, gy + 3);
     }
@@ -1509,12 +1519,24 @@
     ctx.strokeStyle = "#dcc080";
     ctx.lineWidth = 1.7;
     ctx.stroke();
+    var selectedIndex = state.forecastHorizon + 1;
+    var selectedPoint = points[selectedIndex];
+    if (selectedPoint) {
+      var sx = x(selectedIndex), highY = y(selectedPoint.high), lowY = y(selectedPoint.low);
+      ctx.fillStyle = "rgba(217,190,127,.07)";
+      ctx.fillRect(sx-12,pad.top,24,height-pad.top-pad.bottom);
+      ctx.strokeStyle = "rgba(229,203,148,.6)";
+      ctx.lineWidth = 1;ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(sx,pad.top);ctx.lineTo(sx,height-pad.bottom);ctx.stroke();ctx.setLineDash([]);
+      ctx.lineWidth = 2;ctx.strokeStyle = "#dcc080";ctx.beginPath();ctx.moveTo(sx,highY);ctx.lineTo(sx,lowY);ctx.stroke();
+      [highY,lowY].forEach(function(py){ctx.beginPath();ctx.moveTo(sx-4,py);ctx.lineTo(sx+4,py);ctx.stroke();});
+      ctx.beginPath();ctx.arc(sx,y(selectedPoint.center),5,0,Math.PI*2);ctx.fillStyle="#e9d2a0";ctx.fill();
+    }
     points.forEach(function (point, index) {
       ctx.beginPath();
       ctx.arc(x(index), y(point.center), 3, 0, Math.PI * 2);
       ctx.fillStyle = index === 0 ? "#b8cbb1" : "#dcc080";
       ctx.fill();
-      ctx.fillStyle = "#b2b99f";
+      ctx.fillStyle = index === selectedIndex ? "#ecd7a6" : "#b2b99f";
       ctx.font = "11px Noto Sans SC, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(point.label, x(index), height - 18);
@@ -1582,6 +1604,29 @@
   }
 
   function bindEvents() {
+    $("forecastCards").addEventListener("keydown", function(event) {
+      if (!["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) return;
+      var buttons = Array.from($("forecastCards").querySelectorAll("[data-horizon]"));
+      var index = buttons.indexOf(event.target.closest("[data-horizon]"));
+      if (index < 0) return;
+      event.preventDefault();
+      var next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length-1 : (index+(event.key==="ArrowRight"?1:-1)+buttons.length)%buttons.length;
+      buttons[next].click();
+      var selected = $("forecastCards").querySelector('[data-horizon="'+next+'"]');
+      selected.focus({preventScroll:true});
+      var container = $("forecastCards");
+      if (container.scrollWidth > container.clientWidth) container.scrollTo({left:selected.offsetLeft-container.offsetLeft-8,behavior:"auto"});
+    });
+    $("forecastCards").addEventListener("click", function(event) {
+      var button = event.target.closest("[data-horizon]");
+      if (!button) return;
+      var index = Number(button.dataset.horizon);
+      if (!state.forecasts[index] || index === state.forecastHorizon) return;
+      state.forecastHorizon = index;
+      renderForecasts(); drawForecastChart();
+      $("forecastCards").querySelector('[data-horizon="'+index+'"]').focus({preventScroll:true});
+      window.dispatchEvent(new CustomEvent("aurum:horizon"));
+    });
     $("historicalPractice").addEventListener("change", renderOrderPreview);
     $("backupAccount").onclick = function () { download("aurum-account-" + new Date().toISOString().slice(0,10) + ".json", JSON.stringify({app:"AURUM",version:1,exportedAt:new Date().toISOString(),portfolio:state.portfolio, unverifiedOriginal:portfolioReadFailed ? portfolioSignature : undefined}, null, 2), "application/json"); };
     $("restoreAccount").onclick = function () { $("accountFile").click(); };
