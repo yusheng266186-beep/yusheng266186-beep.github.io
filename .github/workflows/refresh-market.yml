@@ -2,7 +2,7 @@ name: Refresh Market Snapshot
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,6 +15,7 @@ concurrency:
 jobs:
   refresh-market:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,3 +35,4 @@ jobs:
         with:
           commit_message: "chore: refresh gold market snapshot"
           file_pattern: data/market-snapshot.json data/embedded-data.js
+

@@ -1,12 +1,14 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import Core from "../assets/core.js";
 
 const outputPath = path.resolve("data/market-history.json");
 const sourceUrl = "https://quote.eastmoney.com/q/118.AU9999.html";
 
 try {
   const dailyResult = await fetchDailyHistory();
-  const daily = dailyResult.points;
+  const previous = await readExisting();
+  const daily = Core.normalizePoints([...(previous?.daily || []), ...dailyResult.points]);
   const intraday = await fetchKlinesWithRetry({ interval: 5, limit: 576 }).catch((error) => {
     console.warn(`Intraday history unavailable: ${error.message}`);
     return [];
@@ -36,6 +38,7 @@ try {
   const current = await readExisting();
   if (current?.daily?.length >= 30) {
     console.warn(`History refresh failed; keeping existing snapshot: ${error.message}`);
+    throw error;
   } else {
     throw error;
   }
@@ -259,3 +262,4 @@ async function readExisting() {
     return null;
   }
 }
+

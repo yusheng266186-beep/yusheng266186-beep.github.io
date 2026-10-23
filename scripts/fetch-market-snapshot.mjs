@@ -2,7 +2,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const outputPath = path.resolve("data/market-snapshot.json");
-const usdCny = Number(process.env.USD_CNY || 7.18);
+import Core from "../assets/core.js";
+const configuredFx = Core.numeric(process.env.USD_CNY);
+const fxAsOf = Core.timestamp(process.env.USD_CNY_ASOF);
+const usdCny = configuredFx > 0 && Core.ageHours(fxAsOf) <= 72 ? configuredFx : null;
 
 let domestic = await fetchEastmoneyDomestic().catch(async (eastmoneyError) => {
   console.warn(`Eastmoney domestic quote failed: ${eastmoneyError.message}`);
@@ -10,32 +13,31 @@ let domestic = await fetchEastmoneyDomestic().catch(async (eastmoneyError) => {
     console.warn(`Sina domestic quote failed: ${sinaError.message}`);
     return fetchSgeOfficialDelayed().catch(async (sgeError) => {
       console.warn(`SGE official quote failed: ${sgeError.message}`);
-      const existing = await readExistingSnapshot();
-      if (existing) {
-        console.log("Keeping existing domestic market snapshot.");
-        return existing;
-      }
-      return fallbackSnapshot();
+      throw new Error("All domestic sources failed; retained the last snapshot without changing its timestamp.");
     });
   });
 });
 
+if (!(domestic.priceCnyGram > 0) || Core.ageHours(domestic.asOf) === Infinity) throw new Error("Invalid domestic price or quote timestamp; old snapshot retained.");
+if (Core.ageHours(domestic.asOf) > 96) throw new Error("Quote is over 96 hours old; refresh did not produce a current snapshot.");
 if (domestic.dataTier !== "official-delayed") {
   const officialCheck = await fetchSgeOfficialDelayed().catch((error) => {
     console.warn(`SGE cross-check failed: ${error.message}`);
     return null;
   });
-  if (officialCheck) domestic = crossCheckDomestic(domestic, officialCheck);
+  if (officialCheck && Math.abs(Date.parse(domestic.asOf) - Date.parse(officialCheck.asOf)) <= 8 * 3600000) domestic = crossCheckDomestic(domestic, officialCheck);
 }
 
 const international = await fetchYahooGoldFuture().catch((error) => {
   console.warn(`International reference failed: ${error.message}`);
-  return domestic.internationalReference || null;
+  return null;
 });
 
 const snapshot = {
   ...domestic,
   usdCny,
+  fxAsOf: usdCny ? fxAsOf : null,
+  fxSource: usdCny ? "Explicit USD_CNY environment setting" : null,
   internationalReference: international
 };
 
@@ -222,7 +224,7 @@ async function fetchSgeOfficialDelayed() {
   if (!res.ok) throw new Error(`SGE returned ${res.status}`);
   const html = await res.text();
   const rows = parseSgeRows(html);
-  const main = rows.find((item) => item.symbol === "Au99.99") || rows.find((item) => item.symbol === "Au(T+D)");
+  const main = rows.find((item) => item.symbol === "Au99.99");
   if (!main || !Number.isFinite(main.latest) || main.latest <= 0) {
     throw new Error("SGE page did not include a valid Au99.99 quote");
   }
@@ -241,7 +243,7 @@ async function fetchSgeOfficialDelayed() {
     changePct: main.open ? (main.latest - main.open) / main.open * 100 : 0,
     volume: null,
     turnover: null,
-    asOf: date ? parseChineseDate(date) : new Date().toISOString(),
+    asOf: date ? parseChineseDate(date) : null,
     source: "上海黄金交易所官方延时行情",
     sourceUrl: url,
     officialSource: "上海黄金交易所延时行情",
@@ -289,39 +291,10 @@ async function fetchYahooGoldFuture() {
     symbol: "GC=F",
     priceUsdOz: close,
     previousUsdOz: previous,
-    priceCnyGram: close / 31.1034768 * usdCny,
-    asOf: timestamp ? new Date(timestamp * 1000).toISOString() : new Date().toISOString(),
+    priceCnyGram: usdCny ? close / 31.1034768 * usdCny : null,
+    asOf: timestamp ? new Date(timestamp * 1000).toISOString() : null,
     source: "Yahoo Finance GC=F delayed futures reference",
     delay: "international delayed reference"
-  };
-}
-
-function fallbackSnapshot() {
-  return {
-    market: "CN-SGE",
-    marketRegion: "CN",
-    unit: "CNY/g",
-    primaryContract: "AU9999",
-    priceCnyGram: 895,
-    previousCnyGram: 881.98,
-    openCnyGram: 885,
-    highCnyGram: 895,
-    lowCnyGram: 884,
-    changeCnyGram: 13.02,
-    changePct: 1.48,
-    volume: null,
-    turnover: null,
-    asOf: new Date().toISOString(),
-    source: "内嵌国内黄金快照",
-    sourceUrl: "https://www.sge.com.cn/sjzx/yshqbg",
-    officialSource: "上海黄金交易所延时行情",
-    officialUrl: "https://www.sge.com.cn/sjzx/yshqbg",
-    delay: "fallback domestic snapshot",
-    dataTier: "fallback",
-    contracts: [
-      { symbol: "AU9999", name: "黄金9999", latest: 895, high: 895, low: 884, open: 885, previousClose: 881.98, change: 13.02, changePct: 1.48 },
-      { symbol: "AUTD", name: "黄金T+D", latest: 888.1, high: 894, low: 884.15, open: 886, previousClose: 879.67, change: 8.43, changePct: 0.96 }
-    ]
   };
 }
 
@@ -337,18 +310,18 @@ function strip(value) {
 function timestampFromEastmoney(value) {
   const seconds = Number(value);
   if (Number.isFinite(seconds) && seconds > 946684800) return new Date(seconds * 1000).toISOString();
-  return new Date().toISOString();
+  return null;
 }
 
 function timestampFromSina(value) {
   const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
-  if (!match) return new Date().toISOString();
+  if (!match) return null;
   return new Date(`${match[1]}-${match[2]}-${match[3]}T${match[4]}:${match[5]}:${match[6]}+08:00`).toISOString();
 }
 
 function parseChineseDate(value) {
   const match = value.match(/(\d{4})年(\d{2})月(\d{2})日/);
-  if (!match) return new Date().toISOString();
+  if (!match) return null;
   return new Date(`${match[1]}-${match[2]}-${match[3]}T15:30:00+08:00`).toISOString();
 }
 
@@ -359,3 +332,4 @@ async function readExistingSnapshot() {
     return null;
   }
 }
+
