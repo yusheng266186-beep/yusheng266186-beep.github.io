@@ -23,7 +23,7 @@
     animate(bead, [{ transform: old === "none" ? bead.style.transform : old }, { transform: "translateX(" + x + "px) scaleX(1)", offset: .7 }, { transform: bead.style.transform }], 260, false);
   }
   function go(id, updateURL = true) {
-    if (id === "decision" || id === "methodology") { const target = id; go(id === "decision" ? "intelligence" : "forecast", updateURL); requestAnimationFrame(() => Q("#" + target)?.scrollIntoView({ behavior: enabled() ? "smooth" : "auto" })); return; }
+    if (id === "decision" || id === "methodology") { const target = id; go(id === "decision" ? "intelligence" : "forecast", updateURL); requestAnimationFrame(() => { const el = Q("#" + target); if (el?.tagName === "DETAILS") el.open = true; el?.scrollIntoView({ behavior: enabled() ? "smooth" : "auto" }); }); return; }
     if (!pages.includes(id)) id = "overview";
     const changed = current !== id, direction = pages.indexOf(id) >= pages.indexOf(current) ? 1 : -1;
     if (changed) { animations.forEach(a => a.cancel()); release(); }
@@ -37,8 +37,6 @@
     if (updateURL && location.hash !== "#" + id) history.pushState(null, "", "#" + id);
     if (changed) {
       scrollTo({ top: 0, behavior: "instant" });
-      const page = Q("[data-page='" + id + "']");
-      animate(page, [{ opacity: .25 }, { opacity: 1 }], phone.matches ? 350 : 480);
       QA("#" + id + " > .section-heading").slice(0, 4).forEach((el, i) => {
         animate(el, [{ opacity: .25, transform: "translateY("+direction*18+"px)" }, { opacity: 1, transform: "translateY(0)" }], 620, false, i*45);
       });
@@ -58,6 +56,7 @@
       if (!target || !section) return;
       e.preventDefault();
       if (section.dataset.page !== current) go(section.dataset.page);
+      if (target.tagName === "DETAILS") target.open = true;
       target.scrollIntoView({behavior:enabled()?"smooth":"auto",block:"start"});
       target.setAttribute("tabindex","-1");target.focus({preventScroll:true});
     }
@@ -96,19 +95,18 @@
     syncMotion();
   };
   reduce.addEventListener("change", syncMotion);
-  const revealObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      revealObserver.unobserve(entry.target);
-      animate(entry.target, [{ opacity: .18, transform: "translateY(26px)" }, { opacity: 1, transform: "translateY(0)" }], phone.matches ? 560 : 780);
-    });
-  }, { threshold: .06 });
-  QA(".panel.reveal,.source-grid,.signal-grid").forEach(el => revealObserver.observe(el));
+  // Reading surfaces remain fully visible during native scrolling. Fading or
+  // translating a large translucent panel changes its compositor surface and
+  // produces a visible flash, especially around the factor controls.
   addEventListener("aurum:horizon", () => {
     animate(Q("#scenarioFocus"),[{opacity:.45,transform:"translateY(6px)"},{opacity:1,transform:"translateY(0)"}],260);
   });
   syncMotion();
-  addEventListener("resize", synchronizeNav); addEventListener("popstate", () => go(location.hash.slice(1), false)); addEventListener("hashchange", () => go(location.hash.slice(1), false));
+  let navWidth = innerWidth, navFrame = 0;
+  addEventListener("resize", () => {
+    if (innerWidth === navWidth || navFrame) return;
+    navFrame = requestAnimationFrame(() => { navFrame = 0; navWidth = innerWidth; synchronizeNav(); });
+  }); addEventListener("popstate", () => go(location.hash.slice(1), false)); addEventListener("hashchange", () => go(location.hash.slice(1), false));
   document.fonts?.ready.then(synchronizeNav);
   go(location.hash.slice(1) || "overview", false);
   animate(Q(".hero-title"), [{ opacity: .1, transform: "translateY(20px)" }, { opacity: 1, transform: "translateY(0)" }], 780);

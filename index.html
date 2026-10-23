@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/cinematic.css"><link rel="preload" as="font" type="font/woff2" href="assets/fonts/space-grotesk.woff2" crossorigin><link rel="preload" as="image" href="assets/gold-sculpture-master.png" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/cinematic.css"><link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-variable.woff2" crossorigin><link rel="preload" as="image" href="assets/gold-sculpture-master.png" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
       <symbol id="i-grid" viewBox="0 0 24 24">
         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
         <rect x="14" y="3" width="7" height="7" rx="1"></rect>
@@ -171,7 +171,7 @@
               <span class="model-chip" id="forecastModel">本地情景模型 · 假设可见</span>
             </div>
 
-            <div class="model-note"><span class="status-dot"></span> 基于报价时点推演；输入过期时，结果也仅是历史情景。<a href="#methodology">了解计算方法 ↗</a></div><div class="horizon-heading"><span>选择一个观察周期</span><span>价格中枢 / 元·克</span></div><div class="forecast-strip" id="forecastCards" role="group" aria-label="观察周期"></div>
+            <div class="model-note"><span class="status-dot"></span> 基于报价时点推演；输入过期时，结果也仅是历史情景。<a href="#methodology">了解计算方法 ↗</a></div><div class="horizon-heading"><span>选择一个观察周期</span><span>价格中枢 · 元/克</span></div><div class="forecast-strip" id="forecastCards" role="group" aria-label="观察周期"></div>
 
             <div class="forecast-layout">
               <article class="panel forecast-chart-panel reveal">
@@ -190,6 +190,7 @@
                   <span><i class="base"></i>基准情景 <b id="baseProbability">--</b></span>
                   <span><i class="bear"></i>谨慎情景 <b id="bearProbability">--</b></span>
                 </div>
+                <div class="scenario-tools"><span>保留这一刻，留待下一次回看。</span><button class="text-button" type="button" id="captureScenario">记录这一情景 ↗</button></div>
               </article>
 
               <article class="panel decision-brief reveal">
@@ -210,17 +211,18 @@
               </article>
             </div>
 
-            <article class="panel factors-panel reveal">
-              <div class="panel-heading compact">
-                <div>
-                  <span class="eyebrow">FACTOR LAB</span>
-                  <h2>驱动假设与敏感性</h2>
-                </div>
-                <span class="factor-total">综合分 <strong id="factorTotal">--</strong></span>
+            <details class="panel assumption-console" id="assumptionConsole">
+              <summary class="assumption-summary">
+                <div class="assumption-heading"><span class="eyebrow">FINE-TUNE YOUR VIEW</span><h2>驱动假设</h2><p id="factorOverview">读取当前假设</p></div>
+                <div class="assumption-score"><span>综合方向分</span><strong id="factorTotal">--</strong></div>
+                <span class="assumption-trigger"><span class="when-closed">调整假设</span><span class="when-open">收起控制台</span><b aria-hidden="true">＋</b></span>
+              </summary>
+              <div class="assumption-editor">
+                <div class="assumption-toolbar"><div class="factor-groups" role="tablist" aria-label="假设分组"><button type="button" role="tab" id="factor-tab-market" data-factor-group="market" aria-controls="factorGrid" aria-selected="true">盘面与情绪</button><button type="button" role="tab" id="factor-tab-domestic" data-factor-group="domestic" aria-controls="factorGrid" aria-selected="false" tabindex="-1">供需与汇率</button><button type="button" role="tab" id="factor-tab-macro" data-factor-group="macro" aria-controls="factorGrid" aria-selected="false" tabindex="-1">全球宏观</button></div><span>− 偏弱影响 · 0 中性 · ＋ 偏强影响</span></div>
+                <div class="factor-grid" id="factorGrid" role="tabpanel" aria-labelledby="factor-tab-market"></div>
+                <div class="assumption-footer"><p class="assumption-footnote">趋势动量来自历史日线，其余为可调研究假设。调整只影响情景，不改变市场报价。</p><button class="text-button" type="button" id="resetAssumptions">恢复数据基线</button></div>
               </div>
-              <div class="factor-grid" id="factorGrid"></div>
-              <p class="panel-footnote">趋势动量按历史日线计算，其余滑杆是可调整的研究假设，不代表已采集宏观指标。拖动只影响情景，不改变市场报价。</p>
-            </article><details class="method-card panel" id="methodology"><summary>这些情景怎样计算？<span>＋</span></summary><div><p>从最近 90 个交易日的对数收益估计日波动，用每年 252 个交易日将观察期统一换算；趋势与因子分值影响年化漂移假设。上下界为基准路径叠加 1.25 倍波动尺度。</p><p>区间、上行与下行情景都没有经过样本外回测或概率校准，不给出命中率。3 年结果只适合做敏感性观察。真实市场可能超出任何情景。</p></div></details></section><section class="view-section" id="trading" data-page="trading" hidden>
+            </details><details class="method-card panel" id="methodology"><summary>这些情景怎样计算？<span>＋</span></summary><div><p>从最近 90 个交易日的对数收益估计日波动，用每年 252 个交易日将观察期统一换算；趋势与因子分值影响年化漂移假设。上下界为基准路径叠加 1.25 倍波动尺度。</p><p>区间、上行与下行情景都没有经过样本外回测或概率校准，不给出命中率。3 年结果只适合做敏感性观察。真实市场可能超出任何情景。</p></div></details></section><section class="view-section" id="trading" data-page="trading" hidden>
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">04 / PRACTICE</span>
@@ -335,12 +337,7 @@
                 <h1>读懂，涌动的力量。</h1>
                 <p>把盘面观察、官方资讯与个人假设分开阅读，找到值得继续核实的线索。</p>
               </div>
-              <div class="news-filters" id="newsFilters">
-                <button type="button" class="active" data-filter="all">全部</button>
-                <button type="button" data-filter="domestic">国内</button>
-                <button type="button" data-filter="macro">宏观</button>
-                <button type="button" data-filter="high">主题相关</button>
-              </div>
+              <nav class="research-section-nav" aria-label="研究内容"><a href="#journalSection">观察手记 <span id="journalNavCount">0</span></a><a href="#decision">研究摘要 ↗</a></nav>
             </div>
 
             <div class="intel-layout">
@@ -370,11 +367,18 @@
                   </div>
                   <span id="newsFreshness">更新中</span>
                 </div>
+              <div class="news-filters" id="newsFilters">
+                <button type="button" class="active" data-filter="all">全部</button>
+                <button type="button" data-filter="domestic">国内</button>
+                <button type="button" data-filter="macro">宏观</button>
+                <button type="button" data-filter="high">主题相关</button>
+              </div>
                 <div class="news-list" id="newsList"></div>
               </article>
             </div>
 
-            <div class="source-grid reveal" id="sourceGrid"></div><section class="research-notes" id="decision">
+            <section class="panel research-journal" id="journalSection"><div class="panel-heading compact"><div><span class="eyebrow">OBSERVATION JOURNAL</span><h2>为判断，留下坐标。</h2></div><button class="text-button" id="exportJournal" type="button" disabled>导出手记 ↗</button></div><div id="journalList"></div><div id="journalUndo" class="journal-undo" role="status"></div><p class="journal-local-note">仅保存在此浏览器，清理数据前请导出备份。</p></section>
+            <details class="panel source-index" id="researchSources"><summary><div><span class="eyebrow">SOURCE DIRECTORY</span><h2>每个判断，都能回到出处。</h2></div><span>核验来源 ＋</span></summary><div class="source-grid" id="sourceGrid"></div></details><section class="research-notes" id="decision">
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">RESEARCH NOTE</span>
@@ -388,7 +392,7 @@
               <article class="panel ai-console reveal">
                 <div class="ai-console-head">
                   <div class="ai-avatar"><svg><use href="#i-sparkles"></use></svg><i></i></div>
-                  <div><span>AURUM COPILOT</span><strong id="aiHeadline">准备生成国内黄金执行建议</strong></div>
+                  <div><span>AURUM COPILOT</span><strong id="aiHeadline">准备形成研究摘要</strong></div>
                   <button class="icon-button" id="configureAI" type="button" title="配置模型接口" aria-label="配置模型接口">
                     <svg><use href="#i-settings"></use></svg>
                   </button>
@@ -423,7 +427,7 @@
                 </article>
               </aside>
             </div></section></section>
-<footer class="app-footer"><div><span class="footer-wordmark">AURUM</span><span>THE VALUE OF A LONGER VIEW.</span></div><p>公开行情与情景推演，仅用于研究和虚拟练习。</p><div class="footer-links"><a href="README.html">使用与方法 ↗</a><button class="text-button" type="button" data-go="intelligence">数据来源 ↗</button></div><div class="source-health"><span id="sideSource">读取来源</span><span id="sideHealth">正在连接</span></div></footer></main></div></div>    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+<footer class="app-footer"><div><span class="footer-wordmark">AURUM</span><span>THE VALUE OF A LONGER VIEW.</span></div><p>公开行情与情景推演，仅用于研究和虚拟练习。</p><div class="footer-links"><a href="README.html">使用与方法 ↗</a><a href="#researchSources">数据来源 ↗</a></div><div class="source-health"><span id="sideSource">读取来源</span><span id="sideHealth">正在连接</span></div></footer></main></div></div>    <div class="drawer-backdrop" id="drawerBackdrop"></div>
     <aside class="settings-drawer" id="settingsDrawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="偏好与研究参数" inert>
       <div class="drawer-head">
         <div><span>TERMINAL SETTINGS</span><h2>偏好与研究参数</h2></div>
@@ -490,4 +494,5 @@
     </div>
 
 
-<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div><script src="data/embedded-data.js"></script><script src="assets/core.js"></script><script src="assets/gold-geometry.js"></script><script src="assets/gold-world.js"></script><script src="assets/scene.js"></script><script src="assets/app.js"></script></body></html>
+<dialog class="journal-dialog" id="journalDialog" aria-labelledby="journalDialogTitle"><form id="journalForm"><div class="journal-dialog-head"><div><span class="eyebrow">KEEP A PERSPECTIVE</span><h2 id="journalDialogTitle">记录这一刻的判断。</h2></div><button type="button" class="icon-button" id="closeJournal" aria-label="关闭记录窗口">×</button></div><p id="journalCaptureMeta"></p><label for="journalNote">此刻，你在观察什么？<span>选填 · 最多 280 字</span></label><textarea id="journalNote" maxlength="280" rows="4" placeholder="写下理由，以及下一次要核实的变化。"></textarea><p class="form-error" id="journalError" role="alert"></p><p class="journal-caption">记录时的报价、周期、区间与全部假设将一并保存到本机。</p><button class="wide-button primary" type="submit">保存并查看手记 ↗</button></form></dialog>
+<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div><script src="data/embedded-data.js"></script><script src="assets/core.js"></script><script src="assets/gold-geometry.js"></script><script src="assets/gold-surface.js"></script><script src="assets/render-policy.js"></script><script src="assets/gold-world.js"></script><script src="assets/scene.js"></script><script src="assets/research-journal.js"></script><script src="assets/journal-ui.js"></script><script src="assets/app.js"></script></body></html>

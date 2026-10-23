@@ -72,6 +72,8 @@
     factors: DEFAULT_FACTORS.map(function (item) { return Object.assign({}, item); }),
     forecasts: [],
     forecastHorizon: 1,
+    factorGroup: "market",
+    factorOverrides: {},
     sourceHealth: [],
     refreshing: false,
     quoteGeneration: 0,
@@ -88,6 +90,7 @@
     newsFilter: "all",
     promptType: "daily",
     aiReportMode: "local",
+    aiReportKey: null,
     resizeTimer: null
   };
 
@@ -561,7 +564,7 @@
 
   function setFactor(id, value) {
     var factor = state.factors.find(function (item) { return item.id === id; });
-    if (factor) factor.value = Math.round(value);
+    if (factor && !state.factorOverrides[id]) factor.value = Math.round(value);
   }
 
   function factorScore() {
@@ -633,8 +636,9 @@
     renderOrderPreview();
     renderIntelligence();
     renderDecisionContext();
-    if (state.aiReportMode !== "external") renderLocalAdvice();
+    syncAdviceContext();
     drawAllCharts();
+    window.AurumJournal?.render();
   }
 
   function renderStatus() {
@@ -784,26 +788,42 @@
   }
 
   function renderForecasts() {
-    var scrollLeft = $("forecastCards").scrollLeft;
-    $("forecastCards").innerHTML = state.forecasts.length ? state.forecasts.map(function (f, index) {
-      var selected = index === state.forecastHorizon;
-      var marker = clamp((f.center-f.low)/Math.max(.01,f.high-f.low)*100,0,100);
-      return '<button type="button" class="forecast-card' + (selected ? ' selected' : '') + '" data-horizon="'+index+'" aria-pressed="'+selected+'"><span class="forecast-top"><span>' + f.label + '</span><b>' + f.stance + '</b></span><strong>' + toFixedPrice(f.center) + '</strong><span class="forecast-range"><span>'+toFixedPrice(f.low)+'</span><span>'+toFixedPrice(f.high)+'</span></span><span class="forecast-rail" aria-hidden="true"><i style="left:'+marker+'%"></i></span><small>'+(selected?'当前观察周期':'查看这一周期')+'</small></button>';
-    }).join("") : '<div class="panel">有效日线不足 30 个，暂不推演情景。</div>';
-    $("forecastCards").scrollLeft = scrollLeft;
+    var container = $("forecastCards"), buttons = container.querySelectorAll("[data-horizon]");
+    if (state.forecasts.length && buttons.length !== state.forecasts.length) {
+      container.innerHTML = state.forecasts.map(function (_, index) {
+        return '<button type="button" class="forecast-card" data-horizon="'+index+'"><span class="forecast-top"><span></span><b></b></span><strong></strong><span class="forecast-range"><span></span><span></span></span><span class="forecast-rail" aria-hidden="true"><i></i></span><small></small></button>';
+      }).join("");
+      buttons = container.querySelectorAll("[data-horizon]");
+    }
+    function updateText(el, value) { if (el.textContent !== value) el.textContent = value; }
+    state.forecasts.forEach(function (f, index) {
+      var button = buttons[index], selected = index === state.forecastHorizon;
+      button.classList.toggle("selected", selected); button.setAttribute("aria-pressed", String(selected));
+      updateText(button.querySelector(".forecast-top>span"), f.label);
+      updateText(button.querySelector(".forecast-top>b"), f.stance);
+      updateText(button.querySelector(":scope>strong"), toFixedPrice(f.center));
+      var range = button.querySelectorAll(".forecast-range>span");
+      updateText(range[0], toFixedPrice(f.low)); updateText(range[1], toFixedPrice(f.high));
+      button.querySelector(".forecast-rail>i").style.left = clamp((f.center-f.low)/Math.max(.01,f.high-f.low)*100,0,100) + "%";
+      updateText(button.querySelector(":scope>small"), selected ? "当前观察周期" : "查看这一周期");
+    });
+    if (!state.forecasts.length && !container.querySelector(".forecast-empty")) container.innerHTML = '<div class="panel forecast-empty">有效日线不足 30 个，暂不推演情景。</div>';
     var focus = state.forecasts[state.forecastHorizon];
+    $("captureScenario").disabled = !focus || !state.quote.asOf;
     $("scenarioFocus").innerHTML = focus ? '<div><span>当前观察 · '+focus.label+'</span><strong>'+toFixedPrice(focus.center)+'<small>元 / 克</small></strong></div><p>波动情景带 <b>'+toFixedPrice(focus.low)+' — '+toFixedPrice(focus.high)+'</b><small>假设区间 · 未经概率校准</small></p>' : '';
     setText("bullProbability", "上界"); setText("baseProbability", "路径"); setText("bearProbability", "下界");
     var score = factorScore(); setText("factorTotal", signedNumber(Math.round(score)));
+    var nonNeutral = state.factors.filter(function (f) { return f.id !== "sgeMomentum" && f.value !== 0; }).length;
+    setText("factorOverview", (state.factorOverrides.sgeMomentum ? "动量假设 " : "历史动量 ") + signedNumber(getFactor("sgeMomentum")) + " · " + (nonNeutral ? "另有 " + nonNeutral + " 项非中性假设" : "其余驱动保持中性"));
     setText("stanceTitle", score > 20 ? "偏强假设，观察条件变化" : score < -20 ? "偏弱假设，关注承受范围" : "保持中性，比较不同路径");
-    setText("stanceSummary", state.forecasts.length ? forecastSummary(state.forecasts[1], score) : "补齐有效历史与报价后再作推演。");
+    setText("stanceSummary", focus ? forecastSummary(focus, score) : "补齐有效历史与报价后再作推演。");
     $("confidenceRing").querySelector("b").textContent = "未校准";
     $("actionList").innerHTML = strategyActions().map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("");
     $("useStrategyBtn").disabled = !state.forecasts.length;
   }
 
   function forecastSummary(forecast, score) {
-    return "在当前假设下，1 个月基准路径为 " + money(forecast.center) + "，波动情景带为 " + money(forecast.low) + " 至 " + money(forecast.high) + "。它不代表命中概率。";
+    return "在当前假设下，" + forecast.label + "基准路径为 " + money(forecast.center) + "，波动情景带为 " + money(forecast.low) + " 至 " + money(forecast.high) + "。它不代表命中概率。";
   }
 
   function strategyActions() {
@@ -817,28 +837,56 @@
   }
 
   function renderFactors() {
+    var groups = { sgeMomentum: "market", risk: "market", positioning: "market", cnDemand: "domestic", cny: "domestic", premium: "domestic", centralBanks: "macro", realRates: "macro", usd: "macro" };
+    if ($("factorGrid").children.length === state.factors.length) {
+      state.factors.forEach(function (factor) {
+        var input = $("factor-" + factor.id);
+        if (document.activeElement !== input) input.value = factor.value;
+        input.style.setProperty("--factor-fill", (factor.value+100)/2 + "%");
+        $("out-" + factor.id).textContent = signedNumber(factor.value);
+        $("note-" + factor.id).textContent = (state.factorOverrides[factor.id] ? "手动假设 · " : "") + factor.note;
+      });
+      return;
+    }
     $("factorGrid").innerHTML = state.factors.map(function (factor) {
-      return '<div class="factor-item"><div><label for="factor-' + factor.id + '">' +
-        escapeHtml(factor.name) + '</label><output id="out-' + factor.id + '">' +
-        signedNumber(factor.value) + '</output></div><input id="factor-' + factor.id +
+      return '<div class="factor-item" data-group="' + groups[factor.id] + '"' + (groups[factor.id] !== state.factorGroup ? ' hidden' : '') + '><div class="factor-label"><label for="factor-' + factor.id + '">' +
+        escapeHtml(factor.name) + '</label><small id="note-' + factor.id + '">' + escapeHtml(factor.note) + '</small></div><input id="factor-' + factor.id +
         '" type="range" min="-100" max="100" step="1" value="' + factor.value +
-        '" data-factor="' + factor.id + '"><small>' + escapeHtml((factor.id === "sgeMomentum" ? "历史计算 · " : factor.id === "premium" ? "有效同窗参考 / 可调整 · " : "手动假设 · ") + factor.note) + "</small></div>";
+        '" data-factor="' + factor.id + '" aria-describedby="note-' + factor.id + '" style="--factor-fill:' + (factor.value+100)/2 + '%"><output for="factor-' + factor.id + '" id="out-' + factor.id + '">' + signedNumber(factor.value) + '</output></div>';
     }).join("");
     document.querySelectorAll("[data-factor]").forEach(function (input) {
       input.addEventListener("input", function () {
         var factor = state.factors.find(function (item) { return item.id === input.dataset.factor; });
         if (!factor) return;
         factor.value = number(input.value, 0);
+        state.factorOverrides[factor.id] = true;
+        input.style.setProperty("--factor-fill", (factor.value+100)/2 + "%");
         $("out-" + factor.id).textContent = signedNumber(factor.value);
-        buildForecasts();
-        renderForecasts();
-        renderHistoryMetrics();
-        renderDecisionContext();
-        renderLocalAdvice();
-        drawForecastChart();
-        drawPriceChart();
+        if (state.factorFrame) return;
+        state.factorFrame = requestAnimationFrame(function () {
+          state.factorFrame = 0;
+          buildForecasts();
+          renderForecasts();
+          renderHistoryMetrics();
+          renderDecisionContext();
+          syncAdviceContext();
+          drawForecastChart();
+          drawPriceChart();
+        });
       });
     });
+  }
+
+  function selectFactorGroup(group, focus) {
+    if (!["market", "domestic", "macro"].includes(group)) return;
+    state.factorGroup = group;
+    document.querySelectorAll("[data-factor-group]").forEach(function (button) {
+      var selected = button.dataset.factorGroup === group;
+      button.setAttribute("aria-selected", String(selected)); button.tabIndex = selected ? 0 : -1;
+      if (selected && focus) button.focus({preventScroll:true});
+    });
+    $("factorGrid").setAttribute("aria-labelledby", "factor-tab-" + group);
+    document.querySelectorAll("#factorGrid [data-group]").forEach(function (row) { row.hidden = row.dataset.group !== group; });
   }
 
   function renderPortfolio() {
@@ -1039,12 +1087,12 @@
 
   function renderDecisionContext() {
     var stats = portfolioStats();
-    var forecast = state.forecasts[1] || {};
+    var forecast = state.forecasts[state.forecastHorizon] || {};
     var context = [
       ["国内主价", money(state.quote.priceCnyGram)],
       ["数据层级", dataTierLabel(state.quote)],
       ["真实历史", state.history.daily.length + " 日"],
-      ["1 月中枢", forecast.center ? money(forecast.center) : "--"],
+      [(forecast.label || "所选周期") + "中枢", forecast.center ? money(forecast.center) : "--"],
       ["账户仓位", stats.allocation.toFixed(1) + "%"],
       ["综合风险", riskScore() + "/100"]
     ];
@@ -1066,10 +1114,26 @@
       "</b>";
   }
 
+  function reportContextKey() {
+    return JSON.stringify({ price: state.quote.priceCnyGram, asOf: state.quote.asOf,
+      horizon: state.forecastHorizon, factors: state.factors.map(function(f){return [f.id,f.value];}),
+      cash: state.portfolio.cash, grams: state.portfolio.grams, cost: state.portfolio.avgCost,
+      risk: [state.config.maxPosition,state.config.stopLoss,state.config.takeProfit],
+      history: [state.history.daily.length,state.history.daily.slice(-1)[0]], prompt: state.promptType,
+      news: mergedNews().slice(0,8).map(function(n){return [n.title,n.publishedAt];}) });
+  }
+  function syncAdviceContext() {
+    if (state.aiReportMode === "external") {
+      $("aiHeadline").textContent = state.aiReportKey === reportContextKey() ? state.aiReportHeadline : "已生成的研究报告 · 输入已变化，请重新生成";
+      return;
+    }
+    renderLocalAdvice();
+  }
+
   function renderLocalAdvice() {
     state.aiReportMode = "local";
     if (!state.forecasts.length) { $("aiHeadline").textContent="有效输入不足"; $("aiOutput").innerHTML="<h3>先补齐研究依据</h3><p>需要有效报价和至少 30 个日线点，才能生成情景摘要。</p>"; return; }
-    var forecast = state.forecasts[1];
+    var forecast = state.forecasts[state.forecastHorizon];
     var stats = portfolioStats();
     var actions = strategyActions();
     var stance = factorScore() > 20 ? "谨慎偏多" : factorScore() < -20 ? "防守偏空" : "中性震荡";
@@ -1078,7 +1142,7 @@
       "<h3>输入与假设</h3><p>报价时点 " + escapeHtml(state.quote.asOf ? formatDateTime(state.quote.asOf) : "未知") + "，AU9999 为 <strong>" + money(state.quote.priceCnyGram) +
       "</strong>，综合因子为 <strong>" + signedNumber(Math.round(factorScore())) +
       "</strong>，假设倾向 <strong>" + stance + "</strong>。</p>" +
-      '<div class="report-grid"><div><span>1 月中枢</span><strong>' + money(forecast.center) +
+      '<div class="report-grid"><div><span>' + escapeHtml(forecast.label) + '中枢</span><strong>' + money(forecast.center) +
       '</strong></div><div><span>波动情景带</span><strong>' + money(forecast.low) + " - " +
       money(forecast.high) + '</strong></div><div><span>当前仓位</span><strong>' +
       stats.allocation.toFixed(1) + "%</strong></div></div>" +
@@ -1101,7 +1165,7 @@
     renderTyping();
     $("generateAdvice").disabled = true;
     try {
-      var inputContext = aiPayload();
+      var inputContext = aiPayload(), inputKey = reportContextKey(), inputProvider = state.config.aiProvider + " · " + state.config.aiModel;
       var response = await fetch(state.config.aiEndpoint.trim(), {
         method: "POST",
         signal: AbortSignal.timeout(30000),
@@ -1130,9 +1194,11 @@
       var text = payload && payload.choices && payload.choices[0] &&
         payload.choices[0].message && payload.choices[0].message.content;
       if (!text) throw new Error("模型返回内容为空");
-      state.aiReportMode = "external";
+      state.aiReportMode = "external"; state.aiReportKey = inputKey;
       renderExternalAdvice(text);
-      $("aiHeadline").textContent = state.config.aiProvider + " · 输入截至 " + formatDateTime(inputContext.quote.asOf);
+      state.aiReportHeadline = inputProvider + " · 输入截至 " + formatDateTime(inputContext.quote.asOf);
+      $("aiHeadline").textContent = state.aiReportHeadline;
+      syncAdviceContext();
       showToast("AI 决策报告已生成", "模型只使用当前页面数据进行推理。");
     } catch (error) {
       state.aiReportMode = "local";
@@ -1154,6 +1220,7 @@
         annualVolatilityPct: annualVolatility(),
         rsi14: computeRsi(14)
       },
+      selectedHorizon: state.forecasts[state.forecastHorizon],
       forecasts: state.forecasts,
       factors: state.factors,
       portfolio: Object.assign({}, state.portfolio, portfolioStats()),
@@ -1205,8 +1272,9 @@
     var width = Math.max(280, rect.width || canvas.clientWidth || 600);
     var cssHeight = height || rect.height || canvas.clientHeight || 300;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(cssHeight * dpr);
+    var pixelWidth = Math.round(width * dpr), pixelHeight = Math.round(cssHeight * dpr);
+    if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
+    if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
     var context = canvas.getContext("2d");
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     context.clearRect(0, 0, width, cssHeight);
@@ -1360,7 +1428,7 @@
   }
 
   function drawGrid(ctx, width, height, pad, min, max, y) {
-    ctx.font = "11px IBM Plex Mono, sans-serif";
+    ctx.font = "11px Inter, sans-serif";
     ctx.textAlign = "left";
     for (var index = 0; index <= 4; index += 1) {
       var value = min + (max - min) * (1 - index / 4);
@@ -1492,7 +1560,7 @@
       ctx.lineTo(width - pad.right, gy);
       ctx.stroke();
       ctx.fillStyle = "#a7b29b";
-      ctx.font = "11px IBM Plex Mono, sans-serif";
+      ctx.font = "11px Inter, sans-serif";
       ctx.textAlign = "right";
       ctx.fillText(value.toFixed(0), pad.left - 8, gy + 3);
     }
@@ -1531,6 +1599,17 @@
       [highY,lowY].forEach(function(py){ctx.beginPath();ctx.moveTo(sx-4,py);ctx.lineTo(sx+4,py);ctx.stroke();});
       ctx.beginPath();ctx.arc(sx,y(selectedPoint.center),5,0,Math.PI*2);ctx.fillStyle="#e9d2a0";ctx.fill();
     }
+    var labelBounds = [];
+    ctx.font = "11px Noto Sans SC, sans-serif";
+    var labelOrder = [selectedIndex,points.length-1,0].concat(points.map(function(_,i){return i;}));
+    var visibleLabels = new Set();
+    labelOrder.forEach(function(index){
+      if (visibleLabels.has(index)) return;
+      var point=points[index];if(!point)return;
+      var half=ctx.measureText(point.label).width/2, left=x(index)-half, right=x(index)+half;
+      if(labelBounds.some(function(b){return left<b.right+9&&right>b.left-9;}))return;
+      labelBounds.push({left:left,right:right});visibleLabels.add(index);
+    });
     points.forEach(function (point, index) {
       ctx.beginPath();
       ctx.arc(x(index), y(point.center), 3, 0, Math.PI * 2);
@@ -1539,7 +1618,7 @@
       ctx.fillStyle = index === selectedIndex ? "#ecd7a6" : "#b2b99f";
       ctx.font = "11px Noto Sans SC, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(point.label, x(index), height - 18);
+      if(visibleLabels.has(index))ctx.fillText(point.label, x(index), height - 18);
     });
   }
 
@@ -1604,6 +1683,22 @@
   }
 
   function bindEvents() {
+    $("resetAssumptions").addEventListener("click", function () {
+      state.factorOverrides = {}; state.factors.forEach(function (factor) { factor.value = 0; });
+      syncDynamicFactors(); buildForecasts(); renderAll();
+      showToast("已恢复数据基线", "历史信号重新计算，其他研究假设归零。");
+    });
+    var factorGroups = ["market", "domestic", "macro"];
+    document.querySelectorAll("[data-factor-group]").forEach(function (button) {
+      button.addEventListener("click", function () { selectFactorGroup(button.dataset.factorGroup, false); });
+      button.addEventListener("keydown", function (event) {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        var index = factorGroups.indexOf(state.factorGroup);
+        var next = event.key === "Home" ? 0 : event.key === "End" ? 2 : (index + (event.key === "ArrowRight" ? 1 : -1) + 3) % 3;
+        selectFactorGroup(factorGroups[next], true);
+      });
+    });
     $("forecastCards").addEventListener("keydown", function(event) {
       if (!["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) return;
       var buttons = Array.from($("forecastCards").querySelectorAll("[data-horizon]"));
@@ -1623,7 +1718,8 @@
       var index = Number(button.dataset.horizon);
       if (!state.forecasts[index] || index === state.forecastHorizon) return;
       state.forecastHorizon = index;
-      renderForecasts(); drawForecastChart();
+      renderForecasts(); drawForecastChart(); renderDecisionContext();
+      syncAdviceContext();
       $("forecastCards").querySelector('[data-horizon="'+index+'"]').focus({preventScroll:true});
       window.dispatchEvent(new CustomEvent("aurum:horizon"));
     });
@@ -1678,9 +1774,11 @@
     $("priceChartWrap").addEventListener("mousemove", function (event) {
       var rect = $("priceCanvas").getBoundingClientRect();
       state.chartHover = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-      drawPriceChart();
+      if (!state.hoverFrame) state.hoverFrame = requestAnimationFrame(function () { state.hoverFrame = 0; drawPriceChart(); });
     });
     $("priceChartWrap").addEventListener("mouseleave", function () {
+      if (state.hoverFrame) cancelAnimationFrame(state.hoverFrame);
+      state.hoverFrame = 0;
       state.chartHover = null;
       $("chartTooltip").classList.remove("visible");
       $("chartTooltip").setAttribute("aria-hidden", "true");
@@ -1724,7 +1822,7 @@
         document.querySelectorAll("#promptChips button").forEach(function (item) {
           item.classList.toggle("active", item === button);
         });
-        renderLocalAdvice();
+        syncAdviceContext();
       });
     });
     $("generateAdvice").addEventListener("click", generateAdvice);
@@ -1742,7 +1840,11 @@
     $("drawerBackdrop").addEventListener("click", closeSettings);
     $("saveSettings").addEventListener("click", applySettings);
     $("restoreDefaults").addEventListener("click", restoreDefaults);
+    var chartViewportKey = window.innerWidth + ":" + window.devicePixelRatio;
     window.addEventListener("resize", function () {
+      var nextKey = window.innerWidth + ":" + window.devicePixelRatio;
+      if (nextKey === chartViewportKey) return;
+      chartViewportKey = nextKey;
       clearTimeout(state.resizeTimer);
       state.resizeTimer = setTimeout(drawAllCharts, 120);
     });
@@ -2238,6 +2340,30 @@
   }
 
   async function init() {
+    window.AurumJournal?.init({
+      notify: showToast, navigate: function (id) { window.AurumUI.go(id); },
+      applySnapshot: function (item) {
+        state.factorOverrides = {};
+        item.factors.forEach(function (saved) {
+          var factor = state.factors.find(function (f) { return f.id === saved.id; });
+          if (factor) { factor.value = saved.value; state.factorOverrides[factor.id] = true; }
+        });
+        syncDynamicFactors(); buildForecasts();
+        var horizon = state.forecasts.findIndex(function (f) { return f.days === item.days; });
+        state.forecastHorizon = horizon < 0 ? 1 : horizon;
+        renderAll(); window.AurumUI.go("forecast");
+        showToast("已载入这组研究假设", "按当前报价重新计算，原手记仍保留当时的数值。");
+      },
+      getQuote: function () { return {price:state.quote.priceCnyGram, asOf:state.quote.asOf}; },
+      getSnapshot: function () {
+        var f = state.forecasts[state.forecastHorizon];
+        if (!f) throw Error("有效历史与报价不足，暂时无法记录情景。");
+        return {price:state.quote.priceCnyGram, quoteAsOf:state.quote.asOf, source:state.quote.source, dataTier:state.quote.dataTier,
+          horizon:f.label, days:f.days, center:f.center, low:f.low, high:f.high,
+          factors:state.factors.map(function (factor) { return {id:factor.id,name:factor.name,value:factor.value,
+            origin:state.factorOverrides[factor.id] ? "manual" : factor.id === "sgeMomentum" ? "history" : "assumption"}; })};
+      }
+    });
     bindEvents();
     setupObservers();
     syncDynamicFactors();
