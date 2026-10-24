@@ -2,6 +2,7 @@
   "use strict";
 
   var Core = window.AurumCore;
+  var Quant = window.AurumQuant;
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
@@ -180,7 +181,7 @@
     return {
       generatedAt: validDate(raw && raw.generatedAt || new Date(0).toISOString()),
       failedSources: raw && Array.isArray(raw.failedSources) ? raw.failedSources.map(String) : [],
-      items: items.map(function (item, index) {
+      items: items.filter(function(item){return item && typeof item === "object";}).map(function (item, index) {
         return {
           id: String(item.id || "news-" + index),
           source: String(item.source || "官方消息"),
@@ -210,9 +211,36 @@
       fetchJson("data/market-history.json?_=" + stamp),
       fetchJson("data/news.json?_=" + stamp)
     ]);
-    if (settled[0].status === "fulfilled") state.quote = normalizeQuote(Object.assign({}, settled[0].value, { dataTier: "snapshot" }));
+    if (settled[0].status === "fulfilled" && state.config.priceProvider === "domestic") {
+      var picked=Core.selectQuote([{...settled[0].value,dataTier:"snapshot"}],state.quote);if(picked.quote)state.quote=picked.quote;
+    }
     if (settled[1].status === "fulfilled") state.history = normalizeHistory(settled[1].value);
     if (settled[2].status === "fulfilled") state.news = normalizeNews(settled[2].value);
+    state.lastResearchAt=Date.now();
+  }
+
+  async function refreshResearchData(force) {
+    if(state.researchRefreshing || document.hidden || navigator.onLine===false || (!force && Date.now()-(state.lastResearchAt||0)<900000))return;
+    state.researchRefreshing=true;state.lastResearchAt=Date.now();
+    try {
+      var results=await Promise.allSettled(["data/market-history.json","data/news.json"].map(async function(url){
+        var response=await fetch(url,{cache:"no-cache",signal:AbortSignal.timeout(12000)});
+        if(!response.ok)throw Error("HTTP "+response.status);return response.json();
+      }));
+      state.researchFailures=results.map(function(r,i){return r.status==="rejected"?i:-1;}).filter(function(i){return i>=0;});
+      var changed=false;
+      if(results[0].status==="fulfilled") {
+        var history=normalizeHistory(results[0].value);
+        if(history.daily.length>=30 && Core.ageHours(history.generatedAt)!==Infinity && Date.parse(history.generatedAt)>(Date.parse(state.history.generatedAt)||0)) {state.history=history;changed=true;}
+      }
+      if(results[1].status==="fulfilled") {
+        var news=normalizeNews(results[1].value);
+        if(news.items.length && Core.ageHours(news.generatedAt)!==Infinity && Date.parse(news.generatedAt)>(Date.parse(state.news.generatedAt)||0)) {state.news=news;changed=true;}
+      }
+      if(changed) {syncDynamicFactors();buildForecasts();renderAll();}
+      renderIntelligence();
+    } catch(error) {state.researchFailures=[0,1];renderIntelligence();}
+    finally {state.researchRefreshing=false;}
   }
 
   async function fetchJson(url) {
@@ -223,13 +251,14 @@
 
   async function refreshQuote(options) {
     options = options || {};
+    if (options.manual)refreshResearchData(true);
     if (state.refreshing) return;
     if (state.config.priceProvider === "domestic" && navigator.onLine === false) {
       renderStatus(); if (options.manual) showToast("当前离线", "保留本机行情与记录，联网后再核对报价。"); return;
     }
     state.refreshing = true;
     var generation = ++state.quoteGeneration;
-    state.pollRemaining = Math.max(30, number(state.config.refreshSeconds, 60));
+    state.pollRemaining = Core.refreshDelay(state.config.refreshSeconds,state.feedFailures);
     $("refreshBtn").classList.add("loading");
     renderStatus();
     state.sourceHealth = [];
@@ -258,7 +287,7 @@
       buildForecasts();
       renderAll({ animatePrice: true, previousPrice: previousPrice });
       if (options.manual) {
-        showToast("行情刷新完成", quoteEventText(previousPrice, state.quote.priceCnyGram));
+        showToast(state.feedFailures ? "已保留可用报价" : "来源核对完成", state.feedFailures ? "公开链路暂不可用，原报价时点保留，可稍后重试。" : quoteEventText(previousPrice, state.quote.priceCnyGram));
       }
     } catch (error) {
       if (generation !== state.quoteGeneration) return;
@@ -269,51 +298,47 @@
     } finally {
       if (generation !== state.quoteGeneration) return;
       state.refreshing = false;
+      state.pollRemaining = Core.refreshDelay(state.config.refreshSeconds,state.feedFailures);
       $("refreshBtn").classList.remove("loading");
       renderStatus();
     }
   }
 
   async function fetchDomesticQuote(generation) {
-    var attempts = [
-      ["东方财富 AU9999", fetchEastmoneyLiveQuote],
-      ["新浪 SGE_AU9999", fetchSinaLiveQuote],
-      ["部署快照", fetchLatestSnapshot]
-    ];
-    var errors = [];
-    for (var index = 0; index < attempts.length; index += 1) {
-      try {
-        var result = await attempts[index][1]();
-        if (index < 2) {
-          result = validateBrowserQuote(result);
-          if (Core.ageHours(result.asOf) > 36) throw new Error("行情时间过期或无效");
-        }
-        if (generation !== state.quoteGeneration) throw new Error("行情设置已改变");
-        state.sourceHealth.push({ name: attempts[index][0], ok: true });
-        return result;
-      } catch (error) {
-        if (generation !== state.quoteGeneration) throw error;
-        errors.push(attempts[index][0] + ": " + error.message);
-        state.sourceHealth.push({ name: attempts[index][0], ok: false, error: error.message });
-      }
+    var providers = [["东方财富 AU9999", fetchEastmoneyLiveQuote],["新浪 SGE_AU9999", fetchSinaLiveQuote]];
+    var settled = await Promise.allSettled(providers.map(async function(provider) {
+      var started = performance.now(), q = validateBrowserQuote(await provider[1]());
+      if (Core.ageHours(q.asOf) > 36) throw Error("行情时间过期或无效");
+      return {quote:q,latency:Math.round(performance.now()-started)};
+    }));
+    if (generation !== state.quoteGeneration) throw Error("行情设置已改变");
+    var candidates=[];
+    settled.forEach(function(result,index) {
+      var ok=result.status==="fulfilled";
+      state.sourceHealth.push({name:providers[index][0],ok:ok,error:ok?"":result.reason.message,latency:ok?result.value.latency:null});
+      if(ok)candidates.push(result.value.quote);
+    });
+    var result=Core.selectQuote(candidates,state.quote);
+    if(candidates.length && result.quote) {
+      state.feedFailures=0;
+      return result.quote;
     }
-    var embedded = DATA.market || state.quote;
-    if (embedded && number(embedded.priceCnyGram, 0) > 0) {
-      var fallback = normalizeQuote(embedded);
-      fallback.dataTier = "snapshot";
-      fallback.fetchedAt = new Date().toISOString();
-      fallback.delay = errors.join("；");
-      state.sourceHealth.push({ name: "内嵌快照", ok: true });
-      return fallback;
-    }
-    throw new Error(errors.join("；") || "没有可用国内行情");
+    state.feedFailures=(state.feedFailures||0)+1;
+    try {
+      var snapshot=await fetchLatestSnapshot();candidates.push(snapshot);
+      state.sourceHealth.push({name:"部署快照",ok:true});
+    } catch(error) {state.sourceHealth.push({name:"部署快照",ok:false,error:error.message});}
+    if(DATA.market)candidates.push({...DATA.market,dataTier:"snapshot"});
+    result=Core.selectQuote(candidates,state.quote);
+    if(!result.quote)throw Error("没有有效报价，保留原始时点");
+    return result.quote;
   }
 
   function validateBrowserQuote(quote) {
     if (!(quote.priceCnyGram > 0) || !Core.timestamp(quote.asOf) || Core.ageHours(quote.asOf) === Infinity) throw new Error("报价或时间无效");
     var baseline = DATA.market || {}, check = baseline.validation;
     if (!check || Core.ageHours(check.checkedAt) > 12 || Core.ageHours(baseline.asOf) > 12) return quote;
-    if (Math.abs(Date.parse(quote.asOf) - Date.parse(baseline.asOf)) > 8 * 3600000) return quote;
+    if (!Core.timestamp(check.officialAsOf) || Math.abs(Date.parse(quote.asOf) - Date.parse(check.officialAsOf)) > 120000) return quote;
     var official = Core.numeric(check.officialPriceCnyGram);
     if (!(official > 0)) return quote;
     var difference = (quote.priceCnyGram / official - 1) * 100;
@@ -366,8 +391,8 @@
       previousClose: scaledValue(data.f60, scale),
       change: scaledValue(data.f169, scale),
       changePct: scaledValue(data.f170, scale),
-      volume: number(data.f47, 0),
-      turnover: number(data.f48, 0),
+      volume: Core.numeric(data.f47),
+      turnover: Core.numeric(data.f48),
       amplitudePct: scaledValue(data.f50, scale),
       asOf: eastmoneyTime(data.f86)
     };
@@ -400,7 +425,7 @@
     var parts = String(raw).split(",");
     var latest = number(parts[3], NaN);
     if (!Number.isFinite(latest) || latest <= 0) return null;
-    var previous = number(parts[5], number(parts[6], latest));
+    var previous = Core.numeric(parts[5]);
     var pct = number(String(parts[17] || "").replace("%", ""), (latest - previous) / previous * 100);
     var symbol = requestSymbol === "SGE_AU9999" ? "AU9999" : "AUTD";
     return {
@@ -408,14 +433,14 @@
       name: symbol === "AU9999" ? "黄金9999" : "黄金T+D",
       exchangeName: parts[2] || symbol,
       latest: latest,
-      high: number(parts[7], latest),
-      low: number(parts[8], latest),
-      open: number(parts[6], latest),
+      high: Core.numeric(parts[7]),
+      low: Core.numeric(parts[8]),
+      open: Core.numeric(parts[6]),
       previousClose: previous,
       change: latest - previous,
       changePct: pct,
-      volume: number(parts[14], 0),
-      turnover: number(parts[15], 0),
+      volume: Core.numeric(parts[14]),
+      turnover: Core.numeric(parts[15]),
       amplitudePct: latest ? (number(parts[7], latest) - number(parts[8], latest)) / latest * 100 : 0,
       asOf: sinaTime(parts[16])
     };
@@ -428,6 +453,7 @@
       unit: "CNY/g",
       primaryContract: "AU9999",
       priceCnyGram: main.latest,
+      observed:Core.contractObserved(main),
       previousCnyGram: main.previousClose || main.open || main.latest,
       openCnyGram: main.open,
       highCnyGram: main.high,
@@ -541,7 +567,7 @@
   }
 
   function scaledValue(value, scale) {
-    var parsed = Number(value);
+    var parsed = Core.numeric(value);
     if (!Number.isFinite(parsed) || parsed <= -1000000000) return NaN;
     return parsed / scale;
   }
@@ -593,9 +619,13 @@
   }
 
   function buildForecasts() {
-    state.scenarioModel = Core.scenarioModel(state.quote.priceCnyGram, state.history.daily, factorScore());
+    if (state.profileHistory !== state.history.daily) {
+      state.quantProfile = Quant.profile(state.history.daily);state.profileHistory = state.history.daily;
+    }
+    var delta = factorScore()-factorScore(dataBaselineFactors());
+    state.scenarioModel = Quant.scenarioModel(state.quote.priceCnyGram, state.quantProfile, delta);
     state.forecasts = state.scenarioModel.points;
-    state.baselineForecasts = Core.scenarioModel(state.quote.priceCnyGram, state.history.daily, factorScore(dataBaselineFactors())).points;
+    state.baselineForecasts = Quant.scenarioModel(state.quote.priceCnyGram, state.quantProfile, 0).points;
   }
 
   function dailyVolatility() { return Core.volatility(state.history.daily);
@@ -670,12 +700,12 @@
     setText("quoteClock", state.quote.asOf ? formatDateTime(state.quote.asOf) : "时间未知");
     setText("sideSource", shortSource(state.quote.source)); setText("sideHealth", sourceHealthText());
     var banner = $("statusBanner");
-    banner.classList.toggle("hidden", !offline && !quality.stale && !state.refreshing && quality.key === "live");
-    setText("statusBannerText", offline ? "当前离线，保留本机行情和记录。联网后重新核对来源与报价时点。" : quality.stale
+    banner.classList.toggle("hidden", !state.feedFailures && !state.quote.sourceConflict && !offline && !quality.stale && !state.refreshing && quality.key === "live");
+    setText("statusBannerText", state.quote.sourceConflict ? "同时间窗口的来源报价分歧较大，暂停模拟成交，请先核验来源。" : offline ? "当前离线，保留本机行情和记录。联网后重新核对来源与报价时点。" : quality.stale
       ? (state.quote.asOf ? "数据截至 " + formatDateTime(state.quote.asOf) + "，已过去 " + ageText(state.quote.asOf) + "。当前仅供历史观察。" : "尚无可核实的报价时点，请检查数据来源。")
-      : state.refreshing ? "正在核对公开行情；报价时间决定数据是否更新。" : "当前为延时行情或部署快照，报价时点见上方。");
-    setText("pollLabel", state.refreshing ? "正在刷新" : offline ? "离线 · 本机记录" : state.config.priceProvider !== "domestic" ? "按需核对" : "下次核对 " + Math.ceil(state.pollRemaining) + "s");
-    $("pollProgress").style.transform = "scaleX(" + clamp(state.pollRemaining / Math.max(30, state.config.refreshSeconds), 0, 1) + ")";
+      : state.refreshing ? "正在核对公开行情；报价时间决定数据是否更新。" : state.feedFailures ? "公开链路暂不可用，保留最近报价并延后核对；时点见上方。" : "当前为延时行情或部署快照，报价时点见上方。");
+    setText("pollLabel", state.refreshing ? "正在刷新" : offline ? "离线 · 本机记录" : state.config.priceProvider !== "domestic" ? "按需核对" : (state.feedFailures ? "备用状态 · " : "") + "下次核对 " + Math.ceil(state.pollRemaining) + "s");
+    $("pollProgress").style.transform = "scaleX(" + clamp(state.pollRemaining / Core.refreshDelay(state.config.refreshSeconds,state.feedFailures), 0, 1) + ")";
     setText("practiceContext", quality.label + (state.quote.asOf ? " · " + formatDateTime(state.quote.asOf) : ""));
   }
 
@@ -831,7 +861,7 @@
     if (!state.forecasts.length && !container.querySelector(".forecast-empty")) container.innerHTML = '<div class="panel forecast-empty">有效日线不足 30 个，暂不推演情景。</div>';
     var focus = state.forecasts[state.forecastHorizon];
     $("captureScenario").disabled = !focus || !state.quote.asOf;
-    $("scenarioFocus").innerHTML = focus ? '<div><span>当前观察 · '+focus.label+'</span><strong>'+toFixedPrice(focus.center)+'<small>元 / 克</small></strong></div><p>波动情景带 <b>'+toFixedPrice(focus.low)+' — '+toFixedPrice(focus.high)+'</b><small>假设区间 · 未经概率校准</small></p>' : '';
+    $("scenarioFocus").innerHTML = focus ? '<div><span>当前观察 · '+focus.label+'</span><strong>'+toFixedPrice(focus.center)+'<small>元 / 克</small></strong></div><p>波动情景带 <b>'+toFixedPrice(focus.low)+' — '+toFixedPrice(focus.high)+'</b><small>历史波动与误差刻度 · 不保证未来覆盖</small></p>' : '';
     var baseline = state.baselineForecasts[state.forecastHorizon];
     $("scenarioComparison").hidden = !baseline || !focus;
     if (baseline && focus) {
@@ -844,18 +874,62 @@
     setText("factorOverview", (state.factorOverrides.sgeMomentum ? "动量假设 " : "历史动量 ") + signedNumber(getFactor("sgeMomentum")) + " · " + (nonNeutral ? "另有 " + nonNeutral + " 项非中性假设" : "其余驱动保持中性"));
     setText("stanceTitle", score > 20 ? "偏强假设，观察条件变化" : score < -20 ? "偏弱假设，关注承受范围" : "保持中性，比较不同路径");
     setText("stanceSummary", focus ? forecastSummary(focus, score) : "补齐有效历史与报价后再作推演。");
-    $("confidenceRing").querySelector("b").textContent = "未校准";
+    $("confidenceRing").querySelector("b").textContent = "先检验";
+    renderModelAudit();
     $("actionList").innerHTML = strategyActions().map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("");
     $("useStrategyBtn").disabled = !state.forecasts.length;
   }
 
+  function selectedAudit() {
+    var f=state.forecasts[state.forecastHorizon];
+    return f && state.quantProfile.evaluations.find(function(e){return e.days===f.days;});
+  }
+  function renderModelAudit() {
+    var e=selectedAudit(),f=state.forecasts[state.forecastHorizon];
+    setText("modelAuditTitle", f ? f.label+" · 把模型放回历史里" : "等待有效历史");
+    var model=e?.model==="trend"?"衰减趋势":"持平基准";
+    setText("forecastModel","本地检验引擎 · "+model);
+    setText("auditModel",model);
+    setText("auditSample",e ? e.count+" 次" : "—");
+    setText("auditError",e?.count ? e.mae.toFixed(2)+"%" : "样本不足");
+    setText("auditBaseline",e?.count ? e.naiveMae.toFixed(2)+"%" : "—");
+    setText("auditCoverage",e?.count>=6 ? e.coverage.toFixed(0)+"%" : "样本不足");
+    var changed=Math.abs(state.scenarioModel.scoreDelta)>.0001;
+    var enough=e?.count>=6;
+    var improvement=e?.naiveMae>1e-8?(1-e.mae/e.naiveMae)*100:0;
+    var message=!enough ? "这个周期没有足够的向前历史检验，暂不能据此评价预测能力。长期结果仅作敏感性观察。" :
+      improvement>0 ? "逐次向前检验中，平均误差比始终持平基准低 "+improvement.toFixed(1)+"%；这只是所示历史窗口的结果。" :
+      "逐次向前检验中，模型尚未优于始终持平基准；请保留基准对照，降低方向判断的权重。";
+    if(enough && e.count<20)message+=" 目前只有 "+e.count+" 次检验，结果容易随新增样本变化。";
+    if(changed)message+=" 当前有手动假设，右侧历史覆盖率不适用于平移后的情景。";
+    setText("auditConclusion",message);
+    $("exportBacktest").disabled=!e?.count;
+    setText("auditWindow", e?.count ? e.records[0].origin+" — "+e.records.at(-1).target+" · "+e.steps+" 个记录交易日/期" : "每年按 252 个交易日近似换算；至少 90 日训练，另需 8 次已结束预测进行初始校准。");
+  }
+  function exportBacktest() {
+    var e=selectedAudit();if(!e?.count)return;
+    var rows=[["训练截至","核验交易日","路径","推演中枢","实际收盘","下界","上界","绝对百分比误差","持平基准误差","是否落入区间"]];
+    e.records.forEach(function(r){rows.push([r.origin,r.target,r.model==="trend"?"衰减趋势":"持平",r.center,r.actual,r.low,r.high,r.error,r.naiveError,r.hit?"是":"否"]);});
+    download("aurum-walk-forward-"+e.days+"d.csv","\ufeff"+rows.map(row=>row.map(Core.csvCell).join(",")).join("\n"),"text/csv;charset=utf-8");
+  }
+  function renderRiskLab() {
+    var input=orderInput(),size=Quant.riskSize(state.portfolio,state.quote,state.config,input,$("riskBudgetPct").value);
+    $("fillRiskSize").disabled=!size || size.grams<.01 || state.tradeSide!=="buy";
+    setText("riskSizeResult",state.tradeSide!=="buy"?"风险预算用于试算新增买入数量；卖出请核对可卖持仓。":!size?"请填写 0.1—5% 的风险预算，并核对费用与止损阈值。":
+      "可试算 "+size.grams.toFixed(2)+"g · 阈值 "+size.stopPct+"% · 本笔测算损失 "+cny(size.estimatedLoss)+" / 预算 "+cny(size.budgetCny)+(size.limitedBy==="cash-or-order"?" · 同时受现金或单笔上限约束":""));
+    var rows=Quant.stress(state.portfolio,state.quote,state.config,input,Number($("stressMove").value));
+    var html=rows?rows.map(function(r){return '<div><span>'+(r.change<0?'下跌 '+(-r.change)+'%':r.change>0?'上涨 '+r.change+'%':'价格不变')+'</span><strong>'+cny(r.equity)+'</strong><small>'+signedCny(r.delta)+' · '+(Math.abs(r.returnPct)>0&&Math.abs(r.returnPct)<.01?'变动 <0.01%':signedPercent(r.returnPct))+'</small></div>';}).join(""):'<p class="lab-empty">先补齐一笔有效模拟委托，再查看下单后的压力结果。</p>';
+    if(html!==state.stressHTML){$("stressResults").innerHTML=html;state.stressHTML=html;}
+  }
   function forecastSummary(forecast, score) {
     return "在当前假设下，" + forecast.label + "基准路径为 " + money(forecast.center) + "，波动情景带为 " + money(forecast.low) + " 至 " + money(forecast.high) + "。它不代表命中概率。";
   }
 
   function strategyActions() {
     var quality = Core.quoteState(state.quote);
+    var audit=selectedAudit();
     return [
+      audit?.count>=6 && audit.mae>=audit.naiveMae ? "历史检验尚未优于持平基准，先比较误差再讨论方向。" : "先查看所选周期的向前历史检验；样本不足时不判断模型优劣。",
       quality.stale ? "先核实报价时间；当前是历史输入，情景也以该时点为起点。" : "先核对来源与报价时点，再比较趋势和波动。",
       "改变一项因子，观察各周期区间怎样变化；宏观因子默认中性。",
       "模拟单笔上限设为权益的 " + state.config.maxPosition + "%，费用、价差与仓位一并计算。",
@@ -969,6 +1043,7 @@
     setText("tradeButtonAmount", cnyPrecise(o.total));
     $("riskChecks").innerHTML = o.checks.map(function (c) { return '<div class="risk-check ' + (c.ok ? '' : 'fail') + '"><span><i></i> ' + escapeHtml(c.label) + '</span><b>' + escapeHtml(c.value) + '</b></div>'; }).join("");
     $("tradeBtn").disabled = !o.valid;
+    renderRiskLab();
     document.querySelectorAll("#quickAmounts [data-grams]").forEach(function(button) {
       var selected = Number(button.dataset.grams) === Number($("tradeGrams").value);
       button.classList.toggle("active",selected); button.setAttribute("aria-pressed",String(selected));
@@ -1006,7 +1081,7 @@
       return category && (!query || (item.title+" "+item.source).toLocaleLowerCase().includes(query));
     });
     $("newsFreshness").textContent = state.news.items.length ? "最近发布 · "+formatDateTime(state.news.items[0].publishedAt) : "暂无有效发布";
-    $("newsSourceState").textContent = (state.news.failedSources.length ? "部分来源暂不可用，保留已发布记录。" : "按原文发布时间排列。") + " 标签仅作主题索引，不推断金价方向。";
+    $("newsSourceState").textContent = ((state.researchFailures||[]).includes(1)?"本次资讯快照核对暂不可用，保留原记录。 ":"") + (state.news.failedSources.length ? "部分来源暂不可用，保留已发布记录。" : "按原文发布时间排列。") + " 标签仅作主题索引，不推断金价方向。";
     var html = filtered.length ? filtered.slice(0,state.newsLimit).map(renderNewsItem).join("") : '<div class="news-empty"><strong>暂时没有匹配的原文。</strong><p>试试其他关键词，或切换资讯类别。</p></div>';
     if (state.newsHTML !== html) { $("newsList").innerHTML = html; state.newsHTML = html; }
     setText("newsResultCount", "已显示 "+Math.min(state.newsLimit,filtered.length)+" / "+filtered.length+" 条");
@@ -1160,7 +1235,7 @@
     state.aiReportMode = "local";
     if (!state.forecasts.length) { $("aiHeadline").textContent="有效输入不足"; $("aiOutput").innerHTML="<h3>先补齐研究依据</h3><p>需要有效报价和至少 30 个日线点，才能生成情景摘要。</p>"; return; }
     var f = state.forecasts[state.forecastHorizon], baseline = state.baselineForecasts[state.forecastHorizon], stats = portfolioStats();
-    var priceDelta = f.center-baseline.center;
+    var priceDelta = f.center-baseline.center, audit=selectedAudit();
     var titles = {daily:"盘面摘要",risk:"持仓风控",forecast:"情景推演",news:"消息线索"};
     $("aiHeadline").textContent = "本地研究笔记 · "+titles[state.promptType];
     var quoteTime = state.quote.asOf ? formatDateTime(state.quote.asOf) : "未知";
@@ -1172,7 +1247,7 @@
         '<h3>自设条件</h3><p>单笔上限为权益的 '+escapeHtml(String(state.config.maxPosition))+'%；止损 '+escapeHtml(String(state.config.stopLoss))+'%、止盈 '+escapeHtml(String(state.config.takeProfit))+'% 仅作参考，不会自动下单。实际模拟委托另行计算价差、手续费与可用现金。</p>';
     } else if (state.promptType === "forecast") {
       html = '<h3>'+escapeHtml(f.label)+' · 假设的影响</h3><div class="report-grid"><div><span>数据基线中枢</span><strong>'+money(baseline.center)+'</strong></div><div><span>当前假设中枢</span><strong>'+money(f.center)+'</strong></div><div><span>假设带来的变化</span><strong>'+(priceDelta>0?'+':'')+priceDelta.toFixed(2)+' 元/克</strong></div></div>'+
-        '<p>当前情景带 '+money(f.low)+' — '+money(f.high)+'。数据基线保留历史动量和有效溢价信号，其他驱动取中性。改变假设不会改变已记录的市场价格。</p><h3>下一次回看</h3><p>先保存此刻的情景和理由，再比较之后的有效报价。区间未经概率校准，3 年结果仅适合观察敏感性。</p>';
+        '<p>当前情景带 '+money(f.low)+' — '+money(f.high)+'。数据基线由历史检验选择持平或衰减趋势路径；手动因子只表达相对基线的变化。改变假设不会改变已记录的市场价格。</p><h3>下一次回看</h3><p>先保存此刻的情景和理由，再比较之后的有效报价。短期数据基线可查看逐次历史检验；手动假设与长期外推不沿用历史覆盖率。</p>';
     } else if (state.promptType === "news") {
       html = '<h3>回到原文核实</h3><p>'+(state.news.failedSources.length ? '部分来源暂不可用，以下保留原发布时间，不代表刚刚发生。' : '下面按官方原文发布时间整理，不从关键词直接推断金价方向。')+'</p>'+
         (state.news.items.length ? '<ol class="report-reading">'+state.news.items.slice(0,5).map(function(item){return '<li><a href="'+safeUrl(item.url)+'" target="_blank" rel="noreferrer">'+escapeHtml(item.title)+' ↗</a><small>'+escapeHtml(item.source+' · '+formatDateTime(item.publishedAt))+'</small></li>';}).join('')+'</ol>' : '<p>暂无有效官方条目，请从来源目录核验。</p>')+
@@ -1181,7 +1256,8 @@
       html = '<h3>此刻的市场输入</h3><div class="report-grid"><div><span>AU9999 主价</span><strong>'+money(state.quote.priceCnyGram)+'</strong></div><div><span>20 日变化</span><strong>'+(state.history.daily.length>=21?signedPercent(historyMomentum(20)*100):'历史不足')+'</strong></div><div><span>历史样本</span><strong>'+state.history.daily.length+' 日</strong></div></div>'+
         '<p>当前观察 '+escapeHtml(f.label)+'，情景中枢 '+money(f.center)+'。综合假设方向分 '+signedNumber(Math.round(factorScore()))+'，它是模型输入，不代表市场预测概率。</p><h3>观察与练习</h3><ol>'+strategyActions().map(function(action){return '<li>'+escapeHtml(action)+'</li>';}).join('')+'</ol>';
     }
-    $("aiOutput").innerHTML = intro+html+'<p class="report-boundary">公开行情可能延迟。以上用于研究与虚拟练习；情景未经回测校准。</p>';
+    var auditText=audit?.count ? "所选周期历史检验 "+audit.count+" 次，平均绝对百分比误差 "+audit.mae.toFixed(2)+"%，持平基准 "+audit.naiveMae.toFixed(2)+"%。历史覆盖率 "+audit.coverage.toFixed(0)+"%，不适用于手动平移或未来保证。" : "所选周期尚无足够向前历史检验，不据此宣称预测能力。";
+    $("aiOutput").innerHTML = intro+html+'<p class="report-boundary">'+escapeHtml(auditText)+'</p>'+'<p class="report-boundary">公开行情可能延迟。以上用于研究与虚拟练习；历史检验只描述过去，不能保证未来表现；手动与长期情景另行判断。</p>';
   }
 
   async function generateAdvice() {
@@ -1250,6 +1326,9 @@
         annualVolatilityPct: annualVolatility(),
         rsi14: computeRsi(14)
       },
+      modelAudit: selectedAudit() ? {model:selectedAudit().model,days:selectedAudit().days,count:selectedAudit().count,
+        maePct:selectedAudit().mae,naiveMaePct:selectedAudit().naiveMae,coveragePct:selectedAudit().coverage,
+        historicalOnly:true,manualShift:Math.abs(state.scenarioModel.scoreDelta)>.0001,method:"prequential-disjoint-blocks-v1"} : null,
       selectedHorizon: state.forecasts[state.forecastHorizon],
       forecasts: state.forecasts,
       factors: state.factors,
@@ -1494,7 +1573,7 @@
   function buildChartForecast(start, days) {
     var m = state.scenarioModel;
     if (!m || !m.ready) return [];
-    return Array.from({ length: days + 1 }, function (_, i) { return Core.scenarioAt(start, i, m.vol, m.drift); });
+    return Quant.path(start,days,state.quantProfile,m.scoreDelta);
   }
 
   function drawForecastBand(ctx, forecast, x, y) {
@@ -1857,7 +1936,7 @@
       });
     });
     ["tradeGrams", "feeRate", "tradeSpread"].forEach(function (id) {
-      $(id).addEventListener("input", renderOrderPreview);
+      $(id).addEventListener("input", function(){renderOrderPreview();if(id!=="tradeGrams")renderPortfolio();});
     });
     $("tradeBtn").addEventListener("click", executeTrade);
     $("exportBtn").addEventListener("click", exportTrades);
@@ -2069,8 +2148,8 @@
   }
 
   function exportTrades() {
-    var rows = [["时间", "方向", "克数", "成交价_元每克", "手续费", "成交金额", "备注", "报价时点", "数据模式", "情景依据"]].concat(state.portfolio.trades.map(function (t) {
-      return [t.createdAt, t.side === "buy" ? "买入" : "卖出", t.grams, t.price, t.fee, t.value, t.note || "", t.quoteAsOf || "旧版未记录", t.dataMode || "旧版记录", t.scenarioBasis || ""];
+    var rows = [["时间", "方向", "克数", "成交价_元每克", "手续费", "成交金额", "备注", "报价时点", "数据模式", "情景依据", "报价来源", "参考克价", "手续费率_%", "模拟价差_%"]].concat(state.portfolio.trades.map(function (t) {
+      return [t.createdAt, t.side === "buy" ? "买入" : "卖出", t.grams, t.price, t.fee, t.value, t.note || "", t.quoteAsOf || "旧版未记录", t.dataMode || "旧版记录", t.scenarioBasis || "",t.quoteSource || "旧版未记录",t.quotePriceCnyGram ?? "",t.feePct ?? "",t.spreadPct ?? ""];
     }));
     download("aurum-practice-" + new Date().toISOString().slice(0,10) + ".csv", "\ufeff" + rows.map(function (row) { return row.map(Core.csvCell).join(","); }).join("\n"), "text/csv;charset=utf-8");
   }
@@ -2082,14 +2161,15 @@
 
   function startPolling() {
     if (state.pollTimer) clearInterval(state.pollTimer);
-    var interval = Math.max(30, number(state.config.refreshSeconds, 60));
+    var interval = Core.refreshDelay(state.config.refreshSeconds,state.feedFailures);
     state.pollRemaining = interval;
     state.pollTimer = setInterval(function () {
       if (document.hidden) return;
+      refreshResearchData(false);
       if (navigator.onLine === false || state.config.priceProvider !== "domestic") {renderStatus();return;}
       state.pollRemaining -= 1;
       if (state.pollRemaining <= 0) {
-        state.pollRemaining = interval;
+        state.pollRemaining = Core.refreshDelay(state.config.refreshSeconds,state.feedFailures);
         refreshQuote();
       }
       renderStatus();
@@ -2098,7 +2178,7 @@
   }
 
   function renderAlerts() {
-    if (Core.quoteState(state.quote).stale) return;
+    if (state.quote.sourceConflict || Core.quoteState(state.quote).stale) return;
     var price = state.quote.priceCnyGram;
     var upper = number(state.config.alertUpper, 0);
     var lower = number(state.config.alertLower, 0);
@@ -2121,6 +2201,7 @@
     window.addEventListener("online",function(){!document.hidden && state.config.priceProvider === "domestic"?refreshQuote():renderStatus();});
     document.addEventListener("visibilitychange",function(){
       if(document.hidden)return;
+      refreshResearchData(false);
       if(state.config.priceProvider === "domestic" && (!state.lastPollAt || Date.now()-state.lastPollAt.getTime()>state.config.refreshSeconds*1000))refreshQuote();
       else renderStatus();
     });
@@ -2203,8 +2284,8 @@
   }
 
   function sourceHealthText() {
-    var source = state.sourceHealth.find(function (item) { return item.ok; });
-    return (source && source.name !== Core.quoteState(state.quote).label ? source.name + " · " : "") + Core.quoteState(state.quote).label;
+    var healthy=state.sourceHealth.filter(function(item){return item.ok;}).length;
+    return shortSource(state.quote.source)+" · "+(state.sourceHealth.length?healthy+"/"+state.sourceHealth.length+" 链路可用 · ":"")+Core.quoteState(state.quote).label;
   }
 
   function quoteEventText(previous, current) {
@@ -2448,12 +2529,20 @@
         var f = state.forecasts[state.forecastHorizon];
         if (!f) throw Error("有效历史与报价不足，暂时无法记录情景。");
         return {price:state.quote.priceCnyGram, quoteAsOf:state.quote.asOf, source:state.quote.source, dataTier:state.quote.dataTier,
-          horizon:f.label, days:f.days, center:f.center, low:f.low, high:f.high,
+          horizon:f.label, days:f.days, center:f.center, low:f.low, high:f.high, method:"AURUM Quant v1 · 向前检验 / EWMA",
           factors:state.factors.map(function (factor) { return {id:factor.id,name:factor.name,value:factor.value,
             origin:state.factorOverrides[factor.id] ? "manual" : factor.id === "sgeMomentum" ? "history" : "assumption"}; })};
       }
     });
     bindEvents();
+    $("exportBacktest").addEventListener("click",exportBacktest);
+    $("riskBudgetPct").addEventListener("input",renderRiskLab);
+    $("stressMove").addEventListener("change",renderRiskLab);
+    $("fillRiskSize").addEventListener("click",function(){
+      var size=Quant.riskSize(state.portfolio,state.quote,state.config,orderInput(),$("riskBudgetPct").value);
+      if(!size || size.grams<.01)return;
+      $("tradeGrams").value=size.grams.toFixed(2);renderOrderPreview();$("tradeGrams").focus({preventScroll:true});
+    });
     setupObservers();
     syncDynamicFactors();
     buildForecasts();

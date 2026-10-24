@@ -22,6 +22,7 @@
     return { id: text(id, 80), createdAt: new Date(now).toISOString(), price: input.price,
       quoteAsOf: input.quoteAsOf, source: text(input.source, 200), dataTier: text(input.dataTier, 40),
       horizon: text(input.horizon, 20), days: input.days, low: input.low, center: input.center, high: input.high,
+      ...(input.method ? {method:text(input.method,100)} : {}),
       note: text(input.note, 280), review:reviewData(input.review), factors: (input.factors || []).slice(0, 12).map(f => {
         if (!f || typeof f.value !== "number" || !Number.isFinite(f.value) || Math.abs(f.value) > 100) throw Error("假设参数无效。");
         return { id: text(f.id, 40), name: text(f.name, 40), value: f.value, origin: text(f.origin, 30) };

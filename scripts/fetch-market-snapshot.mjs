@@ -3,67 +3,30 @@ import path from "node:path";
 
 const outputPath = path.resolve("data/market-snapshot.json");
 import Core from "../assets/core.js";
+import {collectQuotes} from "./quote-collector.mjs";
 const configuredFx = Core.numeric(process.env.USD_CNY);
 const fxAsOf = Core.timestamp(process.env.USD_CNY_ASOF);
 const usdCny = configuredFx > 0 && Core.ageHours(fxAsOf) <= 72 ? configuredFx : null;
 
-let domestic = await fetchEastmoneyDomestic().catch(async (eastmoneyError) => {
-  console.warn(`Eastmoney domestic quote failed: ${eastmoneyError.message}`);
-  return fetchSinaDomestic(eastmoneyError).catch(async (sinaError) => {
-    console.warn(`Sina domestic quote failed: ${sinaError.message}`);
-    return fetchSgeOfficialDelayed().catch(async (sgeError) => {
-      console.warn(`SGE official quote failed: ${sgeError.message}`);
-      throw new Error("All domestic sources failed; retained the last snapshot without changing its timestamp.");
-    });
-  });
-});
-
-if (!(domestic.priceCnyGram > 0) || Core.ageHours(domestic.asOf) === Infinity) throw new Error("Invalid domestic price or quote timestamp; old snapshot retained.");
-if (Core.ageHours(domestic.asOf) > 96) throw new Error("Quote is over 96 hours old; refresh did not produce a current snapshot.");
-if (domestic.dataTier !== "official-delayed") {
-  const officialCheck = await fetchSgeOfficialDelayed().catch((error) => {
-    console.warn(`SGE cross-check failed: ${error.message}`);
-    return null;
-  });
-  if (officialCheck && Math.abs(Date.parse(domestic.asOf) - Date.parse(officialCheck.asOf)) <= 8 * 3600000) domestic = crossCheckDomestic(domestic, officialCheck);
-}
-
-const international = await fetchYahooGoldFuture().catch((error) => {
-  console.warn(`International reference failed: ${error.message}`);
-  return null;
-});
+let previous={};
+try {previous=JSON.parse(await readFile(outputPath,"utf8"));} catch {}
+const providers=[["Eastmoney AU9999",fetchEastmoneyDomestic],["Sina AU9999",fetchSinaDomestic],["SGE delayed",fetchSgeOfficialDelayed]];
+const started=Date.now();
+const [collected,international] = await Promise.all([
+  collectQuotes({providers,previous}),
+  fetchYahooGoldFuture().catch(error=>{console.warn(`International reference failed: ${error.message}`);return null;})
+]);
+const domestic=collected.quote,sourceHealth=collected.sourceHealth;
 
 const snapshot = {
   ...domestic,
+  sourceHealth,
+  collectionMs: Date.now()-started,
   usdCny,
   fxAsOf: usdCny ? fxAsOf : null,
   fxSource: usdCny ? "Explicit USD_CNY environment setting" : null,
   internationalReference: international
 };
-
-function crossCheckDomestic(publicQuote, officialQuote) {
-  const differencePct = officialQuote.priceCnyGram
-    ? (publicQuote.priceCnyGram / officialQuote.priceCnyGram - 1) * 100
-    : null;
-  const validation = {
-    source: "上海黄金交易所官方延时行情",
-    checkedAt: new Date().toISOString(),
-    officialPriceCnyGram: officialQuote.priceCnyGram,
-    differencePct
-  };
-  if (Number.isFinite(differencePct) && Math.abs(differencePct) > 2.5) {
-    return {
-      ...officialQuote,
-      delay: `公开行情与上金所官方延时价偏差 ${differencePct.toFixed(2)}%，已采用官方延时价`,
-      validation
-    };
-  }
-  return {
-    ...publicQuote,
-    delay: `${publicQuote.delay}；已用上金所官方延时价交叉校验`,
-    validation
-  };
-}
 
 await mkdir(path.dirname(outputPath), { recursive: true });
 await writeFile(outputPath, JSON.stringify(snapshot, null, 2));
@@ -86,6 +49,7 @@ async function fetchEastmoneyDomestic() {
     unit: "CNY/g",
     primaryContract: main.symbol,
     priceCnyGram: main.latest,
+    observed:Core.contractObserved(main),
     previousCnyGram: main.previousClose || main.open || main.latest,
     openCnyGram: main.open,
     highCnyGram: main.high,
@@ -105,7 +69,7 @@ async function fetchEastmoneyDomestic() {
   };
 }
 
-async function fetchSinaDomestic(previousError) {
+async function fetchSinaDomestic() {
   const contracts = await fetchSinaContracts();
   const main = contracts.find((item) => item.symbol === "AU9999");
   if (!main || !Number.isFinite(main.latest) || main.latest <= 0) {
@@ -117,6 +81,7 @@ async function fetchSinaDomestic(previousError) {
     unit: "CNY/g",
     primaryContract: "AU9999",
     priceCnyGram: main.latest,
+    observed:Core.contractObserved(main),
     previousCnyGram: main.previousClose || main.open || main.latest,
     openCnyGram: main.open,
     highCnyGram: main.high,
@@ -130,7 +95,7 @@ async function fetchSinaDomestic(previousError) {
     sourceUrl: "https://finance.sina.com.cn/futures/quotes/SGE_AU9999.shtml",
     officialSource: "上海黄金交易所延时行情",
     officialUrl: "https://www.sge.com.cn/sjzx/yshqbg",
-    delay: `东方财富 AU9999 失败后启用新浪上金所公开行情；${previousError.message}`,
+    delay: "新浪上金所公开行情；与其他来源并发核对，按报价时点选择",
     dataTier: "domestic-live",
     contracts
   };
@@ -161,22 +126,22 @@ function parseSinaSge(raw, requestSymbol) {
   const parts = String(raw).split(",");
   const latest = Number(parts[3]);
   if (!Number.isFinite(latest) || latest <= 0) return null;
-  const previousClose = Number(parts[5]) || Number(parts[6]) || latest;
-  const changePct = Number(String(parts[17] || "").replace("%", ""));
+  const previousClose = Core.numeric(parts[5]);
+  const changePct = Core.numeric(String(parts[17] || "").replace("%", ""));
   const symbol = requestSymbol === "SGE_AU9999" ? "AU9999" : "AUTD";
   return {
     symbol,
     name: symbol === "AU9999" ? "黄金9999" : "黄金T+D",
     exchangeName: parts[2] || symbol,
     latest,
-    high: Number(parts[7]) || null,
-    low: Number(parts[8]) || null,
-    open: Number(parts[6]) || null,
+    high: Core.numeric(parts[7]),
+    low: Core.numeric(parts[8]),
+    open: Core.numeric(parts[6]),
     previousClose,
     change: latest - previousClose,
     changePct: Number.isFinite(changePct) ? changePct : (latest - previousClose) / previousClose * 100,
-    volume: Number(parts[14]) || 0,
-    turnover: Number(parts[15]) || 0,
+    volume: Core.numeric(parts[14]),
+    turnover: Core.numeric(parts[15]),
     asOf: timestampFromSina(parts[16])
   };
 }
@@ -195,7 +160,7 @@ async function fetchEastmoneyContract(symbol, fallbackName) {
   const payload = await res.json();
   const data = payload?.data;
   if (!data) throw new Error(`${symbol} returned empty data`);
-  const scale = 10 ** Number(data.f152 || 2);
+  const scale = 10 ** Core.numeric(data.f152,2);
   const latest = scaled(data.f43, scale);
   return {
     symbol: String(data.f57 || symbol),
@@ -207,8 +172,8 @@ async function fetchEastmoneyContract(symbol, fallbackName) {
     previousClose: scaled(data.f60, scale),
     change: scaled(data.f169, scale),
     changePct: scaled(data.f170, scale),
-    volume: Number(data.f47 || 0),
-    turnover: Number(data.f48 || 0),
+    volume: Core.numeric(data.f47),
+    turnover: Core.numeric(data.f48),
     insideVolume: Number(data.f49 || 0),
     amplitudePct: scaled(data.f50, scale),
     asOf: timestampFromEastmoney(data.f86)
@@ -299,8 +264,8 @@ async function fetchYahooGoldFuture() {
 }
 
 function scaled(value, scale) {
-  const number = Number(value);
-  return Number.isFinite(number) ? number / scale : null;
+  const number = Core.numeric(value);
+  return Number.isFinite(number) && number > -1000000000 ? number / scale : null;
 }
 
 function strip(value) {
