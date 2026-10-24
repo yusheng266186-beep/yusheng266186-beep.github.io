@@ -1,5 +1,15 @@
 # AURUM architecture
 
+## 4.5.0 sealed multi-origin validation
+
+The numerical forecast kernel is unchanged from 4.4.1. `docs/validation/4.5.0/` freezes prices, code dependencies, the candidate set, chronological splits, selection and all records. Three finite structural alternatives are screened on development and validation before the reserved tail is opened. Origins are fixed every 21 recorded sessions, targets crossing phases are purged, and primary metrics use non-overlapping target blocks. All alternatives failed predeclared adoption gates; none was tuned after tail inspection. The prior historical use of these data is disclosed.
+
+`validate-model.mjs` reproduces sealed results read-only, checking data and kernel hashes; `validation-utils.mjs` owns phase membership, non-overlap selection, metrics and gates. `build-validation-report.mjs` derives a static report only when the live kernel still matches the tested champion. Embedded data includes this fixed experiment independently of live research snapshots. The new collapsed panel follows selected horizon, shows all three phases and exports all records. Individual records populate the existing worker-based replay. Static render keys prevent poll-driven replacement of focused links or rows.
+
+There are 74 unique origins and 315 retained-model date/horizon pairs, plus 776 development/validation candidate forecasts. Long-horizon overlapping diagnostics do not authorize optimization: three-year diagnostics contain only two non-overlapping blocks. Initial uncalibrated volatility bands are labelled in exports; raw diagnostic interval coverage is not a future coverage guarantee. Old periods test price-only because point-in-time external archives are unavailable.
+
+Forward ledger identity now follows the SHA-256 of the core/evidence/quant kernel, preserving the original release label on each entry. The same kernel/date cannot be duplicated by a new interface release; a changed kernel receives a distinct entry and separate outcome statistics. App identity is verified against the loaded sources. No prior entry or resolved outcome is rewritten by this change.
+
 ## 4.4.1 continuous research updates
 
 `refresh-research.mjs` is the scheduled writer: news, FX/rates/risk and quote capture run independently in parallel; due history runs in the same batch. Ledger and assembly depend on their completion. Transient transport/429/5xx failures retry with bounded backoff, 403 does not loop, and failures retain original observations. A total-news outage writes its attempted receipt without advancing successful generation time. Valid feeds without matching headlines remain healthy. Provider status includes errors, last success and failure streaks.

@@ -11,9 +11,9 @@ export function updateLedger(previous,{daily,forecasts,now,version,methodHash,in
     directionHit:Math.sign(f.center-e.start)===Math.sign(target.close-e.start),hit:target.close>=f.low&&target.close<=f.high};
   }
  }
- if(last&&forecasts.length&&Date.parse(last.time+'T15:30:00+08:00')<=time&&time-Date.parse(last.time+'T15:30:00+08:00')<7*86400000&&!entries.some(e=>e.origin===last.time&&e.version===version)){
-  entries.push({id:version+'|'+last.time,origin:last.time,start:last.close,createdAt:now,version,methodHash,inputHash,
+ if(last&&forecasts.length&&Date.parse(last.time+'T15:30:00+08:00')<=time&&time-Date.parse(last.time+'T15:30:00+08:00')<7*86400000&&!entries.some(e=>e.origin===last.time&&e.methodHash===methodHash)){
+  entries.push({id:methodHash+'|'+last.time,origin:last.time,start:last.close,createdAt:now,version,methodHash,inputHash,
    forecasts:forecasts.map(f=>({days:f.days,steps:Math.max(1,Math.round(f.days*252/365)),center:f.center,low:f.low,high:f.high}))});
  }
- return {generatedAt:now,entries:entries.slice(-1800)};
+ return {generatedAt:now,methodHash,version,entries:entries.slice(-1800)};
 }

@@ -4,7 +4,8 @@
   var Core = window.AurumCore;
   var Quant = window.AurumQuant;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "4.4.1";
+  var RELEASE_VERSION = "4.5.0";
+  var FORECAST_METHOD = "3bda3f4cf30262c03074783cb38c1bfa1ddb7b6a5f39385555a38b4632cb0fb4";
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
@@ -671,7 +672,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=4.4.1");
+      var worker=new Worker("assets/prediction-worker.js?v=4.5.0");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -935,6 +936,7 @@
     setText("stanceSummary", focus ? forecastSummary(focus, score) : "补齐有效历史与报价后再作推演。");
     $("confidenceRing").querySelector("b").textContent = "先检验";
     renderModelAudit();
+    renderValidation();
     renderPredictionEvidence();
     $("actionList").innerHTML = strategyActions().map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("");
     $("useStrategyBtn").disabled = !state.forecasts.length;
@@ -956,9 +958,9 @@
     setText("auditCoverage",e?.count>=6 ? e.coverage.toFixed(0)+"%" : "样本不足");
     setText("auditDirection",e?.count>=6?e.direction.toFixed(1)+"%":"样本不足");
     setText("auditEvidence",e?e.augmentedCount+" / "+e.count:"—");
-    var archived=(state.ledger.entries||[]).filter(function(entry){return entry.version===RELEASE_VERSION;}).flatMap(function(entry){return (entry.forecasts||[]).filter(function(x){return x.days===f?.days;}).map(function(x){return {entry,forecast:x};});});
+    var archived=(state.ledger.entries||[]).filter(function(entry){return entry.methodHash===FORECAST_METHOD;}).flatMap(function(entry){return (entry.forecasts||[]).filter(function(x){return x.days===f?.days;}).map(function(x){return {entry,forecast:x};});});
     var verified=archived.filter(function(x){return x.forecast.result;}),lastArchived=archived.at(-1);
-    setText("prospectiveAudit", "本版建档后核验："+verified.length+" / "+archived.length+" 个已建档起点完成当前周期。"+(verified.length?"已核验平均价格误差 "+(verified.reduce(function(s,x){return s+x.forecast.result.error;},0)/verified.length).toFixed(2)+"%。":"尚未积累真实后续结果，不报告前瞻准确率。")+(lastArchived?"最近建档 "+formatDateTime(lastArchived.entry.createdAt)+"，起点收盘 "+lastArchived.entry.origin+"，当时预测中枢 "+toFixedPrice(lastArchived.forecast.center)+" 元/克；之后不随模型更新重写。":""));
+    setText("prospectiveAudit", "同算法建档后核验："+verified.length+" / "+archived.length+" 个已建档起点完成当前周期。"+(verified.length?"已核验平均价格误差 "+(verified.reduce(function(s,x){return s+x.forecast.result.error;},0)/verified.length).toFixed(2)+"%。":"尚未积累真实后续结果，不报告前瞻准确率。")+(lastArchived?"最近建档 "+formatDateTime(lastArchived.entry.createdAt)+"，起点收盘 "+lastArchived.entry.origin+"，当时预测中枢 "+toFixedPrice(lastArchived.forecast.center)+" 元/克；之后不随模型更新重写。":""));
     var changed=Math.abs(state.scenarioModel.scoreDelta)>.0001;
     var enough=e?.count>=6;
     var improvement=e?.naiveMae>1e-8?(1-e.mae/e.naiveMae)*100:0;
@@ -973,6 +975,29 @@
     setText("auditConclusion",message);
     $("exportBacktest").disabled=!e?.count;
     setText("auditWindow", e?.count ? e.records[0].origin+" — "+e.records.at(-1).target+" · "+e.steps+" 个记录交易日/期" : "每年按 252 个交易日近似换算；至少 120 日训练，另需 8 次已结束预测进行初始校准。");
+  }
+  function renderValidation(){
+    var report=DATA.validation,days=state.forecasts[state.forecastHorizon]?.days||30,h=report?.horizons?.find(function(h){return h.days===days;});
+    if(!h||report.methodHash!==FORECAST_METHOD){setText("validationTitle","多时点记录暂不可用");setText("validationDecision","当前实验记录缺失或对应其他算法；当前预测仍可独立使用历史回放检验。");$("exportValidation").disabled=true;return;}
+    $("exportValidation").disabled=false;
+    if(state.validationDays!==days){state.validationDays=days;state.validationLimit=4;}
+    var validationKey=days+"|"+$("validationPhase").value+"|"+(state.validationLimit||4)+"|"+report.generatedAt;if(state.validationRenderKey===validationKey)return;state.validationRenderKey=validationKey;
+    setText("validationIdentity",report.cutoffs+" 个固定截止日 · "+report.forecasts+" 次日期 / 周期组合 · 2026-10-24 固定实验");
+    setText("validationTitle",h.label+" · 同一标准，比较不同阶段");
+    var long=days>=180;
+    setText("validationDecision",long?"本轮保留现有参数。长期候选虽在部分区间改善，但独立目标太少，没有达到调参所需的样本门槛。长期路径继续作为外推观察。":"本轮保留现有参数。加强正则化、降低回归权重和延长直接拟合窗口三个候选，均未同时通过开发段、验证段的预设门槛；未在看到尾段后继续调参。");
+    var names={development:"开发段",validation:"验证段",holdout:"本轮保留尾段"};
+    $("validationPhases").innerHTML=Object.keys(names).map(function(key){var m=h.phases[key].primary,period=report.phases[key];return '<article class="validation-phase"><span>'+names[key]+'</span><small>'+period.first+' — '+period.last+'</small><dl><div><dt>模型误差 MAPE</dt><dd>'+(m.count?m.mape.toFixed(2)+'%':'—')+'</dd></div><div><dt>持平基准 MAPE</dt><dd>'+(m.count?m.naiveMape.toFixed(2)+'%':'—')+'</dd></div></dl><p>'+m.count+' 个非重叠目标'+(m.count<12?' · 样本不足以采用新参数':m.mape>m.naiveMape?' · 此段尚未优于持平基准':' · 仅描述此段历史结果')+'</p></article>';}).join("");
+    setText("validationProtocol","每隔 21 个记录交易日固定取样，起点至少已有 253 条日线；跨分段的目标不参与选型。候选须在开发、验证段各相对降低至少 1% 的平均误差，同时限制大误差、方向和分行情退化。尾段仅在选择锁定后查看。该历史曾用于旧版回测，属于本轮保留段，不能称为从未见过的数据。数据冻结至 "+report.data.last+"，之后不随实时消息重写。");
+    var phase=$("validationPhase").value,records=h.records.filter(function(r){return phase==='all'||r.phase===phase;}),visible=records.slice(0,state.validationLimit||4);
+    $("validationRecords").innerHTML=visible.length?visible.map(function(r){return '<li><div><strong>'+r.origin+' → '+r.target+'</strong><small>起点 '+toFixedPrice(r.start)+' · '+({rising:'此前 60 日上涨',falling:'此前 60 日下跌',sideways:'此前 60 日震荡'})[r.regime]+'</small></div><div><strong>'+toFixedPrice(r.center)+' <small>预测 / 实际 '+toFixedPrice(r.actual)+' 元/克</small></strong><small>误差 '+r.error.toFixed(2)+'% · 持平 '+r.naiveError.toFixed(2)+'%</small></div><a href="#replayLab" data-validation-date="'+r.origin+'" data-validation-days="'+days+'">单独回放 ↗</a></li>';}).join(""):'<li><div><strong>此分段没有完整走完的目标</strong><small>可选“全时段诊断”查看其他历史起点。不要把未到期结果当成预测成功。</small></div></li>';
+    setText("validationRecordCount","已显示 "+visible.length+" / "+records.length+" 个固定起点。全时段共有 "+h.all.primary.count+" 个非重叠目标 / "+h.all.diagnostic.count+" 条诊断记录。");$("moreValidation").hidden=visible.length>=records.length;
+  }
+  function exportValidation(){
+    var h=DATA.validation?.horizons?.find(function(h){return h.days===(state.forecasts[state.forecastHorizon]?.days||30);});if(!h)return;
+    var rows=[["实验","周期自然日","分段","训练截止","核验日期","起点收盘","预测中枢","实际收盘","下界","上界","MAPE","持平误差","此前60日行情","外部存档输入","区间已具备初始校准"]];
+    h.records.forEach(function(r){rows.push([DATA.validation.id,h.days,r.phase,r.origin,r.target,r.start,r.center,r.actual,r.low,r.high,r.error,r.naiveError,r.regime,r.evidenceCount,r.intervalCalibrated?"是":"否"]);});
+    download("aurum-multi-origin-"+h.days+"d.csv","\ufeff"+rows.map(function(row){return row.map(Core.csvCell).join(",");}).join("\n"),"text/csv;charset=utf-8");
   }
   function exportBacktest() {
     var e=selectedAudit();if(!e?.count)return;
@@ -2650,6 +2675,10 @@
     });
     bindEvents();
     $("exportBacktest").addEventListener("click",exportBacktest);
+    $("validationPhase").addEventListener("change",function(){state.validationLimit=4;renderValidation();});
+    $("moreValidation").addEventListener("click",function(){state.validationLimit=(state.validationLimit||4)+4;renderValidation();});
+    $("exportValidation").addEventListener("click",exportValidation);
+    $("validationRecords").addEventListener("click",function(event){var link=event.target.closest("[data-validation-date]");if(!link)return;$("replayDate").value=link.dataset.validationDate;$("replayHorizon").value=link.dataset.validationDays;$("replayLab").open=true;runReplay();});
     $("runReplay").addEventListener("click",runReplay);
     $("refreshResearchBtn").addEventListener("click",function(){refreshResearchData(true);});
     $("riskBudgetPct").addEventListener("input",renderRiskLab);
