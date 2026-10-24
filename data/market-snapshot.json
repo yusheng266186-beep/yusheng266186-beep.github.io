@@ -4,6 +4,15 @@
   "unit": "CNY/g",
   "primaryContract": "AU9999",
   "priceCnyGram": 862.99,
+  "observed": {
+    "previous": true,
+    "open": true,
+    "range": true,
+    "changeAmount": true,
+    "change": true,
+    "volume": true,
+    "turnover": true
+  },
   "previousCnyGram": 864,
   "openCnyGram": 865,
   "highCnyGram": 872.99,
@@ -53,6 +62,31 @@
       "asOf": "2026-10-23T18:29:57.000Z"
     }
   ],
+  "fetchedAt": null,
+  "internationalCnyGram": null,
+  "domesticPremiumPct": null,
+  "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
+  "sourceConflict": false,
+  "sourceHealth": [
+    {
+      "source": "Eastmoney AU9999",
+      "ok": true,
+      "asOf": "2026-10-23T18:29:55.000Z",
+      "latencyMs": 2738
+    },
+    {
+      "source": "Sina AU9999",
+      "ok": true,
+      "asOf": "2026-10-23T15:59:35.000Z",
+      "latencyMs": 1553
+    },
+    {
+      "source": "SGE delayed",
+      "ok": false,
+      "error": "Invalid or expired quote timestamp"
+    }
+  ],
+  "collectionMs": 2739,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
