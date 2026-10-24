@@ -26,7 +26,7 @@
   "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "国内公开行情刷新；非交易终端逐笔行情",
+  "delay": "国内公开行情刷新；副合约 AUTD 暂未返回",
   "dataTier": "domestic-live",
   "contracts": [
     {
@@ -44,22 +44,6 @@
       "insideVolume": 1948,
       "amplitudePct": 0.04,
       "asOf": "2026-10-23T18:29:55.000Z"
-    },
-    {
-      "symbol": "AUTD",
-      "name": "黄金T+D",
-      "latest": 859.5,
-      "high": 866.79,
-      "low": 854.81,
-      "open": 865.1,
-      "previousClose": 863.38,
-      "change": -5.51,
-      "changePct": -0.64,
-      "volume": 9160,
-      "turnover": 7896814848,
-      "insideVolume": 4822,
-      "amplitudePct": 0.5,
-      "asOf": "2026-10-23T18:29:57.000Z"
     }
   ],
   "fetchedAt": null,
@@ -73,14 +57,14 @@
       "ok": true,
       "kind": "quote",
       "asOf": "2026-10-23T18:29:55.000Z",
-      "latencyMs": 384
+      "latencyMs": 3329
     },
     {
       "source": "Sina AU9999",
       "ok": true,
       "kind": "quote",
       "asOf": "2026-10-23T15:59:35.000Z",
-      "latencyMs": 263
+      "latencyMs": 1251
     },
     {
       "source": "SGE delayed",
@@ -88,7 +72,7 @@
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-10-24",
-      "latencyMs": 425
+      "latencyMs": 1532
     }
   ],
   "officialReference": {
@@ -120,7 +104,7 @@
       "turnover": false
     }
   },
-  "collectionMs": 796,
+  "collectionMs": 3330,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
