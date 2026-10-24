@@ -8,7 +8,8 @@ const files = {
   news: "data/news.json",
   research: "data/research-factors.json",
   ledger: "data/forecast-ledger.json",
-  health: "data/pipeline-health.json"
+  health: "data/pipeline-health.json",
+  validation: "data/model-validation.json"
 };
 
 const payload = {};

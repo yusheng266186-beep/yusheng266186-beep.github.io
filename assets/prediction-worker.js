@@ -1,5 +1,5 @@
 /* Keep rolling regressions and historical replay off the rendering thread. */
-importScripts('core.js?v=4.4.1','evidence.js?v=4.4.1','quant.js?v=4.4.1');
+importScripts('core.js?v=4.5.0','evidence.js?v=4.5.0','quant.js?v=4.5.0');
 self.onmessage=function({data}){
   try {
     const result=data.type==='replay'?AurumQuant.replay(data.daily,data.date,data.days,data.evidence):AurumQuant.profile(data.daily,data.evidence);

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "createdAt": "2026-10-24T02:55:03.105Z",
+  "baseline": "4.4.1",
+  "dataHash": "cea46f28a4f86d9362d29ee3281718dd6174295b4a904cd607a7ac3eb64a4eb8",
+  "count": 1799,
+  "first": "2019-05-27",
+  "last": "2026-10-23",
+  "candidates": [
+    {
+      "id": "current",
+      "description": "Unchanged 4.4.1 champion"
+    },
+    {
+      "id": "ridge80",
+      "description": "Only increase fixed slope ridge penalty from 20 to 80, reduce feature sensitivity"
+    },
+    {
+      "id": "trend65",
+      "description": "Only change fixed ensemble weights from 70/30 to 35/65 ridge/trend"
+    },
+    {
+      "id": "direct252",
+      "description": "Only train direct target up to 252 sessions instead of 63, keep all other parameters"
+    }
+  ],
+  "splits": {
+    "development": {
+      "start": 252,
+      "end": 1078
+    },
+    "validation": {
+      "start": 1079,
+      "end": 1438
+    },
+    "holdout": {
+      "start": 1439,
+      "end": 1798
+    }
+  },
+  "originStride": 21,
+  "originStart": 252,
+  "horizons": [
+    7,
+    30,
+    180,
+    365,
+    1095
+  ],
+  "regimes": {
+    "lookback": 60,
+    "threshold": 0.05
+  },
+  "gate": {
+    "minNonOverlappingPerPhase": 12,
+    "developmentImprovement": 0.01,
+    "validationImprovement": 0.01,
+    "maxRmseRatio": 1.02,
+    "minDirectionDelta": -3,
+    "maxRegimeMapeRatio": 1.1,
+    "minRegimeCount": 8,
+    "minHoldoutImprovement": 0.005,
+    "maxHoldoutRmseRatio": 1.02
+  },
+  "rules": [
+    "No random shuffle; training prefixes and all preprocessing end at each origin.",
+    "Target and origin must both be inside the declared phase; crossing targets are purged.",
+    "Selection uses development and validation only. Freeze selection before revealing holdout.",
+    "No repeated search after seeing holdout; rejected candidate is not adjusted this round.",
+    "Primary errors and gates use non-overlapping target blocks; overlapping monthly-origin records are labelled diagnostics only.",
+    "External inputs unavailable before their first observed archive are excluded. These tests are price-only.",
+    "Historical data were inspected in prior releases; the reserved tail is held out for this round, not a never-seen independent dataset. True prospective forecasts remain separate.",
+    "Long horizons without enough non-overlapping targets are not tuned or advertised as validated."
+  ]
+}
