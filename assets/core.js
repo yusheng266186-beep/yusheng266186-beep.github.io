@@ -62,6 +62,29 @@
     q.premiumNote = synchronous ? "同一时间窗口的期货折算参考" : "国际报价或汇率时间不匹配，暂不比较";
     return q;
   }
+  function selectQuote(candidates,current,now=Date.now()) {
+    const valid=q=>q && q.dataTier!=="manual" && numeric(q.priceCnyGram)>0 && ageHours(q.asOf,now)!==Infinity;
+    const incoming=candidates.filter(valid).map(q=>normalizeQuote(q,now));
+    const previous=valid(current)?normalizeQuote(current,now):null;
+    const rank=q=>["snapshot","fallback"].includes(q.dataTier)?0:1;
+    const ordered=[...incoming,...(previous?[previous]:[])].sort((a,b)=>Date.parse(b.asOf)-Date.parse(a.asOf)||rank(b)-rank(a));
+    const quote=ordered[0]||null;
+    const peers=quote?incoming.filter(q=>Math.abs(Date.parse(q.asOf)-Date.parse(quote.asOf))<=120000):[];
+    const sources=new Set(peers.map(q=>/^https?:\/\//.test(q.sourceUrl||"")?q.sourceUrl.split("/")[2]:q.source));
+    const conflict=peers.some(q=>Math.abs(q.priceCnyGram/quote.priceCnyGram-1)>.025) || (!!(quote?.sourceConflict||previous?.sourceConflict) && sources.size<2);
+    return {quote:quote?{...quote,sourceConflict:conflict}:null,retained:quote===previous,conflict};
+  }
+  function refreshDelay(seconds,failures=0) {
+    const base=Math.max(30,numeric(seconds,60));
+    return Math.min(Math.max(600,base),base*2**clamp(numeric(failures,0),0,4));
+  }
+  function contractObserved(c) {
+    return {previous:numeric(c.previousClose)>0,open:numeric(c.open)>0,
+      range:numeric(c.high)>0&&numeric(c.low)>0&&numeric(c.high)>=numeric(c.low),
+      change:numeric(c.previousClose)>0||Number.isFinite(numeric(c.changePct)),
+      changeAmount:numeric(c.previousClose)>0||Number.isFinite(numeric(c.change)),
+      volume:numeric(c.volume)>=0,turnover:numeric(c.turnover)>=0};
+  }
   function normalizePoints(points) {
     const map = new Map();
     for (const p of Array.isArray(points) ? points : []) {
@@ -167,8 +190,9 @@
     const mode = quoteState(q, now), historical = mode.stale || q.dataTier === "manual";
     const checks = [
       { ok: Number.isFinite(grams) && grams > 0 && Math.abs(grams * 100 - Math.round(grams * 100)) < 1e-6, label: "交易克数", value: "至少 0.01g，精确到 0.01g" },
-      { ok: feePct >= 0 && feePct <= 5 && spreadPct >= 0 && spreadPct <= 10 && price > 0 && maxPosition >= 1 && maxPosition <= 100, label: "价格与费用", value: "手续费 0—5%，价差 0—10%" },
+      { ok: feePct >= 0 && feePct <= 5 && spreadPct >= 0 && spreadPct <= 10 && price > 0 && value > 0 && maxPosition >= 1 && maxPosition <= 100, label: "价格与费用", value: "金额至少 0.01 元；手续费 0—5%，价差 0—10%" },
       { ok: q.priceCnyGram > 0 && (!historical || input.historical === true), label: "行情时效", value: historical ? "需开启历史价格练习" : mode.label },
+      { ok: !q.sourceConflict, label: "来源一致性", value: q.sourceConflict ? "同时间窗口报价分歧较大，请核验后再练习" : "未发现同窗口来源冲突；不等于官方核验" },
       { ok: side === "sell" || total <= money(stats.equity * maxPosition / 100), label: "单笔上限", value: money(stats.equity * maxPosition / 100).toFixed(2) + " 元" },
       { ok: side === "buy" ? total <= p.cash : grams <= p.grams, label: side === "buy" ? "可用现金" : "可卖持仓", value: side === "buy" ? p.cash.toFixed(2) + " 元" : p.grams.toFixed(2) + "g" }
     ];
@@ -205,7 +229,7 @@
     next.totalFees = money(p.totalFees + o.fee);
     next.trades.unshift({ id: String(now) + "-" + p.trades.length, side: o.side, grams: o.grams, price: o.price,
       value: o.value, fee: o.fee, note: String(input.note || "").slice(0, 1000), createdAt: new Date(now).toISOString(),
-      quoteAsOf: q.asOf, dataMode: o.historical ? "historical-practice" : q.dataTier, instrument:"AU9999" });
+      quoteAsOf: q.asOf, quoteSource:q.source || "", quotePriceCnyGram:q.priceCnyGram, feePct:numeric(input.feePct), spreadPct:numeric(input.spreadPct), dataMode: o.historical ? "historical-practice" : q.dataTier, instrument:"AU9999" });
     return next;
   }
   function csvCell(value) {
@@ -214,5 +238,5 @@
     return '"' + s.replace(/"/g, '""') + '"';
   }
   return { numeric, money, timestamp, ageHours, quoteState, normalizeQuote, normalizePoints, chinaDate,
-    momentum, historyWindow, closedDaily, quoteReference, volatility, scenarioAt, scenarioModel, emptyPortfolio, validatePortfolio, portfolioStats, order, orderCapacity, execute, csvCell };
+    momentum, historyWindow, closedDaily, quoteReference, volatility, scenarioAt, scenarioModel, selectQuote, refreshDelay, contractObserved, emptyPortfolio, validatePortfolio, portfolioStats, order, orderCapacity, execute, csvCell };
 });

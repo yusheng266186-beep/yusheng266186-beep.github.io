@@ -994,3 +994,41 @@ body.light-motion .composition-track>i,body.light-motion .forecast-card,body.lig
 .inspection-slider input:focus-visible { outline:1px solid #dcc18aaa; outline-offset:2px; border-radius:9px; background:#c7ad7008; }
 .inspection-foot { margin-top:10px; }
 textarea:focus-visible { outline:2px solid #dcc18a; outline-offset:2px; }
+
+/* Research tools reveal depth on demand, without stacking another dashboard. */
+.model-audit,.risk-lab { margin:24px 0; padding:0; overflow:hidden; }
+.model-audit>summary,.risk-lab>summary { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:28px 32px; cursor:pointer; list-style:none; }
+.model-audit>summary::-webkit-details-marker,.risk-lab>summary::-webkit-details-marker { display:none; }
+.model-audit summary h2,.risk-lab summary h2 { margin:10px 0 8px; font:400 clamp(22px,2.1vw,31px) var(--serif); }
+.model-audit summary p,.risk-lab summary p { font-size:12px; margin:0; line-height:1.8; }
+.lab-expand { color:var(--gold); flex-shrink:0; font-size:11px; }
+.lab-content { border-top:1px solid var(--line); padding:29px 32px 30px; }
+.audit-metrics { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:20px; }
+.audit-metrics>div,.stress-results>div { min-width:0; }
+.audit-metrics span,.stress-results span { display:block; color:var(--muted); font-size:10px; line-height:1.8; }
+.audit-metrics strong { display:block; margin-top:10px; font:500 clamp(20px,2vw,28px) var(--number); color:#e8d4a5; }
+.lab-conclusion { font-size:12px; line-height:2; margin:25px 0 12px; max-width:980px; }
+.lab-meta { font:400 10px/1.9 var(--number); color:#9ba68f; }
+.lab-footer { display:flex; justify-content:space-between; align-items:center; gap:24px; border-top:1px solid var(--line); padding-top:18px; margin-top:24px; }
+.lab-footer p { font-size:10px; line-height:2; max-width:820px; margin:0; }
+.lab-footer .text-button,.lab-footer .text-link { flex-shrink:0; font-size:11px; }
+.lab-controls { display:flex; align-items:end; gap:24px; flex-wrap:wrap; }
+.lab-controls label { display:grid; gap:10px; color:var(--muted); font-size:11px; min-width:170px; }
+.lab-controls .input-shell input { width:120px; }
+.lab-controls select { min-height:46px; padding:8px 14px; border-radius:12px; color:var(--ink); background:#0c140f; border:1px solid var(--line); }
+.lab-controls button { min-height:46px; }
+.stress-results { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:26px; margin:25px 0 8px; }
+.stress-results strong { display:block; margin:10px 0 8px; font:500 clamp(20px,2.2vw,32px) var(--number); letter-spacing:-.04em; color:#e8d4a5; }
+.stress-results small { font:400 10px/1.8 var(--number); color:var(--muted); }
+.lab-empty { grid-column:1/-1; font-size:12px; line-height:2; }
+@media(max-width:800px) { .audit-metrics { grid-template-columns:repeat(3,minmax(0,1fr)); gap:25px 18px; } .lab-footer { align-items:start; flex-direction:column; gap:14px; } }
+@media(max-width:600px) { .model-audit>summary,.risk-lab>summary { padding:24px 20px; gap:15px; align-items:start; } .lab-expand { max-width:55px; line-height:1.8; } .lab-content { padding:24px 20px; } .audit-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } .lab-controls { gap:18px; } .lab-controls label { flex:1; min-width:120px; } .lab-controls .input-shell input { width:100%; } .stress-results { grid-template-columns:1fr; gap:0; } .stress-results>div { display:grid; grid-template-columns:1fr auto; align-items:center; padding:16px 0; border-bottom:1px solid var(--line); } .stress-results strong { margin:0; font-size:25px; } .stress-results small { grid-column:2; text-align:right; margin-top:5px; } }
+
+.lab-expand .lab-open { display:none; }
+.model-audit[open] .lab-open,.risk-lab[open] .lab-open { display:inline; }
+.model-audit[open] .lab-closed,.risk-lab[open] .lab-closed { display:none; }
+
+.lab-controls .input-shell { min-height:46px; display:flex; align-items:center; background:#0c140f; border:1px solid var(--line); border-radius:12px; }
+.lab-controls .input-shell input { min-width:0; height:44px; padding:10px 13px; border:0; background:transparent; color:var(--ink); font:400 15px var(--number); border-radius:12px; }
+.lab-controls .input-shell b { padding:0 12px 0 0; color:var(--muted); font-size:12px; }
+@media(max-width:600px) { .risk-title-tail { display:block; } }

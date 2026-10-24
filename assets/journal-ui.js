@@ -72,6 +72,7 @@
       content.append(metrics, node("p", "journal-provenance", tier + " · 报价截至 " + new Date(item.quoteAsOf).toLocaleString("zh-CN", {hour12:false}) + " · " + item.source), factors,
         node("p", "journal-caption", "这是当时的研究快照。报价变化不代表情景预测准确率。"));
       const until=new Date(Date.parse(item.quoteAsOf)+item.days*86400000);
+      if(item.method)content.append(node("p","journal-caption","计算方法 · "+item.method));
       if (Number.isFinite(until.getTime())) content.append(node("p","journal-caption","观察期参考至 "+until.toLocaleDateString("zh-CN")+"，以原报价时点为起点。"));
       if (item.review) {
         const review=node("div","journal-review-note");
