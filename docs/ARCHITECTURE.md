@@ -1,5 +1,11 @@
 # AURUM architecture
 
+## 4.3.2 content layout constraints
+
+The final stylesheet `assets/layout.css` defines reading gutters, shrinkable grid/flex children, text wrapping and responsive content layouts while preserving the full-bleed sculpture. The overview chapter bridge shares the home-details gutter. The order title and quote occupy separate rows. Forecast buttons retain keyed nodes and show explicit lower/upper bounds, the center, model and sample status; no quantitative forecast is changed to create visual differences.
+
+`setupCanvas` uses the actual CSS width instead of a 280px floor. The historical projection reserves its width from the available plot, keeping it positive at narrow sizes and shortening its label. The inspection overlay uses the same logical width. Verification includes browser boundary checks across five chapters and six widths, expanded content, drawers and a short-screen journal dialog, plus isolated DOM checks of card semantics and a 238px chart/projection regression.
+
 The site remains buildless HTML, CSS and classic JavaScript so both GitHub Pages and direct-file use are supported. Existing v3 portfolio and v5 configuration keys are retained.
 
 `data/embedded-data.js` supplies the offline seed. `core.js` exposes pure, independently tested domain operations through a browser global and CommonJS export. `scene.js` owns hash navigation and motion, and emits `aurum:chapter` after revealing a section. `app.js` adapts public providers, loads static files, renders the views and redraws visible canvases. No animation writes financial state.

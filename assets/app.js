@@ -843,7 +843,7 @@
     var container = $("forecastCards"), buttons = container.querySelectorAll("[data-horizon]");
     if (state.forecasts.length && buttons.length !== state.forecasts.length) {
       container.innerHTML = state.forecasts.map(function (_, index) {
-        return '<button type="button" class="forecast-card" data-horizon="'+index+'"><span class="forecast-top"><span></span><b></b></span><strong></strong><span class="forecast-range"><span></span><span></span></span><span class="forecast-rail" aria-hidden="true"><i></i></span><small></small></button>';
+        return '<button type="button" class="forecast-card" data-horizon="'+index+'"><span class="forecast-top"><span></span><b></b></span><span class="forecast-bounds"><span class="forecast-bound"><span>假设下界</span><b data-bound="low"></b></span><span class="forecast-bound"><span>假设上界</span><b data-bound="high"></b></span></span><span class="forecast-center"><span>路径中枢</span><b></b></span><small class="forecast-status"></small></button>';
       }).join("");
       buttons = container.querySelectorAll("[data-horizon]");
     }
@@ -852,14 +852,19 @@
       var button = buttons[index], selected = index === state.forecastHorizon;
       button.classList.toggle("selected", selected); button.setAttribute("aria-pressed", String(selected));
       updateText(button.querySelector(".forecast-top>span"), f.label);
-      updateText(button.querySelector(".forecast-top>b"), f.stance);
-      updateText(button.querySelector(":scope>strong"), toFixedPrice(f.center));
-      var range = button.querySelectorAll(".forecast-range>span");
-      updateText(range[0], toFixedPrice(f.low)); updateText(range[1], toFixedPrice(f.high));
-      button.querySelector(".forecast-rail>i").style.left = clamp((f.center-f.low)/Math.max(.01,f.high-f.low)*100,0,100) + "%";
-      updateText(button.querySelector(":scope>small"), selected ? "当前观察周期" : "查看这一周期");
+      var audit = state.quantProfile.evaluations.find(function(e){return e.days===f.days;});
+      var manual = Math.abs(state.scenarioModel.scoreDelta)>.0001;
+      var modelLabel = manual ? "手动假设" : audit?.model === "trend" ? "衰减趋势" : "持平基准";
+      updateText(button.querySelector(".forecast-top>b"), modelLabel);
+      updateText(button.querySelector('[data-bound="low"]'), toFixedPrice(f.low));
+      updateText(button.querySelector('[data-bound="high"]'), toFixedPrice(f.high));
+      updateText(button.querySelector(".forecast-center>b"), toFixedPrice(f.center));
+      updateText(button.querySelector(".forecast-status"), (selected ? "当前周期" : "查看周期") + " · " + (audit?.count>=6 ? "历史检验 "+audit.count+" 次" : "尚无充分检验"));
+      button.setAttribute("aria-label", f.label+"，"+modelLabel+"，假设下界 "+toFixedPrice(f.low)+"，上界 "+toFixedPrice(f.high)+"，路径中枢 "+toFixedPrice(f.center)+" 元每克");
     });
     if (!state.forecasts.length && !container.querySelector(".forecast-empty")) container.innerHTML = '<div class="panel forecast-empty">有效日线不足 30 个，暂不推演情景。</div>';
+    var sameCenter=state.forecasts.length>1 && state.forecasts.every(function(f){return Math.abs(f.center-state.forecasts[0].center)<.005;});
+    setText("forecastBasisNote", sameCenter ? "当前各期采用持平基准，中枢保持当前参考价；观察周期不同，上下界随之变化。相同中枢不代表相同区间，也不代表价格不会变化。" : "先比较各周期的上下界，再查看路径中枢。手动假设会平移路径，历史检验结果不适用于这项平移。");
     var focus = state.forecasts[state.forecastHorizon];
     $("captureScenario").disabled = !focus || !state.quote.asOf;
     $("scenarioFocus").innerHTML = focus ? '<div><span>当前观察 · '+focus.label+'</span><strong>'+toFixedPrice(focus.center)+'<small>元 / 克</small></strong></div><p>波动情景带 <b>'+toFixedPrice(focus.low)+' — '+toFixedPrice(focus.high)+'</b><small>历史波动与误差刻度 · 不保证未来覆盖</small></p>' : '';
@@ -1377,7 +1382,7 @@
 
   function setupCanvas(canvas, height) {
     var rect = canvas.getBoundingClientRect();
-    var width = Math.max(280, rect.width || canvas.clientWidth || 600);
+    var width = Math.max(1, rect.width || canvas.clientWidth || 600);
     var cssHeight = height || rect.height || canvas.clientHeight || 300;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var pixelWidth = Math.round(width * dpr), pixelHeight = Math.round(cssHeight * dpr);
@@ -1458,7 +1463,9 @@
     var pad = { top: 22, right: 58, bottom: 34, left: 16 };
     var reference = Core.quoteReference(state.quote,view.last.time);
     var showForecast = state.chartIndicators.forecast && state.scenarioModel && state.scenarioModel.ready;
-    var splitX = showForecast ? width * 0.79 : width - pad.right;
+    var plotRight = width-pad.right;
+    var projectionWidth = showForecast ? Math.min(110,Math.max(54,(plotRight-pad.left)*.22)) : 0;
+    var splitX = plotRight-projectionWidth;
     var historyEnd = splitX - (reference ? 22 : 0);
     var plotBottom = height - pad.bottom;
     var closes = daily.map(function (point) { return point.close; });
@@ -1505,7 +1512,7 @@
       ctx.setLineDash([]);
       ctx.fillStyle = "#ccb57d";
       ctx.font = "11px Noto Sans SC, sans-serif";
-      ctx.fillText("30 日假设", splitX + 8, pad.top + 12);
+      ctx.fillText(projectionWidth>=76 ? "30 日假设" : "30 日", splitX + 6, pad.top + 12);
       drawForecastBand(ctx, forecast, xForecast, y);
     }
 
