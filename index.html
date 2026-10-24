@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css?v=4.3.2"><link rel="stylesheet" href="assets/styles.css?v=4.3.2"><link rel="stylesheet" href="assets/cinematic.css?v=4.3.2"><link rel="stylesheet" href="assets/layout.css?v=4.3.2"><link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-variable.woff2" crossorigin><link rel="preload" as="image" href="assets/gold-sculpture-master.png" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css?v=4.4.0"><link rel="stylesheet" href="assets/styles.css?v=4.4.0"><link rel="stylesheet" href="assets/cinematic.css?v=4.4.0"><link rel="stylesheet" href="assets/layout.css?v=4.4.0"><link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-variable.woff2" crossorigin><link rel="preload" as="image" href="assets/gold-sculpture-master.png" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
       <symbol id="i-grid" viewBox="0 0 24 24">
         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
         <rect x="14" y="3" width="7" height="7" rx="1"></rect>
@@ -213,9 +213,14 @@
               </article>
             </div>
 
+            <details class="panel prediction-evidence" id="predictionEvidence"><summary><div><span class="eyebrow">BEHIND THE FORECAST</span><h2>预测依据，逐项看清。</h2><p id="evidenceSummary">读取市场与事件输入</p></div><span>展开依据 ＋</span></summary><div class="evidence-content"><p id="evidenceClock" class="lab-meta"></p><div id="evidenceRows" class="evidence-grid"></div><p id="evidenceLimits" class="lab-meta"></p></div></details>
+
+            <details class="panel replay-lab" id="replayLab"><summary><div><span class="eyebrow">REWIND & VERIFY</span><h2>回到某一天，再预测一次。</h2><p>锁住当时的输入，交给后来的价格核验。</p></div><span>打开回放 ＋</span></summary><div class="evidence-content"><div class="replay-controls"><label for="replayDate">训练截止日期<input type="date" id="replayDate"></label><label for="replayHorizon">预测周期<select id="replayHorizon"><option value="7">1 周</option><option value="30" selected>1 个月</option><option value="180">6 个月</option><option value="365">1 年</option><option value="1095">3 年</option></select></label><button class="wide-button" type="button" id="runReplay">锁定日期并验证 ↗</button></div><p id="replayStatus" class="lab-meta" role="status">选择日期后开始回放。之后的价格只用作核验，不进入训练。</p><dl id="replayResults" class="replay-results"></dl></div></details>
+
+            <p class="prospective-audit" id="prospectiveAudit" role="status"></p>
             <details class="panel model-audit" id="modelAudit">
               <summary><div><span class="eyebrow">TEST BEFORE TRUST</span><h2 id="modelAuditTitle">把模型放回历史里</h2><p>先看误差，再看方向。</p></div><span class="lab-expand"><span class="lab-closed">展开检验 ＋</span><span class="lab-open">收起检验 −</span></span></summary>
-              <div class="lab-content"><div class="audit-metrics"><div><span>当前数据路径</span><strong id="auditModel">—</strong></div><div><span>非重叠检验次数</span><strong id="auditSample">—</strong></div><div><span>逐次选择策略误差</span><strong id="auditError">—</strong></div><div><span>始终持平基准误差</span><strong id="auditBaseline">—</strong></div><div><span>历史区间覆盖率</span><strong id="auditCoverage">—</strong></div></div><p class="lab-conclusion" id="auditConclusion"></p><p class="lab-meta" id="auditWindow"></p><div class="lab-footer"><p>每次只使用当时已知数据；不重叠的预测区段。区间以历史误差的 80% 分位为目标刻度，覆盖率为后续实际检验结果，非未来命中概率。策略误差统计当时逐次选择的完整策略，当前路径可能与历次选择不同。</p><button type="button" class="text-button" id="exportBacktest">导出逐次检验 ↗</button></div></div>
+              <div class="lab-content"><div class="audit-metrics"><div><span>当前数据路径</span><strong id="auditModel">—</strong></div><div><span>非重叠检验次数</span><strong id="auditSample">—</strong></div><div><span>模型价格误差 MAPE</span><strong id="auditError">—</strong></div><div><span>持平基准误差 MAPE</span><strong id="auditBaseline">—</strong></div><div><span>历史区间覆盖率</span><strong id="auditCoverage">—</strong></div><div><span>涨跌方向命中率</span><strong id="auditDirection">—</strong></div><div><span>含当时外部存档的检验</span><strong id="auditEvidence">—</strong></div></div><p class="lab-conclusion" id="auditConclusion"></p><p class="lab-meta" id="auditWindow"></p><div class="lab-footer"><p>每次只使用截止时点前的数据，不重叠核验。至少 8 次已结束误差用于区间校准；之后的有限样本 80% 分位为目标刻度，覆盖率按真实结果计算。历史价格来自当前快照，未具备修订版本。旧日期没有消息或市场因子存档时，仅验证量价部分；完整多因子预测的效果须靠之后积累的存档检验。</p><button type="button" class="text-button" id="exportBacktest">导出逐次检验 ↗</button></div></div>
             </details>
 
             <details class="panel assumption-console" id="assumptionConsole">
@@ -229,7 +234,7 @@
                 <div class="factor-grid" id="factorGrid" role="tabpanel" aria-labelledby="factor-tab-market"></div>
                 <div class="assumption-footer"><p class="assumption-footnote">数值表示对金价的假设影响，正值偏强、负值偏弱。自动动量和有效溢价为因子参照；统计路径单独检验，手动调整仅表达相对基线的变化。</p><button class="text-button" type="button" id="resetAssumptions">恢复数据基线</button></div>
               </div>
-            </details><details class="method-card panel" id="methodology"><summary>这些情景怎样计算？<span>＋</span></summary><div><p>使用最近最多 90 个交易日的对数收益，结合 EWMA（衰减 0.94）与历史波动下限估计波动尺度。持平路径与衰减趋势路径作逐次向前比较：前 90 日训练，每个预测区段互不重叠，只用当时已经结束的误差选择路径；趋势需比持平误差低至少 2% 才启用。</p><p>先积累至少 8 次已结束预测，再用此前误差的有限样本 80% 分位确定区间尺度，后续逐次记录覆盖率和绝对百分比误差。当前报价用于情景起点，历史检验从当时收盘开始；每年 252 个交易日为近似换算，不是交易日历承诺。<a href="https://otexts.com/fpp3/tscv.html" target="_blank" rel="noreferrer">滚动起点检验方法 ↗</a></p><p>自动动量和溢价只作为因子基线展示，不再重复加入统计路径。手动因子相对数据基线的变化只平移情景中枢，历史覆盖率不适用于这项人为平移。样本不足的周期使用 1.2816 倍波动作探索刻度；长期周期采用波动敏感性外推，不能声称经过验证；3 年结果尤其需要谨慎理解。</p></div></details><a class="chapter-bridge" href="#trading"><div><span>04 / PRACTICE</span><strong>让假设，经历一次练习。</strong><p>把仓位、费用和价格时点放在一起理解。</p></div><b aria-hidden="true">&#8599;</b></a></section><section class="view-section" id="trading" data-page="trading" hidden>
+            </details><details class="method-card panel" id="methodology"><summary>预测怎样计算？<span>＋</span></summary><div><p>各周期独立拟合对数收益：5 / 20 / 60 日动量、均线偏离、高点回撤和成交量相对活跃度作特征，使用近 504 条可用训练记录、半衰期 126 日的时间权重、标准化后的岭回归（惩罚 20）。固定 70% 回归与 30% 衰减趋势集成，再用此前最近 24 次已结束误差作可靠度收缩，收益受波动封顶约束；超过 63 个交易日作衰减外推。这些规则提前固定，不以核验期结果调参。</p><p>外部市场输入来自 ECB 汇率、美国财政部实际收益率、Cboe VIX；消息来自美联储、ECB、BEA、BLS、上金所与新闻发布者。明确事件按源和维度去重，48 小时半衰期，7 日过期；含条件和否定的语句不直接判断方向。外部修正使用有上限的先验规则，不声称是已训练的因果系数。<a href="https://www.gold.org/goldhub/tools/gold-return-attribution-model" target="_blank" rel="noreferrer">黄金驱动维度参考 ↗</a></p><p>从第 120 日起非重叠向前核验，仅使用已结束的预测误差校准 EWMA 波动区间。消息发布时间和首次见到时间都需早于预测起点，修订版本分开保存；缺少当时外部存档的旧日期只检验量价部分。手动修正不沿用历史覆盖率。尚未走完的周期等待核验，长周期样本不足不报告可靠准确率。<a href="https://otexts.com/fpp3/tscv.html" target="_blank" rel="noreferrer">滚动起点检验 ↗</a></p></div></details><a class="chapter-bridge" href="#trading"><div><span>04 / PRACTICE</span><strong>让假设，经历一次练习。</strong><p>把仓位、费用和价格时点放在一起理解。</p></div><b aria-hidden="true">&#8599;</b></a></section><section class="view-section" id="trading" data-page="trading" hidden>
             <div class="section-heading reveal">
               <div>
                 <span class="section-index">04 / PRACTICE</span>
@@ -344,7 +349,7 @@
               <div>
                 <span class="section-index">05 / RESEARCH</span>
                 <h1>读懂，涌动的力量。</h1>
-                <p>把盘面观察、官方资讯与个人假设分开阅读，找到值得继续核实的线索。</p>
+                <p>把盘面观察、消息原文与个人假设分开阅读，找到值得继续核实的线索。</p>
               </div>
               <nav class="research-section-nav" aria-label="研究内容"><a href="#journalSection">观察手记 <span id="journalNavCount">0</span></a><a href="#decision">研究摘要 ↗</a></nav>
             </div>
@@ -358,13 +363,13 @@
                   </div>
                   <span id="impactDirection">读取数据</span>
                 </div>
-                <div class="market-observations" id="impactList"></div><div class="observation-assumptions"><span id="researchFactorSummary">当前研究假设</span><a class="text-link" href="#assumptionConsole">调整假设 ↗</a></div><p class="observation-note">根据页面有效报价与历史计算，和官方原文分开阅读。</p>
+                <div class="market-observations" id="impactList"></div><div class="observation-assumptions"><span id="researchFactorSummary">当前研究假设</span><a class="text-link" href="#assumptionConsole">调整假设 ↗</a></div><p class="observation-note">根据页面有效报价与历史计算，和消息原文分开阅读。</p>
               </article>
 
               <article class="panel news-terminal reveal">
                 <div class="panel-heading compact">
                   <div>
-                    <span class="eyebrow">OFFICIAL READING</span>
+                    <span class="eyebrow">SOURCE READING</span>
                     <h2>回到信息的源头。</h2>
                   </div>
                   <span id="newsFreshness">更新中</span>
@@ -497,4 +502,4 @@
 
 
 <dialog class="journal-dialog" id="journalDialog" aria-labelledby="journalDialogTitle"><form id="journalForm"><div class="journal-dialog-head"><div><span class="eyebrow">KEEP A PERSPECTIVE</span><h2 id="journalDialogTitle">记录这一刻的判断。</h2></div><button type="button" class="icon-button" id="closeJournal" aria-label="关闭记录窗口">×</button></div><p id="journalCaptureMeta"></p><label for="journalNote"><span id="journalNotePrompt">此刻，你在观察什么？</span><span id="journalNoteHint">选填 · 最多 280 字</span></label><textarea id="journalNote" maxlength="280" rows="4" placeholder="写下理由，以及下一次要核实的变化。"></textarea><p class="form-error" id="journalError" role="alert"></p><p class="journal-caption" id="journalSaveHint">记录时的报价、周期、区间与全部假设将一并保存到本机。</p><button class="wide-button primary" id="journalSave" type="submit">保存并查看手记 ↗</button></form></dialog>
-<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div><script src="data/embedded-data.js"></script><script src="assets/core.js?v=4.3.2"></script><script src="assets/quant.js?v=4.3.2"></script><script src="assets/gold-geometry.js?v=4.3.2"></script><script src="assets/gold-surface.js?v=4.3.2"></script><script src="assets/render-policy.js?v=4.3.2"></script><script src="assets/gold-world.js?v=4.3.2"></script><script src="assets/scene.js?v=4.3.2"></script><script src="assets/research-journal.js?v=4.3.2"></script><script src="assets/journal-ui.js?v=4.3.2"></script><script src="assets/app.js?v=4.3.2"></script></body></html>
+<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div><script src="data/embedded-data.js"></script><script src="assets/core.js?v=4.4.0"></script><script src="assets/evidence.js?v=4.4.0"></script><script src="assets/quant.js?v=4.4.0"></script><script src="assets/gold-geometry.js?v=4.4.0"></script><script src="assets/gold-surface.js?v=4.4.0"></script><script src="assets/render-policy.js?v=4.4.0"></script><script src="assets/gold-world.js?v=4.4.0"></script><script src="assets/scene.js?v=4.4.0"></script><script src="assets/research-journal.js?v=4.4.0"></script><script src="assets/journal-ui.js?v=4.4.0"></script><script src="assets/app.js?v=4.4.0"></script></body></html>

@@ -5,7 +5,9 @@ const root = process.cwd();
 const files = {
   market: "data/market-snapshot.json",
   history: "data/market-history.json",
-  news: "data/news.json"
+  news: "data/news.json",
+  research: "data/research-factors.json",
+  ledger: "data/forecast-ledger.json"
 };
 
 const payload = {};

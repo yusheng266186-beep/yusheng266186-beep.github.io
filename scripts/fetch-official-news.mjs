@@ -1,12 +1,19 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { mergeFeedResults } from "./news-utils.mjs";
+import Evidence from "../assets/evidence.js";
 
 const sources = [
   ["fed-all", "Federal Reserve", "https://www.federalreserve.gov/feeds/press_all.xml"],
   ["fed-monetary", "Fed Monetary Policy", "https://www.federalreserve.gov/feeds/press_monetary.xml"],
   ["bls-cpi", "BLS CPI", "https://www.bls.gov/feed/cpi.rss"],
-  ["bls-ppi", "BLS PPI", "https://www.bls.gov/feed/ppi.rss"]
+  ["bls-ppi", "BLS PPI", "https://www.bls.gov/feed/ppi.rss"],
+  ["bls-jobs", "BLS Employment", "https://www.bls.gov/feed/empsit.rss"],
+  ["fed-speeches", "Fed Speeches", "https://www.federalreserve.gov/feeds/speeches.xml"],
+  ["ecb", "European Central Bank", "https://www.ecb.europa.eu/rss/press.html"],
+  ["bea", "BEA Economic Releases", "https://apps.bea.gov/rss/rss.xml"],
+  ["bbc-world", "BBC World", "https://feeds.bbci.co.uk/news/world/rss.xml"],
+  ["cnbc-economy", "CNBC Economy", "https://www.cnbc.com/id/20910258/device/rss/rss.html"]
 ];
 
 const outputPath = path.resolve("data/news.json");
@@ -22,7 +29,7 @@ await mkdir(path.dirname(outputPath), { recursive: true });
 const next = JSON.stringify(nextPayload, null, 2);
 const current = JSON.stringify(previous);
 
-if (normalize(current) !== normalize(next)) {
+if (normalize(current) !== normalize(next) || previous.generatedAt !== nextPayload.generatedAt) {
   await writeFile(outputPath, next);
   console.log(`Updated ${outputPath} with ${items.length} official news items.`);
 } else {
@@ -37,9 +44,17 @@ async function fetchSource([id, name, url]) {
   if (!res.ok) throw new Error(`${name} returned ${res.status}`);
   const xml = await res.text();
   const items = parseItems(xml, { id, name, url })
-    .filter((item) => id !== "fed-all" || isGoldRelevant(item))
+    .filter((item) => !["fed-all","bbc-world","cnbc-economy"].includes(id) || isGoldRelevant(item))
     .slice(0, 10);
   if (!items.length) throw new Error(`${name} returned no dated items`);
+  await Promise.all(items.filter(item=>["fed-monetary","ecb"].includes(id)&&/FOMC statement|monetary policy decisions/i.test(item.title)&&Date.now()-Date.parse(item.publishedAt)<7*86400000).slice(0,3).map(async item=>{
+    try{
+      const article=await fetch(item.url,{signal:AbortSignal.timeout(8000)});if(!article.ok)return;
+      const text=clean((await article.text()).replace(/<(?:script|style)\b[\s\S]*?<\/(?:script|style)>/gi," "));
+      const sentences=text.split(/(?<=[.!?])\s+/).filter(s=>s.length<700&&Evidence.classifyNews({title:s}).score);
+      if(sentences.length){item.summary=sentences.slice(0,2).join(" ").slice(0,1000);item.impact=Evidence.classifyNews(item).score>0?"bullish":"bearish";}
+    }catch{/* RSS item remains usable when the linked decision is unavailable. */}
+  }));
   return items;
 }
 
@@ -59,7 +74,7 @@ async function fetchSgeNotices() {
       const url = new URL(match[1], baseUrl).href;
       if (!title || !dateMatch) return null;
       const publishedAt = dateMatch
-        ? new Date(`20${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T12:00:00+08:00`).toISOString()
+        ? new Date(`20${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T23:59:59+08:00`).toISOString()
         : new Date().toISOString();
       return {
         id: `sge-notice-${publishedAt.slice(0, 10)}-${index}`,
@@ -67,8 +82,9 @@ async function fetchSgeNotices() {
         title,
         url,
         publishedAt,
+        timePrecision: "date-only",
         summary: "上海黄金交易所官方公告",
-        impact: inferSgeImpact(title),
+        impact: "neutral",
         weight: inferSgeWeight(title),
         category: "domestic"
       };
@@ -99,7 +115,7 @@ function parseItems(xml, source) {
       url,
       publishedAt,
       summary,
-      impact: inferImpact(`${title} ${summary}`),
+      impact: ({1:"bullish",[-1]:"bearish"})[Math.sign(Evidence.classifyNews({title,summary}).score)] || "neutral",
       weight: inferWeight(`${title} ${summary}`),
       category: "macro"
     };
@@ -107,7 +123,7 @@ function parseItems(xml, source) {
 }
 
 function isGoldRelevant(item) {
-  return /fomc|monetary|federal funds|interest rate|inflation|economic projection|discount rate|treasury|dollar|gold/i
+  return /fomc|monetary|federal funds|interest rate|inflation|economic projection|discount rate|treasury|dollar|gold|ceasefire|armed conflict|banking crisis|war|iran|ukraine/i
     .test(`${item.title} ${item.summary}`);
 }
 

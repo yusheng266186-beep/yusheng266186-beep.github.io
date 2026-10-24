@@ -2,9 +2,9 @@ const test=require('node:test'),assert=require('node:assert/strict'),Q=require('
 function rows(count=440){let price=900;return Array.from({length:count},(_,i)=>{price*=Math.exp(.00035+Math.sin(i*1.71)*.009+Math.cos(i*.31)*.004);return {time:new Date(Date.UTC(2024,0,1+i)).toISOString().slice(0,10),open:price,close:price,high:price+1,low:price-1};});}
 const now=Date.now(),q={priceCnyGram:900,asOf:new Date(now).toISOString(),dataTier:'domestic-live'},cfg={maxPosition:100,stopLoss:4},input={side:'buy',grams:10,feePct:.035,spreadPct:.1};
 test('walk-forward records use disjoint targets and are unchanged when future prices are appended',()=>{
- const first=Q.profile(rows(300)),later=Q.profile(rows(440));
+ const first=Q.profile(rows(340)),later=Q.profile(rows(440));
  for(let j=0;j<2;j++){const a=first.evaluations[j].records,b=later.evaluations[j].records;assert.ok(a.length>0);assert.deepEqual(b.slice(0,a.length),a);for(let i=1;i<a.length;i++)assert.ok(a[i].origin>=a[i-1].target);assert.ok(a.every(r=>r.origin<r.target));}
- const changed=rows(440);for(let i=300;i<changed.length;i++)for(const k of ['open','high','low','close'])changed[i][k]*=10;
+ const changed=rows(440);for(let i=340;i<changed.length;i++)for(const k of ['open','high','low','close'])changed[i][k]*=10;
  assert.deepEqual(Q.profile(changed).evaluations[0].records.slice(0,first.evaluations[0].records.length),first.evaluations[0].records);
 });
 test('history audit reproduces actual errors and coverage rather than a target percentage',()=>{
@@ -26,7 +26,25 @@ test('scenario chart endpoints exactly match cards and manual shifts cannot chan
 test('EWMA responds to a recent volatility shock and constant prices remain finite',()=>{
  const quiet=rows(),shock=rows();for(let i=430;i<440;i++)for(const k of ['open','high','low','close'])shock[i][k]*=i%2?1.2:.8;
  assert.ok(Q.profile(shock).fit.sigma>Q.profile(quiet).fit.sigma);
- const flat=rows().map(r=>({...r,open:900,close:900,high:901,low:899}));assert.equal(Q.profile(flat).evaluations[0].model,'naive');assert.ok(Number.isFinite(Q.scenarioModel(900,Q.profile(flat),0).points[0].high));
+ const flat=rows().map(r=>({...r,open:900,close:900,high:901,low:899}));assert.equal(Q.scenarioModel(900,Q.profile(flat),0).points[0].center,900);assert.ok(Number.isFinite(Q.scenarioModel(900,Q.profile(flat),0).points[0].high));
+});
+test('direct horizon fits generate data-dependent centers without forcing a direction for flat prices',()=>{
+ const p=Q.profile(rows()),m=Q.scenarioModel(900,p,0);assert.ok(new Set(m.points.map(f=>f.center.toFixed(4))).size>1);
+ const changed=rows().map((r,i)=>({...r,close:r.close*Math.exp(-i*.002),open:r.open*Math.exp(-i*.002),high:r.high*Math.exp(-i*.002),low:r.low*Math.exp(-i*.002)}));
+ assert.notEqual(Q.scenarioModel(900,Q.profile(changed),0).points[1].center,m.points[1].center);
+});
+test('volume feature is invariant to consistent units and rejects unknown provenance',()=>{
+ const raw=rows(),a=raw.map((r,i)=>({...r,volumeSource:'provider-a',volume:100+20*Math.sin(i)})),b=a.map(r=>({...r,volume:r.volume*1000}));
+ const pa=Q.scenarioModel(900,Q.profile(a)).points,pb=Q.scenarioModel(900,Q.profile(b)).points;
+ assert.ok(pa.every((p,i)=>Math.abs(p.center-pb[i].center)<1e-8));
+ const unknown=a.map(r=>({...r,volumeSource:undefined}));assert.deepEqual(Q.scenarioModel(900,Q.profile(unknown)).points,Q.scenarioModel(900,Q.profile(raw)).points);
+});
+test('date replay trains only on cutoff prices and external evidence already first seen at that cutoff',()=>{
+ const data=rows(),date=data[260].time,a=Q.replay(data,date,30),changed=data.map((r,i)=>i>260?{...r,close:r.close*2,open:r.open*2,high:r.high*2,low:r.low*2}:r),b=Q.replay(changed,date,30);
+ assert.equal(a.center,b.center);assert.equal(a.low,b.low);assert.notEqual(a.actual,b.actual);assert.ok(a.target>a.origin);assert.equal(a.trainCount,261);
+ const news={title:'Federal Reserve lowered the target range for the federal funds rate',source:'Fed',url:'https://example.test/fed',publishedAt:date+'T00:00:00Z',firstSeenAt:'2099-01-01T00:00:00Z'};
+ assert.equal(Q.replay(data,date,30,{news:[news]}).center,a.center);assert.equal(Q.replay(data,date,30,{news:[news]}).evidenceCount,0);
+ assert.equal(Q.replay(data,data[30].time,30).ready,false);assert.equal(Q.replay(data,data.at(-1).time,30).actual,undefined);
 });
 test('stress marks the projected account, including spread and fees, without executing or mutating',()=>{
  const p=C.emptyPortfolio(),copy=JSON.stringify(p),o=C.order(p,q,cfg,input),r=Q.stress(p,q,cfg,input,10);

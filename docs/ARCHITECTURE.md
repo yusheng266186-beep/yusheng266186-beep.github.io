@@ -1,5 +1,21 @@
 # AURUM architecture
 
+## 4.4.0 prediction and point-in-time evidence
+
+This section supersedes the v1 forecast-selection description below. `quant.js` fits each horizon's completed log return with standardized lagged 5/20/60-day returns, mean deviation, drawdown and observed volume activity. Up to 504 training origins, 126-session weight half-life, fixed ridge penalties (20 for slopes, 5 for intercept), and a fixed 70/30 ridge/damped-trend ensemble are declared before evaluation. Direct target length is capped at 63 sessions; longer forecasts extrapolate with diminishing growth. This is not a claim of reliable long-term prediction.
+
+`evidence.js` is a pure shared evidence gate. Inputs are archived ECB bilateral FX, Treasury 10-year real yields and Cboe VIX plus explicit policy/demand/risk/flow events from primary publishers. Missing/stale sources are excluded rather than fabricated. News publication and first observation must both precede a forecast origin; revised content is versioned, market snapshots are frozen, and inputs expire. The external correction is a capped and transient expert prior, not a fitted causal coefficient. Historical dates before archive coverage evaluate the price model only; the UI reports external-evidence test counts separately. Current historical prices are not a true vintage archive, which is disclosed in replay and aggregate audits.
+
+`prediction-worker.js` trains and replays outside the rendering thread. Profile/replay request generations discard stale worker results; unsupported workers fall back to the same pure functions. Empty startup state accurately announces background training. Current evidence decay is refreshed on quote/research updates without repeating historical regressions when inputs have not changed. Native animation, account storage and model fitting remain independent.
+
+Replay limits all features, training targets and calibration to the chosen closed date; future prices are read only for the revealed target. Evaluation begins at record 120, uses disjoint target blocks and eight initial resolved errors for interval calibration. Audits expose MAPE versus naive, direction accuracy, interval coverage, counts and CSV rows. Tests append and perturb future prices/news to verify immutability of past forecasts.
+
+News/factor collection targets ten-minute GitHub scheduling and browser five-minute revalidation. Schedules and publisher cadence can delay updates; this is explicitly not tick-real-time news. Partial feed failure retains dated content, with checked source status; market-factor failures retain original observations until expiry. Existing market quote/history schedules and isolated subproject remain intact.
+
+Programmatically focused headings suppress the browser's large default outline; interactive keyboard focus styling remains visible. Source directory and local/optional model reports include the new provenance and validation boundaries.
+
+Forecast magnitude is additionally shrunk using only the preceding 24 resolved candidate-versus-naive errors (squared error ratio, bounded 0.15–1; initial 0.5), not future test outcomes. Volume features require continuous provider provenance. `ledger-utils.mjs` appends one immutable live forecast per version/closed date, with code and input hashes; target outcomes resolve only after a later valid closed capture and are frozen thereafter. This prospective, overlapping ledger is distinct from development-period disjoint historical evaluation and starts with no verified accuracy.
+
 ## 4.3.2 content layout constraints
 
 The final stylesheet `assets/layout.css` defines reading gutters, shrinkable grid/flex children, text wrapping and responsive content layouts while preserving the full-bleed sculpture. The overview chapter bridge shares the home-details gutter. The order title and quote occupy separate rows. Forecast buttons retain keyed nodes and show explicit lower/upper bounds, the center, model and sample status; no quantitative forecast is changed to create visual differences.
