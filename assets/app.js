@@ -472,6 +472,7 @@
       dataTier: "domestic-live",
       contracts: contracts,
       usdCny: state.quote.usdCny, fxAsOf: state.quote.fxAsOf,
+      officialReference:state.quote.officialReference || DATA.market && DATA.market.officialReference,
       internationalReference: state.quote.internationalReference || DATA.market && DATA.market.internationalReference
     };
   }
@@ -1171,6 +1172,8 @@
       ["02", "20 日动量", validHistory ? signedPercent(historyMomentum(20)*100) : "有效历史不足", "仅按已记录收盘价计算", "#history"],
       ["03", "内外盘比较", Number.isFinite(premium) ? signedPercent(premium) : "等待有效参照", Number.isFinite(premium) ? "国内相对同期国际折算价" : "国际报价与汇率需处于有效时间窗口", "#researchSources"]
     ];
+    var official=state.quote.officialReference;
+    if(official?.timePrecision==="date-only" && official.priceCnyGram>0)items.push(["04","官方日级对照",money(official.priceCnyGram),official.referenceDate+" · 不含精确时刻，不作同步比价",safeUrl(official.sourceUrl)]);
     var html = items.map(function(item) {
       return '<a class="observation-row" href="'+item[4]+'"><span class="observation-index">'+item[0]+'</span><div><span>'+escapeHtml(item[1])+'</span><strong>'+escapeHtml(item[2])+'</strong><small>'+escapeHtml(item[3])+'</small></div><b aria-hidden="true">↗</b></a>';
     }).join("");
@@ -1214,7 +1217,7 @@
 
   function reportContextKey() {
     return JSON.stringify({ price: state.quote.priceCnyGram, asOf: state.quote.asOf,
-      quoteFields:[state.quote.previousCnyGram,state.quote.openCnyGram,state.quote.highCnyGram,state.quote.lowCnyGram,state.quote.domesticPremiumPct,state.quote.dataTier,state.quote.source,state.quote.observed],
+      quoteFields:[state.quote.previousCnyGram,state.quote.openCnyGram,state.quote.highCnyGram,state.quote.lowCnyGram,state.quote.domesticPremiumPct,state.quote.dataTier,state.quote.source,state.quote.observed,state.quote.officialReference],
       horizon: state.forecastHorizon, factors: state.factors.map(function(f){return [f.id,f.value];}),
       cash: state.portfolio.cash, grams: state.portfolio.grams, cost: state.portfolio.avgCost,
       accountSummary:[state.portfolio.realized,state.portfolio.totalFees,state.portfolio.trades.length],

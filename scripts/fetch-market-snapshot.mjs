@@ -3,7 +3,7 @@ import path from "node:path";
 
 const outputPath = path.resolve("data/market-snapshot.json");
 import Core from "../assets/core.js";
-import {collectQuotes} from "./quote-collector.mjs";
+import {collectQuotes,parseOfficialReference} from "./quote-collector.mjs";
 const configuredFx = Core.numeric(process.env.USD_CNY);
 const fxAsOf = Core.timestamp(process.env.USD_CNY_ASOF);
 const usdCny = configuredFx > 0 && Core.ageHours(fxAsOf) <= 72 ? configuredFx : null;
@@ -21,6 +21,7 @@ const domestic=collected.quote,sourceHealth=collected.sourceHealth;
 const snapshot = {
   ...domestic,
   sourceHealth,
+  officialReference:collected.references[0] || null,
   collectionMs: Date.now()-started,
   usdCny,
   fxAsOf: usdCny ? fxAsOf : null,
@@ -187,56 +188,7 @@ async function fetchSgeOfficialDelayed() {
     headers: { "User-Agent": "Mozilla/5.0 AurumGoldDashboard/2.0" }
   });
   if (!res.ok) throw new Error(`SGE returned ${res.status}`);
-  const html = await res.text();
-  const rows = parseSgeRows(html);
-  const main = rows.find((item) => item.symbol === "Au99.99");
-  if (!main || !Number.isFinite(main.latest) || main.latest <= 0) {
-    throw new Error("SGE page did not include a valid Au99.99 quote");
-  }
-  const date = html.match(/上海黄金交易所(\d{4}年\d{2}月\d{2}日)延时行情/)?.[1] || "";
-  return {
-    market: "CN-SGE",
-    marketRegion: "CN",
-    unit: "CNY/g",
-    primaryContract: main.symbol,
-    priceCnyGram: main.latest,
-    previousCnyGram: main.open || main.latest,
-    openCnyGram: main.open,
-    highCnyGram: main.high,
-    lowCnyGram: main.low,
-    changeCnyGram: main.latest - (main.open || main.latest),
-    changePct: main.open ? (main.latest - main.open) / main.open * 100 : 0,
-    volume: null,
-    turnover: null,
-    asOf: date ? parseChineseDate(date) : null,
-    source: "上海黄金交易所官方延时行情",
-    sourceUrl: url,
-    officialSource: "上海黄金交易所延时行情",
-    officialUrl: url,
-    delay: "官方延时行情",
-    dataTier: "official-delayed",
-    contracts: rows
-  };
-}
-
-function parseSgeRows(html) {
-  const rows = [...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
-  return rows.map((row) => {
-    const cells = [...row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((cell) => strip(cell[1]));
-    if (cells.length < 5) return null;
-    const [symbol, latest, high, low, open] = cells;
-    return {
-      symbol,
-      name: symbol,
-      latest: Number(latest),
-      high: Number(high),
-      low: Number(low),
-      open: Number(open),
-      previousClose: Number(open),
-      change: Number(latest) - Number(open),
-      changePct: Number(open) ? (Number(latest) - Number(open)) / Number(open) * 100 : 0
-    };
-  }).filter((item) => item && item.symbol && Number.isFinite(item.latest));
+  return parseOfficialReference(await res.text());
 }
 
 async function fetchYahooGoldFuture() {
@@ -284,11 +236,6 @@ function timestampFromSina(value) {
   return new Date(`${match[1]}-${match[2]}-${match[3]}T${match[4]}:${match[5]}:${match[6]}+08:00`).toISOString();
 }
 
-function parseChineseDate(value) {
-  const match = value.match(/(\d{4})年(\d{2})月(\d{2})日/);
-  if (!match) return null;
-  return new Date(`${match[1]}-${match[2]}-${match[3]}T15:30:00+08:00`).toISOString();
-}
 
 async function readExistingSnapshot() {
   try {
