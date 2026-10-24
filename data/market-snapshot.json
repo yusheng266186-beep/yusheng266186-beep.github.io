@@ -71,22 +71,56 @@
     {
       "source": "Eastmoney AU9999",
       "ok": true,
+      "kind": "quote",
       "asOf": "2026-10-23T18:29:55.000Z",
-      "latencyMs": 2738
+      "latencyMs": 2114
     },
     {
       "source": "Sina AU9999",
       "ok": true,
+      "kind": "quote",
       "asOf": "2026-10-23T15:59:35.000Z",
-      "latencyMs": 1553
+      "latencyMs": 2430
     },
     {
       "source": "SGE delayed",
-      "ok": false,
-      "error": "Invalid or expired quote timestamp"
+      "ok": true,
+      "kind": "reference",
+      "asOf": null,
+      "referenceDate": "2026-10-24",
+      "latencyMs": 1955
     }
   ],
-  "collectionMs": 2739,
+  "officialReference": {
+    "market": "CN-SGE",
+    "primaryContract": "AU9999",
+    "unit": "CNY/g",
+    "priceCnyGram": 862.99,
+    "highCnyGram": 872.99,
+    "lowCnyGram": 855,
+    "openCnyGram": 865,
+    "previousCnyGram": null,
+    "changeCnyGram": null,
+    "changePct": null,
+    "volume": null,
+    "turnover": null,
+    "asOf": null,
+    "referenceDate": "2026-10-24",
+    "timePrecision": "date-only",
+    "dataTier": "official-reference",
+    "source": "上海黄金交易所官方日期级参照",
+    "sourceUrl": "https://www.sge.com.cn/sjzx/yshqbg",
+    "observed": {
+      "previous": false,
+      "open": true,
+      "range": true,
+      "change": false,
+      "changeAmount": false,
+      "volume": false,
+      "turnover": false
+    }
+  },
+  "collectionMs": 2460,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
