@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { mergeFeedResults } from "./news-utils.mjs";
+import { mergeFeedResults,failedFeedSnapshot,goldRelevant } from "./news-utils.mjs";
+import {fetchText} from "./fetch-utils.mjs";
 import Evidence from "../assets/evidence.js";
 
 const sources = [
@@ -13,17 +14,23 @@ const sources = [
   ["ecb", "European Central Bank", "https://www.ecb.europa.eu/rss/press.html"],
   ["bea", "BEA Economic Releases", "https://apps.bea.gov/rss/rss.xml"],
   ["bbc-world", "BBC World", "https://feeds.bbci.co.uk/news/world/rss.xml"],
-  ["cnbc-economy", "CNBC Economy", "https://www.cnbc.com/id/20910258/device/rss/rss.html"]
+  ["cnbc-economy", "CNBC Economy", "https://www.cnbc.com/id/20910258/device/rss/rss.html"],
+  ["cnbc-top", "CNBC Top News", "https://www.cnbc.com/id/100003114/device/rss/rss.html"],
+  ["wsj-markets", "WSJ Markets", "https://feeds.content.dowjones.io/public/rss/RSSMarketsMain"],
+  ["marketwatch", "MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines"]
 ];
 
 const outputPath = path.resolve("data/news.json");
 const settled = await Promise.allSettled([
   ...sources.map(fetchSource),
-  fetchSgeNotices()
+  fetchSgeNotices(),fetchSinaNews()
 ]);
 let previous = {};
 try { previous = JSON.parse(await readFile(outputPath,"utf8")); } catch {}
-const nextPayload = mergeFeedResults(previous, settled, [...sources.map(s => s[1]), "上海黄金交易所"]);
+const sourceNames=[...sources.map(s => s[1]), "上海黄金交易所","新浪财经滚动"];
+let nextPayload;
+try{nextPayload=mergeFeedResults(previous,settled,sourceNames);}
+catch(error){await writeFile(outputPath,JSON.stringify(failedFeedSnapshot(previous,settled,sourceNames,new Date().toISOString()),null,2));throw error;}
 const items = nextPayload.items;
 await mkdir(path.dirname(outputPath), { recursive: true });
 const next = JSON.stringify(nextPayload, null, 2);
@@ -37,16 +44,10 @@ if (normalize(current) !== normalize(next) || previous.generatedAt !== nextPaylo
 }
 
 async function fetchSource([id, name, url]) {
-  const res = await fetch(url, {
-    signal: AbortSignal.timeout(12000),
-    headers: { "User-Agent": "AurumGoldDashboard/3.0" }
-  });
-  if (!res.ok) throw new Error(`${name} returned ${res.status}`);
-  const xml = await res.text();
-  const items = parseItems(xml, { id, name, url })
-    .filter((item) => !["fed-all","bbc-world","cnbc-economy"].includes(id) || isGoldRelevant(item))
-    .slice(0, 10);
-  if (!items.length) throw new Error(`${name} returned no dated items`);
+  const xml = await fetchText(url);
+  const parsed=parseItems(xml,{id,name,url}).filter(item=>Date.parse(item.publishedAt)<=Date.now()+300000);
+  if(!parsed.length)throw Error(`${name} returned no valid dated feed`);
+  const items=parsed.filter(item=>!['fed-all','bbc-world','cnbc-economy','cnbc-top','wsj-markets','marketwatch'].includes(id)||isGoldRelevant(item)).slice(0,16);
   await Promise.all(items.filter(item=>["fed-monetary","ecb"].includes(id)&&/FOMC statement|monetary policy decisions/i.test(item.title)&&Date.now()-Date.parse(item.publishedAt)<7*86400000).slice(0,3).map(async item=>{
     try{
       const article=await fetch(item.url,{signal:AbortSignal.timeout(8000)});if(!article.ok)return;
@@ -55,17 +56,20 @@ async function fetchSource([id, name, url]) {
       if(sentences.length){item.summary=sentences.slice(0,2).join(" ").slice(0,1000);item.impact=Evidence.classifyNews(item).score>0?"bullish":"bearish";}
     }catch{/* RSS item remains usable when the linked decision is unavailable. */}
   }));
-  return items;
+  return {items,validFeed:true};
+}
+
+async function fetchSinaNews(){
+ const url='https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid=2516&num=100&page=1';
+ const payload=JSON.parse(await fetchText(url));if(!Array.isArray(payload.result?.data)||!payload.result.data.length)throw Error('Sina news returned no dated feed');
+ const items=payload.result.data.map(item=>({id:'sina-'+String(item.oid||item.docid),source:'新浪财经滚动',publisher:String(item.media_name||'新浪财经'),title:clean(item.title||''),summary:clean(item.intro||item.summary||'').slice(0,360),url:item.url,
+  publishedAt:Number(item.ctime)>0?new Date(Number(item.ctime)*1000).toISOString():null,weight:70,category:'domestic'})).filter(item=>item.title&&item.publishedAt&&Date.parse(item.publishedAt)<=Date.now()+300000&&isGoldRelevant(item)).slice(0,24);
+ return {items,validFeed:true};
 }
 
 async function fetchSgeNotices() {
   const baseUrl = "https://www.sge.com.cn";
-  const res = await fetch(baseUrl, {
-    signal: AbortSignal.timeout(12000),
-    headers: { "User-Agent": "Mozilla/5.0 AurumGoldDashboard/3.0" }
-  });
-  if (!res.ok) throw new Error(`SGE notices returned ${res.status}`);
-  const html = await res.text();
+  const html = await fetchText(baseUrl);
   const candidates = [...html.matchAll(/href="([^"]*\/jjsnotice\/\d+)"[^>]*>([\s\S]*?)<\/a>/gi)]
     .map((match, index) => {
       const text = clean(match[2]).replace(/\bnew\b/gi, "").trim();
@@ -123,8 +127,7 @@ function parseItems(xml, source) {
 }
 
 function isGoldRelevant(item) {
-  return /fomc|monetary|federal funds|interest rate|inflation|economic projection|discount rate|treasury|dollar|gold|ceasefire|armed conflict|banking crisis|war|iran|ukraine/i
-    .test(`${item.title} ${item.summary}`);
+  return goldRelevant(item);
 }
 
 function inferSgeImpact(text) {

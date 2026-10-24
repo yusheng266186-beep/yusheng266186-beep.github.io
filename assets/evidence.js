@@ -15,7 +15,7 @@
   function classifyNews(item){
     const text=String(item.title||"")+" "+String(item.summary||"");
     // No generic 'inflation', 'risk' or 'cut' scoring. Negated/conditional statements stay unresolved.
-    if(/(?:does not|did not|not to|no plans to|may|might|could|expected to|forecast to).{0,45}(?:cut|lower|raise|hike|buy|sell)|不.{0,5}(?:降息|加息|购金)|可能|预计|有望/i.test(text))return {score:0,dimension:"unresolved",reason:"条件、预期或否定语句，未作方向判定"};
+    if(/\b(?:does not|did not|not to|no plans to|may|might|could|expected to|forecast to)\b.{0,45}(?:cut|lower|raise|hike|buy|sell)|不.{0,5}(?:降息|加息|购金)|可能|预计|有望|预期|料将|或将|暗示|考虑|押注|预测|概率/i.test(text))return {score:0,dimension:"unresolved",reason:"条件、预期或否定语句，未作方向判定"};
     const hits=rules.filter(r=>r[2].test(text)),sum=hits.reduce((s,r)=>s+r[1],0);
     return {score:sum?Math.sign(sum)*.6:0,dimension:hits[0]?.[0]||"unresolved",reason:hits.length?hits.map(r=>r[3]).join(" / "):"未识别明确事件方向"};
   }

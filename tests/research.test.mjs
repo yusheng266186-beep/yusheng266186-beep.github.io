@@ -12,3 +12,7 @@ test('partial source failures retain previous observations with original availab
  const out=mergeSnapshots(old,[{...factor,id:'risk',value:20}],[],now);assert.equal(out.snapshots.at(-1).factors.length,2);assert.equal(out.snapshots.at(-1).factors[0].availableAt,factor.availableAt);
  const future=buildFactors({id:'cboe',url:'https://cboe.test',rows:[{date:'2026-10-23',value:20},{date:'2099-01-01',value:30}]},now);assert.equal(future[0].change,0);
 });
+test('date-only market observations become usable when actually first collected, without waiting for midnight',()=>{
+ const now='2026-10-23T14:15:00Z',f=buildFactors({id:'cboe',url:'https://cboe.test',rows:[{date:'2026-10-22',value:18},{date:'2026-10-23',value:20}]},now)[0];
+ assert.equal(f.availableAt,now);assert.equal(f.timePrecision,'date-only');assert.ok(Date.parse(f.observedAt)<Date.parse(now));
+});

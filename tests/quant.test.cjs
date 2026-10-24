@@ -46,6 +46,12 @@ test('date replay trains only on cutoff prices and external evidence already fir
  assert.equal(Q.replay(data,date,30,{news:[news]}).center,a.center);assert.equal(Q.replay(data,date,30,{news:[news]}).evidenceCount,0);
  assert.equal(Q.replay(data,data[30].time,30).ready,false);assert.equal(Q.replay(data,data.at(-1).time,30).actual,undefined);
 });
+test('published/replay horizon endpoints exactly reproduce the audited forecast at its original cutoff',()=>{
+ const data=rows(),profile=Q.profile(data);
+ for(const horizon of [7,30]){const e=profile.evaluations.find(e=>e.days===horizon);for(const record of e.records.slice(-3)){
+  const replay=Q.replay(data,record.origin,horizon);assert.ok(Math.abs(replay.center-record.center)<1e-8);assert.ok(Math.abs(replay.low-record.low)<1e-8);assert.ok(Math.abs(replay.high-record.high)<1e-8);
+ }}
+});
 test('stress marks the projected account, including spread and fees, without executing or mutating',()=>{
  const p=C.emptyPortfolio(),copy=JSON.stringify(p),o=C.order(p,q,cfg,input),r=Q.stress(p,q,cfg,input,10);
  assert.equal(r[1].equity,p.cash-o.total+10*900);assert.equal(r[0].equity,p.cash-o.total+10*810);assert.equal(r[2].equity,p.cash-o.total+10*990);

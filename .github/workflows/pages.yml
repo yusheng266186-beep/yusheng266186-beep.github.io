@@ -5,7 +5,7 @@ on:
     branches: ["main"]
   workflow_dispatch:
   workflow_run:
-    workflows: ["Refresh Market Snapshot", "Refresh Market History", "Refresh Official News"]
+    workflows: ["Refresh Market Snapshot", "Refresh Market History", "Refresh Official News", "Refresh Research Pipeline", "Research Recovery Watchdog"]
     types: [completed]
 
 permissions:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion != 'cancelled' && github.event.workflow_run.head_branch == 'main')
     timeout-minutes: 8
     environment:
       name: github-pages

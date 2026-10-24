@@ -4,6 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumQuant;
   var Evidence = window.AurumEvidence;
+  var RELEASE_VERSION = "4.4.1";
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
@@ -73,7 +74,9 @@
     {name:"美国财政部实际收益率",tier:"自动因子",description:"10 年实际收益率的水平与近 20 个参考日变动",url:"https://home.treasury.gov/treasury-daily-interest-rate-xml-feed"},
     {name:"Cboe VIX",tier:"自动因子",description:"权益波动与风险情绪代理，不等同于黄金波动率",url:"https://www.cboe.com/tradable_products/vix/vix_historical_data/"},
     {name:"BEA / BLS / ECB",tier:"官方资讯",description:"经济发布、通胀、就业及政策声明；不可用来源显式保留失败状态",url:"https://www.bea.gov/news"},
-    {name:"BBC World / CNBC Economy",tier:"新闻发布者",description:"补充地缘与经济事件，保留发布者原文与首次见到的版本",url:"https://feeds.bbci.co.uk/news/world/rss.xml"}
+    {name:"BBC World / CNBC Economy",tier:"新闻发布者",description:"补充地缘与经济事件，保留发布者原文与首次见到的版本",url:"https://feeds.bbci.co.uk/news/world/rss.xml"},
+    {name:"新浪财经滚动",tier:"中文财经",description:"黄金、汇率、利率与地缘快讯，标明实际提供方及原文时间",url:"https://finance.sina.com.cn/roll/"},
+    {name:"CNBC / WSJ / MarketWatch",tier:"财经发布者",description:"补充市场与大宗商品报道；过滤无关金额和科技新闻",url:"https://www.cnbc.com/rss-feeds/"}
   ];
 
   var state = {
@@ -84,6 +87,7 @@
     news: normalizeNews(DATA.news),
     research: DATA.research || {snapshots:[]},
     ledger: DATA.ledger || {entries:[]},
+    pipelineHealth: DATA.health || null,
     factors: DEFAULT_FACTORS.map(function (item) { return Object.assign({}, item); }),
     forecasts: [],
     forecastHorizon: 1,
@@ -188,12 +192,14 @@
     var items = raw && Array.isArray(raw.items) ? raw.items : [];
     return {
       generatedAt: validDate(raw && raw.generatedAt || new Date(0).toISOString()),
+      checkedAt: Core.timestamp(raw && (raw.checkedAt||raw.generatedAt)),
       failedSources: raw && Array.isArray(raw.failedSources) ? raw.failedSources.map(String) : [],
       sourceStatus: raw && Array.isArray(raw.sourceStatus) ? raw.sourceStatus : [],
       items: items.filter(function(item){return item && typeof item === "object";}).map(function (item, index) {
         return {
           id: String(item.id || "news-" + index),
           source: String(item.source || "消息原文"),
+          publisher: String(item.publisher || item.source || "消息原文"),
           title: String(item.title || "未命名消息"),
           summary: String(item.summary || ""),
           url: safeUrl(item.url),
@@ -220,45 +226,50 @@
     var stamp = Date.now();
     var settled = await Promise.allSettled([
       fetchJson("data/market-snapshot.json?_=" + stamp),
-      fetchJson("data/market-history.json?_=" + stamp),
-      fetchJson("data/news.json?_=" + stamp),
-      fetchJson("data/research-factors.json?_=" + stamp),
-      fetchJson("data/forecast-ledger.json?_=" + stamp)
+      fetchJson("data/research-bundle.json?_=" + stamp)
     ]);
     if (settled[0].status === "fulfilled" && state.config.priceProvider === "domestic") {
       var picked=Core.selectQuote([{...settled[0].value,dataTier:"snapshot"}],state.quote);if(picked.quote)state.quote=picked.quote;
     }
-    if (settled[1].status === "fulfilled") state.history = normalizeHistory(settled[1].value);
-    if (settled[2].status === "fulfilled") state.news = normalizeNews(settled[2].value);
-    if (settled[3].status === "fulfilled") state.research = settled[3].value;
-    if (settled[4].status === "fulfilled") state.ledger = settled[4].value;
+    if (settled[1].status === "fulfilled") {try{adoptResearchBundle(settled[1].value);}catch(error){state.researchFailures=[0,1,2,3];}}
     state.lastResearchAt=Date.now();
   }
 
   async function refreshResearchData(force) {
-    if(state.researchRefreshing || document.hidden || navigator.onLine===false || (!force && Date.now()-(state.lastResearchAt||0)<300000))return;
+    var delay=Math.min(300000,60000*Math.pow(2,Math.min(3,state.researchFailureCount||0)));
+    if(state.researchRefreshing || document.hidden || navigator.onLine===false || (!force && Date.now()-(state.lastResearchAt||0)<delay))return;
     state.researchRefreshing=true;state.lastResearchAt=Date.now();
+    renderResearchHealth();
     try {
-      var results=await Promise.allSettled(["data/market-history.json","data/news.json","data/research-factors.json","data/forecast-ledger.json"].map(async function(url){
+      var results=await Promise.allSettled(["data/research-bundle.json","data/pipeline-health.json"].map(async function(url){
         var response=await fetch(url,{cache:"no-cache",signal:AbortSignal.timeout(12000)});
         if(!response.ok)throw Error("HTTP "+response.status);return response.json();
       }));
-      state.researchFailures=results.map(function(r,i){return r.status==="rejected"?i:-1;}).filter(function(i){return i>=0;});
-      var changed=false;
-      if(results[0].status==="fulfilled") {
-        var history=normalizeHistory(results[0].value);
-        if(history.daily.length>=30 && Core.ageHours(history.generatedAt)!==Infinity && Date.parse(history.generatedAt)>(Date.parse(state.history.generatedAt)||0)) {state.history=history;changed=true;}
-      }
-      if(results[1].status==="fulfilled") {
-        var news=normalizeNews(results[1].value);
-        if(news.items.length && Core.ageHours(news.generatedAt)!==Infinity && Date.parse(news.generatedAt)>(Date.parse(state.news.generatedAt)||0)) {state.news=news;changed=true;}
-      }
-      if(results[2].status==="fulfilled" && Array.isArray(results[2].value.snapshots) && Date.parse(results[2].value.generatedAt)>(Date.parse(state.research.generatedAt)||0)){state.research=results[2].value;changed=true;}
-      if(results[3].status==="fulfilled" && Array.isArray(results[3].value.entries)){state.ledger=results[3].value;changed=true;}
+      state.researchFailures=results[0].status==='rejected'?[0,1,2,3]:[];
+      var changed=results[0].status==='fulfilled'?adoptResearchBundle(results[0].value):false;
+      if(results[0].status==='rejected')state.researchFailureCount=(state.researchFailureCount||0)+1;
+      else{state.researchFailureCount=0;state.lastResearchCheckedAt=new Date().toISOString();}
+      if(results[1].status==='fulfilled')adoptPipelineHealth(results[1].value);
       if(changed) {syncDynamicFactors();buildForecasts();renderAll();}
       renderIntelligence();
-    } catch(error) {state.researchFailures=[0,1];renderIntelligence();}
-    finally {state.researchRefreshing=false;}
+    } catch(error) {state.researchFailures=[0,1,2,3];state.researchFailureCount=(state.researchFailureCount||0)+1;renderIntelligence();}
+    finally {state.researchRefreshing=false;renderResearchHealth();}
+  }
+  function adoptPipelineHealth(value){
+    if(value?.schema===1&&Core.ageHours(value.generatedAt)!==Infinity&&Date.parse(value.generatedAt)>=(Date.parse(state.pipelineHealth?.generatedAt)||0))state.pipelineHealth=value;
+  }
+  function adoptResearchBundle(bundle){
+    if(bundle?.schema!==1||!Array.isArray(bundle.history?.daily)||!Array.isArray(bundle.news?.items)||!Array.isArray(bundle.research?.snapshots)||!Array.isArray(bundle.ledger?.entries))throw Error("研究快照未通过结构校验");
+    var changed=false;
+    if(Core.ageHours(bundle.history.generatedAt)!==Infinity&&Date.parse(bundle.history.generatedAt)>Date.parse(state.history.generatedAt)&&bundle.history.daily.length>=30){state.history=normalizeHistory(bundle.history);changed=true;}
+    if(Core.ageHours(bundle.news.checkedAt||bundle.news.generatedAt)!==Infinity&&Date.parse(bundle.news.checkedAt||bundle.news.generatedAt)>(Date.parse(state.news.checkedAt||state.news.generatedAt)||0)){
+      var news=normalizeNews(bundle.news);if(JSON.stringify(news.items)===JSON.stringify(state.news.items))news.items=state.news.items;state.news=news;changed=true;
+    }
+    if(Core.ageHours(bundle.research.generatedAt)!==Infinity&&Date.parse(bundle.research.generatedAt)>(Date.parse(state.research.generatedAt)||0)){
+      var research=bundle.research;if(JSON.stringify(research.snapshots)===JSON.stringify(state.research.snapshots))research={...research,snapshots:state.research.snapshots};state.research=research;changed=true;
+    }
+    if(Core.ageHours(bundle.ledger.generatedAt)!==Infinity&&Date.parse(bundle.ledger.generatedAt)>(Date.parse(state.ledger.generatedAt)||0)){state.ledger=bundle.ledger;changed=true;}
+    adoptPipelineHealth(bundle.health);return changed;
   }
 
   async function fetchJson(url) {
@@ -641,8 +652,8 @@
   }
 
   function buildForecasts() {
-    if (state.profileHistory !== state.history.daily || state.profileNews!==state.news || state.profileResearch!==state.research) {
-      state.profileHistory = state.history.daily;state.profileNews=state.news;state.profileResearch=state.research;
+    if (state.profileHistory !== state.history.daily || state.profileNews!==state.news.items || state.profileResearch!==state.research.snapshots) {
+      state.profileHistory = state.history.daily;state.profileNews=state.news.items;state.profileResearch=state.research.snapshots;
       var worker=predictionWorker();
       if(worker){state.profileRequest=(state.profileRequest||0)+1;state.quantProfile=state.quantProfile||Quant.profile([]);state.profilePending=true;worker.postMessage({type:"profile",id:state.profileRequest,daily:state.history.daily,evidence:evidenceData()});}
       else state.quantProfile=Quant.profile(state.history.daily,evidenceData());
@@ -660,7 +671,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=4.4.0");
+      var worker=new Worker("assets/prediction-worker.js?v=4.4.1");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -731,6 +742,7 @@
   }
 
   function renderStatus() {
+    renderResearchHealth();
     var session = marketSession(new Date()), quality = Core.quoteState(state.quote);
     var offline = navigator.onLine === false;
     $("refreshBtn").disabled = state.refreshing;
@@ -944,9 +956,9 @@
     setText("auditCoverage",e?.count>=6 ? e.coverage.toFixed(0)+"%" : "样本不足");
     setText("auditDirection",e?.count>=6?e.direction.toFixed(1)+"%":"样本不足");
     setText("auditEvidence",e?e.augmentedCount+" / "+e.count:"—");
-    var archived=(state.ledger.entries||[]).flatMap(function(entry){return (entry.forecasts||[]).filter(function(x){return x.days===f?.days;}).map(function(x){return {entry,forecast:x};});});
+    var archived=(state.ledger.entries||[]).filter(function(entry){return entry.version===RELEASE_VERSION;}).flatMap(function(entry){return (entry.forecasts||[]).filter(function(x){return x.days===f?.days;}).map(function(x){return {entry,forecast:x};});});
     var verified=archived.filter(function(x){return x.forecast.result;}),lastArchived=archived.at(-1);
-    setText("prospectiveAudit", "建档后核验："+verified.length+" / "+archived.length+" 个已建档起点完成当前周期。"+(verified.length?"已核验平均价格误差 "+(verified.reduce(function(s,x){return s+x.forecast.result.error;},0)/verified.length).toFixed(2)+"%。":"尚未积累真实后续结果，不报告前瞻准确率。")+(lastArchived?"最近建档 "+formatDateTime(lastArchived.entry.createdAt)+"，起点收盘 "+lastArchived.entry.origin+"，当时预测中枢 "+toFixedPrice(lastArchived.forecast.center)+" 元/克；之后不随模型更新重写。":""));
+    setText("prospectiveAudit", "本版建档后核验："+verified.length+" / "+archived.length+" 个已建档起点完成当前周期。"+(verified.length?"已核验平均价格误差 "+(verified.reduce(function(s,x){return s+x.forecast.result.error;},0)/verified.length).toFixed(2)+"%。":"尚未积累真实后续结果，不报告前瞻准确率。")+(lastArchived?"最近建档 "+formatDateTime(lastArchived.entry.createdAt)+"，起点收盘 "+lastArchived.entry.origin+"，当时预测中枢 "+toFixedPrice(lastArchived.forecast.center)+" 元/克；之后不随模型更新重写。":""));
     var changed=Math.abs(state.scenarioModel.scoreDelta)>.0001;
     var enough=e?.count>=6;
     var improvement=e?.naiveMae>1e-8?(1-e.mae/e.naiveMae)*100:0;
@@ -971,7 +983,7 @@
   function renderPredictionEvidence(){
     var ctx=state.quantProfile.context,e=selectedAudit(),contributions=e?.contributions||[];
     setText("evidenceSummary",(ctx?.drivers.length||0)+" 项市场输入 · "+(ctx?.events.length||0)+" 条明确事件 · 可追溯时点");
-    setText("evidenceClock","资讯核对 "+formatDateTime(state.news.generatedAt)+" · 市场因子核对 "+formatDateTime(state.research.generatedAt)+"。已收录 "+state.news.items.length+" 条原文；本次资讯渠道 "+state.news.sourceStatus.filter(function(s){return s.ok;}).length+" / "+state.news.sourceStatus.length+" 可用。"+(state.news.failedSources.length?"未获取："+state.news.failedSources.join("、")+"。":"")+"后台目标每 10 分钟采集，前台每 5 分钟核对；调度及源站可能延迟，非逐笔实时资讯。没有明确方向的消息不会强行打分。");
+    setText("evidenceClock","资讯核对 "+formatDateTime(state.news.generatedAt)+" · 市场因子核对 "+formatDateTime(state.research.generatedAt)+"。已收录 "+state.news.items.length+" 条原文；本次资讯渠道 "+state.news.sourceStatus.filter(function(s){return s.ok;}).length+" / "+state.news.sourceStatus.length+" 可用。"+(state.news.failedSources.length?"未获取："+state.news.failedSources.join("、")+"。":"")+"后台目标每 5 分钟采集，前台每 1 分钟核对；调度及源站可能延迟，非逐笔实时资讯。没有明确方向的消息不会强行打分。");
     var rows=contributions.map(function(c){return '<div class="evidence-row"><span>'+escapeHtml(c.label)+'</span><b>'+signedPercent(Math.expm1(c.move)*100)+'</b><small>量价模型 · 对数贡献换算</small></div>';});
     rows=rows.concat((ctx?.drivers||[]).map(function(d){return '<a class="evidence-row" href="'+safeUrl(d.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(d.label)+'</span><b>'+signedNumber(Math.round(d.value*100))+'</b><small>'+escapeHtml(d.detail+' · 观测 '+d.observedAt.slice(0,10))+'</small></a>';}));
     rows=rows.concat((ctx?.events||[]).slice(0,8).map(function(event){return '<a class="evidence-row" href="'+safeUrl(event.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(event.label)+'</span><b>'+signedNumber(Math.round(event.value*100))+'</b><small>'+escapeHtml(event.source+' · '+formatDateTime(event.publishedAt))+'</small></a>';}));
@@ -1158,12 +1170,13 @@
   }
 
   function renderIntelligence() {
+    renderResearchHealth();
     var query = state.newsQuery.trim().toLocaleLowerCase();
     var filtered = state.news.items.filter(function (item) {
       var category = state.newsFilter === "all" || (state.newsFilter === "high" ? item.weight >= 60 : item.category === state.newsFilter);
       return category && (!query || (item.title+" "+item.source).toLocaleLowerCase().includes(query));
     });
-    $("newsFreshness").textContent = state.news.items.length ? "最近发布 · "+formatDateTime(state.news.items[0].publishedAt) : "暂无有效发布";
+    $("newsFreshness").textContent = state.news.items.length ? "原文最新 · "+formatDateTime(state.news.items[0].publishedAt) : "暂无有效发布";
     $("newsSourceState").textContent = ((state.researchFailures||[]).includes(1)?"本次资讯快照核对暂不可用，保留原记录。 ":"") + (state.news.failedSources.length ? "部分来源暂不可用，保留已发布记录。" : "按原文发布时间排列。") + " 明确政策与供需事件经时效、去重后参与预测；通用主题不直接判断利好利坏。";
     var html = filtered.length ? filtered.slice(0,state.newsLimit).map(renderNewsItem).join("") : '<div class="news-empty"><strong>暂时没有匹配的原文。</strong><p>试试其他关键词，或切换资讯类别。</p></div>';
     if (state.newsHTML !== html) { $("newsList").innerHTML = html; state.newsHTML = html; }
@@ -1176,6 +1189,18 @@
         '</span><i></i></div><strong>' + escapeHtml(source.name) +
         '</strong><small>' + escapeHtml(source.description) + "</small></a>";
     }).join("");
+  }
+  function renderResearchHealth(){
+    var health=state.pipelineHealth?.news&&state.pipelineHealth?.factors?state.pipelineHealth:null,age=Core.ageHours(health?.generatedAt),delayed=age>25/60,offline=navigator.onLine===false;
+    var partial=health?.status==='partial'||(health?.news?.available<health?.news?.total)||(health?.factors?.available<health?.factors?.total);
+    var label=offline?"离线 · 保留最近记录":!health?"等待采集回执":delayed?"采集回执已延迟":health.status==='failed'?"采集异常 · 保留有效输入":partial?"更新运行中 · 部分渠道降级":"自动更新运行正常";
+    setText("researchPipelineStatus",label);$("researchUpdateBar").dataset.state=offline||delayed||health?.status==='failed'?'warning':partial?'partial':'ok';
+    setText("researchPipelineDetail",(health?"资讯渠道 "+health.news.available+" / "+health.news.total+" 可用，市场来源 "+health.factors.available+" / "+health.factors.total+"。":"")+(delayed&&health?"已 "+Math.floor(age*60)+" 分钟没有新回执，后台补抓会重试；旧数据保留原时点。":"后台目标每 5 分钟采集，页面每 1 分钟核对已发布快照；源站和调度可能延迟。")+((state.researchFailures||[]).length?" 本次页面核对失败，将退避重试。":"")+(state.lastResearchCheckedAt?" 本页核对 "+formatDateTime(state.lastResearchCheckedAt)+"。":""));
+    setText("researchPipelineClock",health?.generatedAt?formatDateTime(health.generatedAt):"尚无回执");
+    setText("researchPublishedClock",state.news.items[0]?.publishedAt?formatDateTime(state.news.items[0].publishedAt):"暂无原文");
+    setText("researchDailyClock",state.history.daily.at(-1)?.time||"暂无收盘");
+    $("refreshResearchBtn").disabled=state.researchRefreshing||offline;setText("refreshResearchBtn",state.researchRefreshing?"正在核对…":"核对最新快照 ↻");
+    $("researchRunLink").hidden=!health?.runUrl;$("researchRunLink").href=safeUrl(health?.runUrl);
   }
 
   function mergedNews() {
@@ -1242,7 +1267,7 @@
     return '<a class="news-item" href="' + safeUrl(item.url) +
       '" target="_blank" rel="noreferrer"><time>' + escapeHtml(item.timePrecision==="date-only"?formatShortDate(time).slice(0,10)+" · 仅日期":formatShortDate(time)) +
       "</time><div><strong>" + escapeHtml(item.title) + "</strong><p>" +
-      escapeHtml(item.source + " · " + item.summary) + "</p></div><span class=\"news-meta\"><b class=\"impact-tag " +
+      escapeHtml(item.source + (item.publisher&&item.publisher!==item.source?" / "+item.publisher:"") + " · " + item.summary) + "</p></div><span class=\"news-meta\"><b class=\"impact-tag " +
       'neutral\">' + label + "</b><svg><use href=\"#i-external\"></use></svg></span></a>";
   }
 
@@ -2287,7 +2312,7 @@
     window.addEventListener("aurum:chapter", function () { requestAnimationFrame(drawAllCharts); });
     document.fonts && document.fonts.ready.then(drawAllCharts);
     window.addEventListener("offline",renderStatus);
-    window.addEventListener("online",function(){!document.hidden && state.config.priceProvider === "domestic"?refreshQuote():renderStatus();});
+    window.addEventListener("online",function(){if(!document.hidden)refreshResearchData(true);!document.hidden && state.config.priceProvider === "domestic"?refreshQuote():renderStatus();});
     document.addEventListener("visibilitychange",function(){
       if(document.hidden)return;
       refreshResearchData(false);
@@ -2626,6 +2651,7 @@
     bindEvents();
     $("exportBacktest").addEventListener("click",exportBacktest);
     $("runReplay").addEventListener("click",runReplay);
+    $("refreshResearchBtn").addEventListener("click",function(){refreshResearchData(true);});
     $("riskBudgetPct").addEventListener("input",renderRiskLab);
     $("stressMove").addEventListener("change",renderRiskLab);
     $("fillRiskSize").addEventListener("click",function(){

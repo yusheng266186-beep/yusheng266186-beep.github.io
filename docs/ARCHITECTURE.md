@@ -1,5 +1,17 @@
 # AURUM architecture
 
+## 4.4.1 continuous research updates
+
+`refresh-research.mjs` is the scheduled writer: news, FX/rates/risk and quote capture run independently in parallel; due history runs in the same batch. Ledger and assembly depend on their completion. Transient transport/429/5xx failures retry with bounded backoff, 403 does not loop, and failures retain original observations. A total-news outage writes its attempted receipt without advancing successful generation time. Valid feeds without matching headlines remain healthy. Provider status includes errors, last success and failure streaks.
+
+One five-minute schedule replaces the three independent scheduled writers to avoid GitHub concurrency discarding pending streams. Legacy jobs remain manual. `Research Recovery Watchdog` checks every half hour and invokes the reusable research workflow after a missing/failed heartbeat. It can be manually forced to exercise the recovery path. GitHub scheduling itself can be delayed, so the product states a target cadence rather than tick-real-time guarantees. Trusted-main data failures also deploy their receipt so users see the failure instead of an old green status.
+
+`pipeline-health.json` contains per-stage outcome and source counts. `research-bundle.json` atomically packages history, news, factors, ledger and health; `embedded-data.js` is rebuilt from the same inputs. The page revalidates the bundle plus small health receipt every minute, rejects malformed cohorts and older datasets, retains the old snapshot on error and backs off. Returning online rechecks immediately. Metadata-only updates reuse item/snapshot arrays and do not retrain historical regressions. No collector token is sent to the browser.
+
+Date-only factors use midnight only as a decay reference; first observed availability still gates use. They no longer wait until midnight to enter a current forecast. Treasury capture also requests the previous year when fewer than 21 observations exist. Calendar horizons now map to the exact recorded-session target used by the audit, with shared path destination state; a replay at an audit origin exactly matches center and bounds.
+
+News adds Sina's public finance roll, CNBC Top News and Dow Jones publisher feeds. Relevant-title/strong-summary matching avoids unrelated dollar amounts, Goldman and award substrings. Chinese conditional/expected-policy language stays unresolved. Prospective statistics filter the current release version while prior published records remain immutable. This does not establish a new predictive accuracy claim.
+
 ## 4.4.0 prediction and point-in-time evidence
 
 This section supersedes the v1 forecast-selection description below. `quant.js` fits each horizon's completed log return with standardized lagged 5/20/60-day returns, mean deviation, drawdown and observed volume activity. Up to 504 training origins, 126-session weight half-life, fixed ridge penalties (20 for slopes, 5 for intercept), and a fixed 70/30 ridge/damped-trend ensemble are declared before evaluation. Direct target length is capped at 63 sessions; longer forecasts extrapolate with diminishing growth. This is not a claim of reliable long-term prediction.

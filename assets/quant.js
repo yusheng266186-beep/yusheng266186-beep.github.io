@@ -99,10 +99,11 @@
   function at(price,days,p,scoreDelta=0){
     if(!(price>0)||!p?.ready)return null;
     if(days===0)return {center:price,low:price,high:price};
-    const years=Math.max(0,days)/365,h=days*252/365;
-    const result=p.evaluations.find(e=>e.days===days);
+    const years=Math.max(0,days)/365;
+    const result=p.destination||p.evaluations.find(e=>e.days===days);
     // Intermediate chart points use the selected destination horizon, never a different fitted model.
     const source=result||p.evaluations.find(e=>e.days===30);
+    const h=source?source.steps*Math.max(0,days)/source.days:days*252/365;
     const width=source?.multiplier??1.2815515655;
     const shift=clamp(Core.numeric(scoreDelta,0)/100*.12,-.12,.12)*years;
     const ratio=source?Math.min(1,h/source.steps):0,base=(source?.move||0)*ratio;
@@ -112,7 +113,7 @@
   }
   function path(price,days,p,delta=0){
     const destination=p.evaluations.find(e=>e.days===days)||p.evaluations.find(e=>e.days===30);
-    const local={...p,evaluations:[{...destination,days:30}]};
+    const local={...p,destination};
     return Array.from({length:days+1},(_,i)=>at(price,i,local,delta));
   }
   function scenarioModel(price,p,scoreDelta=0){

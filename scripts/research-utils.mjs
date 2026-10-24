@@ -15,8 +15,8 @@ export function parseVix(csv){
 }
 export function buildFactors({id,url,rows},now){
  rows=rows.filter(r=>r.date<=now.slice(0,10));const last=rows.at(-1),base=rows.at(-Math.min(21,rows.length));if(!last||!base)return [];
- const common={source:id,url,observedAt:last.date+'T23:59:59Z',availableAt:now};
- // Dates lack release time. Use end-of-day and never backdate first availability.
+ const common={source:id,url,observationDate:last.date,timePrecision:'date-only',observedAt:last.date+'T00:00:00Z',availableAt:now};
+ // Midnight is only the date-based decay reference; actual availability is the first capture.
  if(id==='ecb')return [
   {...common,id:'cny',label:'人民币 / 美元',value:last.cny,change:(last.cny/base.cny-1)*100,unit:'%',signal:clamp(Math.log(last.cny/base.cny)/.025,-1,1),weight:1.2,detail:'20 个参考日变化；人民币走弱对国内克价偏正向'},
   {...common,id:'usd',label:'美元 / 欧元代理',value:last.usd,change:(last.usd/base.usd-1)*100,unit:'%',signal:clamp(-Math.log(last.usd/base.usd)/.04,-1,1),weight:.6,detail:'双边汇率代理，不是美元指数；美元走强偏负向'}];
