@@ -54,17 +54,15 @@
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "kind": "quote",
-      "asOf": "2026-10-23T18:29:55.000Z",
-      "latencyMs": 3329
+      "ok": false,
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
       "kind": "quote",
       "asOf": "2026-10-23T15:59:35.000Z",
-      "latencyMs": 1251
+      "latencyMs": 1117
     },
     {
       "source": "SGE delayed",
@@ -72,7 +70,7 @@
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-10-24",
-      "latencyMs": 1532
+      "latencyMs": 3689
     }
   ],
   "officialReference": {
@@ -104,9 +102,18 @@
       "turnover": false
     }
   },
-  "collectionMs": 3330,
+  "collectionMs": 3806,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
-  "internationalReference": null
+  "internationalReference": {
+    "market": "COMEX",
+    "symbol": "GC=F",
+    "priceUsdOz": 4010,
+    "previousUsdOz": 4060.39990234375,
+    "priceCnyGram": null,
+    "asOf": "2026-10-23T04:00:00.000Z",
+    "source": "Yahoo Finance GC=F delayed futures reference",
+    "delay": "international delayed reference"
+  }
 }
