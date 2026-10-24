@@ -3,6 +3,7 @@
 
   var Core = window.AurumCore;
   var Quant = window.AurumQuant;
+  var Evidence = window.AurumEvidence;
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
@@ -67,7 +68,12 @@
       tier: "官方",
       description: "货币政策、外汇储备与宏观流动性观察",
       url: "https://www.pbc.gov.cn/"
-    }
+    },
+    {name:"ECB 参考汇率",tier:"自动因子",description:"人民币/美元与美元/欧元代理，按观测日期和首次抓取归档",url:"https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"},
+    {name:"美国财政部实际收益率",tier:"自动因子",description:"10 年实际收益率的水平与近 20 个参考日变动",url:"https://home.treasury.gov/treasury-daily-interest-rate-xml-feed"},
+    {name:"Cboe VIX",tier:"自动因子",description:"权益波动与风险情绪代理，不等同于黄金波动率",url:"https://www.cboe.com/tradable_products/vix/vix_historical_data/"},
+    {name:"BEA / BLS / ECB",tier:"官方资讯",description:"经济发布、通胀、就业及政策声明；不可用来源显式保留失败状态",url:"https://www.bea.gov/news"},
+    {name:"BBC World / CNBC Economy",tier:"新闻发布者",description:"补充地缘与经济事件，保留发布者原文与首次见到的版本",url:"https://feeds.bbci.co.uk/news/world/rss.xml"}
   ];
 
   var state = {
@@ -76,6 +82,8 @@
     quote: normalizeQuote(Object.assign({}, DATA.market || fallbackQuote(), { dataTier: "snapshot" })),
     history: normalizeHistory(DATA.history),
     news: normalizeNews(DATA.news),
+    research: DATA.research || {snapshots:[]},
+    ledger: DATA.ledger || {entries:[]},
     factors: DEFAULT_FACTORS.map(function (item) { return Object.assign({}, item); }),
     forecasts: [],
     forecastHorizon: 1,
@@ -181,14 +189,18 @@
     return {
       generatedAt: validDate(raw && raw.generatedAt || new Date(0).toISOString()),
       failedSources: raw && Array.isArray(raw.failedSources) ? raw.failedSources.map(String) : [],
+      sourceStatus: raw && Array.isArray(raw.sourceStatus) ? raw.sourceStatus : [],
       items: items.filter(function(item){return item && typeof item === "object";}).map(function (item, index) {
         return {
           id: String(item.id || "news-" + index),
-          source: String(item.source || "官方消息"),
+          source: String(item.source || "消息原文"),
           title: String(item.title || "未命名消息"),
           summary: String(item.summary || ""),
           url: safeUrl(item.url),
           publishedAt: Core.timestamp(item.publishedAt),
+          timePrecision: item.timePrecision==="date-only"?"date-only":"timestamp",
+          firstSeenAt: Core.timestamp(item.firstSeenAt),
+          versions: Array.isArray(item.versions)?item.versions:[],
           impact: ["bullish", "bearish", "mixed", "neutral"].includes(item.impact) ? item.impact : "neutral",
           weight: clamp(number(item.weight, 42), 0, 100),
           category: inferNewsCategory(item)
@@ -209,21 +221,25 @@
     var settled = await Promise.allSettled([
       fetchJson("data/market-snapshot.json?_=" + stamp),
       fetchJson("data/market-history.json?_=" + stamp),
-      fetchJson("data/news.json?_=" + stamp)
+      fetchJson("data/news.json?_=" + stamp),
+      fetchJson("data/research-factors.json?_=" + stamp),
+      fetchJson("data/forecast-ledger.json?_=" + stamp)
     ]);
     if (settled[0].status === "fulfilled" && state.config.priceProvider === "domestic") {
       var picked=Core.selectQuote([{...settled[0].value,dataTier:"snapshot"}],state.quote);if(picked.quote)state.quote=picked.quote;
     }
     if (settled[1].status === "fulfilled") state.history = normalizeHistory(settled[1].value);
     if (settled[2].status === "fulfilled") state.news = normalizeNews(settled[2].value);
+    if (settled[3].status === "fulfilled") state.research = settled[3].value;
+    if (settled[4].status === "fulfilled") state.ledger = settled[4].value;
     state.lastResearchAt=Date.now();
   }
 
   async function refreshResearchData(force) {
-    if(state.researchRefreshing || document.hidden || navigator.onLine===false || (!force && Date.now()-(state.lastResearchAt||0)<900000))return;
+    if(state.researchRefreshing || document.hidden || navigator.onLine===false || (!force && Date.now()-(state.lastResearchAt||0)<300000))return;
     state.researchRefreshing=true;state.lastResearchAt=Date.now();
     try {
-      var results=await Promise.allSettled(["data/market-history.json","data/news.json"].map(async function(url){
+      var results=await Promise.allSettled(["data/market-history.json","data/news.json","data/research-factors.json","data/forecast-ledger.json"].map(async function(url){
         var response=await fetch(url,{cache:"no-cache",signal:AbortSignal.timeout(12000)});
         if(!response.ok)throw Error("HTTP "+response.status);return response.json();
       }));
@@ -237,6 +253,8 @@
         var news=normalizeNews(results[1].value);
         if(news.items.length && Core.ageHours(news.generatedAt)!==Infinity && Date.parse(news.generatedAt)>(Date.parse(state.news.generatedAt)||0)) {state.news=news;changed=true;}
       }
+      if(results[2].status==="fulfilled" && Array.isArray(results[2].value.snapshots) && Date.parse(results[2].value.generatedAt)>(Date.parse(state.research.generatedAt)||0)){state.research=results[2].value;changed=true;}
+      if(results[3].status==="fulfilled" && Array.isArray(results[3].value.entries)){state.ledger=results[3].value;changed=true;}
       if(changed) {syncDynamicFactors();buildForecasts();renderAll();}
       renderIntelligence();
     } catch(error) {state.researchFailures=[0,1];renderIntelligence();}
@@ -597,10 +615,13 @@
   }
 
   function dataBaselineFactors() {
+    var context=Evidence.context(evidenceData());
     return DEFAULT_FACTORS.map(function (factor) {
       var value = 0;
       if (factor.id === "sgeMomentum" && state.history.daily.length >= 21) value = clamp(historyMomentum(20) * 100 * 5.2, -85, 85);
       if (factor.id === "premium" && Number.isFinite(state.quote.domesticPremiumPct)) value = clamp(-state.quote.domesticPremiumPct * 7, -80, 80);
+      var driver=context.drivers.find(function(d){return d.id===factor.id;});if(driver)value=driver.value*100;
+      if(factor.id==="centralBanks"||factor.id==="cnDemand"){var events=context.events.filter(function(e){return e.dimension==="demand"||e.dimension==="flows";});if(events.length)value=clamp(events.reduce(function(s,e){return s+e.value;},0)*100,-100,100);}
       return Object.assign({}, factor, {value:Math.round(value)});
     });
   }
@@ -620,13 +641,32 @@
   }
 
   function buildForecasts() {
-    if (state.profileHistory !== state.history.daily) {
-      state.quantProfile = Quant.profile(state.history.daily);state.profileHistory = state.history.daily;
+    if (state.profileHistory !== state.history.daily || state.profileNews!==state.news || state.profileResearch!==state.research) {
+      state.profileHistory = state.history.daily;state.profileNews=state.news;state.profileResearch=state.research;
+      var worker=predictionWorker();
+      if(worker){state.profileRequest=(state.profileRequest||0)+1;state.quantProfile=state.quantProfile||Quant.profile([]);state.profilePending=true;worker.postMessage({type:"profile",id:state.profileRequest,daily:state.history.daily,evidence:evidenceData()});}
+      else state.quantProfile=Quant.profile(state.history.daily,evidenceData());
     }
-    var delta = factorScore()-factorScore(dataBaselineFactors());
+    state.quantProfile.context=Evidence.context(evidenceData());
+    var baselineFactors=dataBaselineFactors();
+    var adjustedFactors=baselineFactors.map(function(f){return state.factorOverrides[f.id]?state.factors.find(function(x){return x.id===f.id;}):f;});
+    var delta = factorScore(adjustedFactors)-factorScore(baselineFactors);
     state.scenarioModel = Quant.scenarioModel(state.quote.priceCnyGram, state.quantProfile, delta);
     state.forecasts = state.scenarioModel.points;
-    state.baselineForecasts = Quant.scenarioModel(state.quote.priceCnyGram, state.quantProfile, 0).points;
+    state.baselineForecasts = Quant.scenarioModel(state.quote.priceCnyGram, {...state.quantProfile,context:null}, 0).points;
+  }
+  function evidenceData(){return {news:state.news.items,snapshots:state.research.snapshots||[]};}
+  function predictionWorker(){
+    if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
+    if(state.predictionWorker)return state.predictionWorker;
+    try{
+      var worker=new Worker("assets/prediction-worker.js?v=4.4.0");
+      worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
+        state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
+      }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
+      worker.onerror=function(){worker.terminate();state.predictionWorker=null;state.workerUnavailable=true;state.profilePending=false;state.quantProfile=Quant.profile(state.history.daily,evidenceData());buildForecasts();renderAll();$("runReplay").disabled=false;};
+      state.predictionWorker=worker;return worker;
+    }catch(error){state.workerUnavailable=true;return null;}
   }
 
   function dailyVolatility() { return Core.volatility(state.history.daily);
@@ -854,7 +894,7 @@
       updateText(button.querySelector(".forecast-top>span"), f.label);
       var audit = state.quantProfile.evaluations.find(function(e){return e.days===f.days;});
       var manual = Math.abs(state.scenarioModel.scoreDelta)>.0001;
-      var modelLabel = manual ? "手动假设" : audit?.model === "trend" ? "衰减趋势" : "持平基准";
+      var modelLabel = manual ? "手动假设" : state.quantProfile.context?.active ? "量价 + 多因子" : "量价集成";
       updateText(button.querySelector(".forecast-top>b"), modelLabel);
       updateText(button.querySelector('[data-bound="low"]'), toFixedPrice(f.low));
       updateText(button.querySelector('[data-bound="high"]'), toFixedPrice(f.high));
@@ -862,9 +902,9 @@
       updateText(button.querySelector(".forecast-status"), (selected ? "当前周期" : "查看周期") + " · " + (audit?.count>=6 ? "历史检验 "+audit.count+" 次" : "尚无充分检验"));
       button.setAttribute("aria-label", f.label+"，"+modelLabel+"，假设下界 "+toFixedPrice(f.low)+"，上界 "+toFixedPrice(f.high)+"，路径中枢 "+toFixedPrice(f.center)+" 元每克");
     });
-    if (!state.forecasts.length && !container.querySelector(".forecast-empty")) container.innerHTML = '<div class="panel forecast-empty">有效日线不足 30 个，暂不推演情景。</div>';
+    if (!state.forecasts.length) {var empty=state.profilePending?"正在后台训练各周期预测，页面可以继续浏览。":"有效日线不足 30 个，暂不推演情景。";if(container.textContent!==empty)container.innerHTML='<div class="panel forecast-empty">'+empty+'</div>';}
     var sameCenter=state.forecasts.length>1 && state.forecasts.every(function(f){return Math.abs(f.center-state.forecasts[0].center)<.005;});
-    setText("forecastBasisNote", sameCenter ? "当前各期采用持平基准，中枢保持当前参考价；观察周期不同，上下界随之变化。相同中枢不代表相同区间，也不代表价格不会变化。" : "先比较各周期的上下界，再查看路径中枢。手动假设会平移路径，历史检验结果不适用于这项平移。");
+    setText("forecastBasisNote", "中枢由各周期独立训练的正则化收益模型与衰减趋势组成；可用的汇率、实际利率、风险情绪和明确事件作有上限的时效修正。"+(sameCenter?"当前输入接近平稳，模型未强制制造方向差异。":"")+"6 个月以上含长期外推。展开‘预测依据’查看输入与贡献。"+(Math.abs(state.scenarioModel.scoreDelta)>.0001?"手动假设会平移路径，不能沿用原历史覆盖率。":""));
     var focus = state.forecasts[state.forecastHorizon];
     $("captureScenario").disabled = !focus || !state.quote.asOf;
     $("scenarioFocus").innerHTML = focus ? '<div><span>当前观察 · '+focus.label+'</span><strong>'+toFixedPrice(focus.center)+'<small>元 / 克</small></strong></div><p>波动情景带 <b>'+toFixedPrice(focus.low)+' — '+toFixedPrice(focus.high)+'</b><small>历史波动与误差刻度 · 不保证未来覆盖</small></p>' : '';
@@ -872,16 +912,18 @@
     $("scenarioComparison").hidden = !baseline || !focus;
     if (baseline && focus) {
       var delta = focus.center - baseline.center;
-      $("scenarioComparison").innerHTML = '<span>同周期数据基线 <b>'+toFixedPrice(baseline.center)+'</b></span><span>'+(Math.abs(delta)<.005 ? '当前与数据基线一致' : '假设使中枢 <b>'+(delta>0?'+':'')+delta.toFixed(2)+' 元/克</b>')+'</span>';
+      $("scenarioComparison").innerHTML = '<span>同周期量价基线 <b>'+toFixedPrice(baseline.center)+'</b></span><span>'+(Math.abs(delta)<.005 ? '暂无有效外部修正' : '事件 / 因子 / 手动修正 <b>'+(delta>0?'+':'')+delta.toFixed(2)+' 元/克</b>')+'</span>';
     }
     setText("bullProbability", "上界"); setText("baseProbability", "路径"); setText("bearProbability", "下界");
     var score = factorScore(); setText("factorTotal", signedNumber(Math.round(score)));
     var nonNeutral = state.factors.filter(function (f) { return f.id !== "sgeMomentum" && f.value !== 0; }).length;
     setText("factorOverview", (state.factorOverrides.sgeMomentum ? "动量假设 " : "历史动量 ") + signedNumber(getFactor("sgeMomentum")) + " · " + (nonNeutral ? "另有 " + nonNeutral + " 项非中性假设" : "其余驱动保持中性"));
-    setText("stanceTitle", score > 20 ? "偏强假设，观察条件变化" : score < -20 ? "偏弱假设，关注承受范围" : "保持中性，比较不同路径");
+    var change=focus&&state.quote.priceCnyGram>0?(focus.center/state.quote.priceCnyGram-1)*100:0;
+    setText("stanceTitle", change>.3?"模型偏强 · "+signedPercent(change):change<-.3?"模型偏弱 · "+signedPercent(change):"模型判断接近平稳");
     setText("stanceSummary", focus ? forecastSummary(focus, score) : "补齐有效历史与报价后再作推演。");
     $("confidenceRing").querySelector("b").textContent = "先检验";
     renderModelAudit();
+    renderPredictionEvidence();
     $("actionList").innerHTML = strategyActions().map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("");
     $("useStrategyBtn").disabled = !state.forecasts.length;
   }
@@ -893,13 +935,18 @@
   function renderModelAudit() {
     var e=selectedAudit(),f=state.forecasts[state.forecastHorizon];
     setText("modelAuditTitle", f ? f.label+" · 把模型放回历史里" : "等待有效历史");
-    var model=e?.model==="trend"?"衰减趋势":"持平基准";
-    setText("forecastModel","本地检验引擎 · "+model);
+    var model=e?.model==="trend"?"收缩趋势":"正则化量价集成";
+    setText("forecastModel",state.profilePending?"预测引擎 · 后台重算中":"预测引擎 · "+model);
     setText("auditModel",model);
     setText("auditSample",e ? e.count+" 次" : "—");
     setText("auditError",e?.count ? e.mae.toFixed(2)+"%" : "样本不足");
     setText("auditBaseline",e?.count ? e.naiveMae.toFixed(2)+"%" : "—");
     setText("auditCoverage",e?.count>=6 ? e.coverage.toFixed(0)+"%" : "样本不足");
+    setText("auditDirection",e?.count>=6?e.direction.toFixed(1)+"%":"样本不足");
+    setText("auditEvidence",e?e.augmentedCount+" / "+e.count:"—");
+    var archived=(state.ledger.entries||[]).flatMap(function(entry){return (entry.forecasts||[]).filter(function(x){return x.days===f?.days;}).map(function(x){return {entry,forecast:x};});});
+    var verified=archived.filter(function(x){return x.forecast.result;}),lastArchived=archived.at(-1);
+    setText("prospectiveAudit", "建档后核验："+verified.length+" / "+archived.length+" 个已建档起点完成当前周期。"+(verified.length?"已核验平均价格误差 "+(verified.reduce(function(s,x){return s+x.forecast.result.error;},0)/verified.length).toFixed(2)+"%。":"尚未积累真实后续结果，不报告前瞻准确率。")+(lastArchived?"最近建档 "+formatDateTime(lastArchived.entry.createdAt)+"，起点收盘 "+lastArchived.entry.origin+"，当时预测中枢 "+toFixedPrice(lastArchived.forecast.center)+" 元/克；之后不随模型更新重写。":""));
     var changed=Math.abs(state.scenarioModel.scoreDelta)>.0001;
     var enough=e?.count>=6;
     var improvement=e?.naiveMae>1e-8?(1-e.mae/e.naiveMae)*100:0;
@@ -907,16 +954,46 @@
       improvement>0 ? "逐次向前检验中，平均误差比始终持平基准低 "+improvement.toFixed(1)+"%；这只是所示历史窗口的结果。" :
       "逐次向前检验中，模型尚未优于始终持平基准；请保留基准对照，降低方向判断的权重。";
     if(enough && e.count<20)message+=" 目前只有 "+e.count+" 次检验，结果容易随新增样本变化。";
-    if(changed)message+=" 当前有手动假设，右侧历史覆盖率不适用于平移后的情景。";
+    if(e?.recentCount)message+=" 最近 "+e.recentCount+" 次模型误差 "+e.recentMae.toFixed(2)+"%，同期持平基准 "+e.recentNaiveMae.toFixed(2)+"%。";
+    message+=" 方向命中率只统计涨跌符号，不是价格准确率。外部事件修正仅在有当时存档时参加检验；尚无存档的旧日期只检验量价模型。";
+    if(state.quantProfile.context?.active && !(e?.augmentedCount>=6))message+=" 当前外部修正尚无充分前瞻检验，不能据此声称提高了准确率。";
+    if(changed)message+=" 当前有手动假设，历史覆盖率不适用于人为平移。";
     setText("auditConclusion",message);
     $("exportBacktest").disabled=!e?.count;
-    setText("auditWindow", e?.count ? e.records[0].origin+" — "+e.records.at(-1).target+" · "+e.steps+" 个记录交易日/期" : "每年按 252 个交易日近似换算；至少 90 日训练，另需 8 次已结束预测进行初始校准。");
+    setText("auditWindow", e?.count ? e.records[0].origin+" — "+e.records.at(-1).target+" · "+e.steps+" 个记录交易日/期" : "每年按 252 个交易日近似换算；至少 120 日训练，另需 8 次已结束预测进行初始校准。");
   }
   function exportBacktest() {
     var e=selectedAudit();if(!e?.count)return;
-    var rows=[["训练截至","核验交易日","路径","推演中枢","实际收盘","下界","上界","绝对百分比误差","持平基准误差","是否落入区间"]];
-    e.records.forEach(function(r){rows.push([r.origin,r.target,r.model==="trend"?"衰减趋势":"持平",r.center,r.actual,r.low,r.high,r.error,r.naiveError,r.hit?"是":"否"]);});
+    var rows=[["训练截至","核验交易日","模型","预测中枢","实际收盘","下界","上界","绝对百分比误差","持平基准误差","是否落入区间","涨跌方向命中","当时外部输入数"]];
+    e.records.forEach(function(r){rows.push([r.origin,r.target,r.model,r.center,r.actual,r.low,r.high,r.error,r.naiveError,r.hit?"是":"否",r.directionHit?"是":"否",r.evidenceCount]);});
     download("aurum-walk-forward-"+e.days+"d.csv","\ufeff"+rows.map(row=>row.map(Core.csvCell).join(",")).join("\n"),"text/csv;charset=utf-8");
+  }
+  function renderPredictionEvidence(){
+    var ctx=state.quantProfile.context,e=selectedAudit(),contributions=e?.contributions||[];
+    setText("evidenceSummary",(ctx?.drivers.length||0)+" 项市场输入 · "+(ctx?.events.length||0)+" 条明确事件 · 可追溯时点");
+    setText("evidenceClock","资讯核对 "+formatDateTime(state.news.generatedAt)+" · 市场因子核对 "+formatDateTime(state.research.generatedAt)+"。已收录 "+state.news.items.length+" 条原文；本次资讯渠道 "+state.news.sourceStatus.filter(function(s){return s.ok;}).length+" / "+state.news.sourceStatus.length+" 可用。"+(state.news.failedSources.length?"未获取："+state.news.failedSources.join("、")+"。":"")+"后台目标每 10 分钟采集，前台每 5 分钟核对；调度及源站可能延迟，非逐笔实时资讯。没有明确方向的消息不会强行打分。");
+    var rows=contributions.map(function(c){return '<div class="evidence-row"><span>'+escapeHtml(c.label)+'</span><b>'+signedPercent(Math.expm1(c.move)*100)+'</b><small>量价模型 · 对数贡献换算</small></div>';});
+    rows=rows.concat((ctx?.drivers||[]).map(function(d){return '<a class="evidence-row" href="'+safeUrl(d.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(d.label)+'</span><b>'+signedNumber(Math.round(d.value*100))+'</b><small>'+escapeHtml(d.detail+' · 观测 '+d.observedAt.slice(0,10))+'</small></a>';}));
+    rows=rows.concat((ctx?.events||[]).slice(0,8).map(function(event){return '<a class="evidence-row" href="'+safeUrl(event.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(event.label)+'</span><b>'+signedNumber(Math.round(event.value*100))+'</b><small>'+escapeHtml(event.source+' · '+formatDateTime(event.publishedAt))+'</small></a>';}));
+    var html=rows.join("");if(state.evidenceHTML!==html){$("evidenceRows").innerHTML=html;state.evidenceHTML=html;}
+    var failed=(state.research.status||[]).filter(function(s){return !s.ok;}).map(function(s){return s.id;});
+    setText("evidenceLimits","价格贡献单位为收益百分比；预测幅度根据此前已结束的误差收缩，当前保留 "+((e?.shrink||.5)*100).toFixed(0)+"%。外部输入为 −100 至 +100 的方向分，合计修正封顶 ±4%，随时间衰减。外部系数是预设规则，未冒充训练结果。"+(failed.length?"本次市场来源不可用："+failed.join("、")+"；旧观测超过 7 日退出。":"")+"央行储备、ETF 资金流只有明确事件时参与；未取得的数据不补零冒充观测。消息首次见到和发布均须早于计算时点。");
+    var daily=state.history.daily;
+    if(daily.length>=120){$("replayDate").min=daily[119].time;$("replayDate").max=daily.at(-1).time;if(!$("replayDate").value)$("replayDate").value=daily[Math.max(119,daily.length-64)].time;}
+    $("runReplay").disabled=daily.length<120;
+  }
+  function runReplay(){
+    var date=$("replayDate").value,days=Number($("replayHorizon").value);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>$("replayDate").max||date<$("replayDate").min){setText("replayStatus","请选择有效历史范围内的日期。");return;}
+    var worker=predictionWorker();
+    if(worker){state.replayRequest=(state.replayRequest||0)+1;$("runReplay").disabled=true;setText("replayStatus","正在独立计算所选历史时点…");worker.postMessage({type:"replay",id:state.replayRequest,daily:state.history.daily,date,days,evidence:evidenceData()});}
+    else renderReplayResult(Quant.replay(state.history.daily,date,days,evidenceData()));
+  }
+  function renderReplayResult(r){
+    if(!r.ready){setText("replayStatus",r.reason);return;}
+    var values=[["训练截至",r.origin],["起点收盘",money(r.start)],["当时预测中枢",money(r.center)],["当时预测区间",toFixedPrice(r.low)+" — "+toFixedPrice(r.high)],["核验日期",r.target||"尚未走完该周期"],["实际收盘",r.actual?money(r.actual):"等待后续日线"],["模型绝对百分比误差",r.error===null?"待核验":r.error.toFixed(2)+"%"],["持平基准误差",r.baselineError===null?"待核验":r.baselineError.toFixed(2)+"%"],["涨跌方向",r.directionHit===null?"待核验":r.directionHit?"命中":"未命中"]];
+    $("replayResults").innerHTML=values.map(function(v){return '<div><dt>'+v[0]+'</dt><dd>'+escapeHtml(v[1])+'</dd></div>';}).join("");
+    setText("replayStatus","仅用截至 "+r.origin+" 的 "+r.trainCount+" 条收盘训练，不读取之后的价格作特征；后续收盘只用于核验。"+(r.evidenceCount?"当时有 "+r.evidenceCount+" 项外部存档可用。":"此日期没有当时已见的外部存档，本次仅回放量价模型。")+"休市日回退到此前末次记录；后续目标按记录交易日换算。原始价格为当前历史快照，未具备历史修订版本。单次结果不能代表总体准确率。");
   }
   function renderRiskLab() {
     var input=orderInput(),size=Quant.riskSize(state.portfolio,state.quote,state.config,input,$("riskBudgetPct").value);
@@ -937,7 +1014,7 @@
     return [
       audit?.count>=6 && audit.mae>=audit.naiveMae ? "历史检验尚未优于持平基准，先比较误差再讨论方向。" : "先查看所选周期的向前历史检验；样本不足时不判断模型优劣。",
       quality.stale ? "先核实报价时间；当前是历史输入，情景也以该时点为起点。" : "先核对来源与报价时点，再比较趋势和波动。",
-      "改变一项因子，观察各周期区间怎样变化；宏观因子默认中性。",
+      "展开预测依据，检查自动因子的时点、来源与事件修正；再用历史日期回放验证判断。",
       "模拟单笔上限设为权益的 " + state.config.maxPosition + "%，费用、价差与仓位一并计算。",
       "记录假设与复盘条件；止损 " + state.config.stopLoss + "% 与止盈 " + state.config.takeProfit + "% 是自设提醒，不会自动成交。"
     ];
@@ -1087,7 +1164,7 @@
       return category && (!query || (item.title+" "+item.source).toLocaleLowerCase().includes(query));
     });
     $("newsFreshness").textContent = state.news.items.length ? "最近发布 · "+formatDateTime(state.news.items[0].publishedAt) : "暂无有效发布";
-    $("newsSourceState").textContent = ((state.researchFailures||[]).includes(1)?"本次资讯快照核对暂不可用，保留原记录。 ":"") + (state.news.failedSources.length ? "部分来源暂不可用，保留已发布记录。" : "按原文发布时间排列。") + " 标签仅作主题索引，不推断金价方向。";
+    $("newsSourceState").textContent = ((state.researchFailures||[]).includes(1)?"本次资讯快照核对暂不可用，保留原记录。 ":"") + (state.news.failedSources.length ? "部分来源暂不可用，保留已发布记录。" : "按原文发布时间排列。") + " 明确政策与供需事件经时效、去重后参与预测；通用主题不直接判断利好利坏。";
     var html = filtered.length ? filtered.slice(0,state.newsLimit).map(renderNewsItem).join("") : '<div class="news-empty"><strong>暂时没有匹配的原文。</strong><p>试试其他关键词，或切换资讯类别。</p></div>';
     if (state.newsHTML !== html) { $("newsList").innerHTML = html; state.newsHTML = html; }
     setText("newsResultCount", "已显示 "+Math.min(state.newsLimit,filtered.length)+" / "+filtered.length+" 条");
@@ -1163,7 +1240,7 @@
     var time = new Date(item.publishedAt);
     var label = item.category === "domestic" ? "国内发布" : "宏观发布";
     return '<a class="news-item" href="' + safeUrl(item.url) +
-      '" target="_blank" rel="noreferrer"><time>' + escapeHtml(formatShortDate(time)) +
+      '" target="_blank" rel="noreferrer"><time>' + escapeHtml(item.timePrecision==="date-only"?formatShortDate(time).slice(0,10)+" · 仅日期":formatShortDate(time)) +
       "</time><div><strong>" + escapeHtml(item.title) + "</strong><p>" +
       escapeHtml(item.source + " · " + item.summary) + "</p></div><span class=\"news-meta\"><b class=\"impact-tag " +
       'neutral\">' + label + "</b><svg><use href=\"#i-external\"></use></svg></span></a>";
@@ -1255,9 +1332,9 @@
         '<h3>自设条件</h3><p>单笔上限为权益的 '+escapeHtml(String(state.config.maxPosition))+'%；止损 '+escapeHtml(String(state.config.stopLoss))+'%、止盈 '+escapeHtml(String(state.config.takeProfit))+'% 仅作参考，不会自动下单。实际模拟委托另行计算价差、手续费与可用现金。</p>';
     } else if (state.promptType === "forecast") {
       html = '<h3>'+escapeHtml(f.label)+' · 假设的影响</h3><div class="report-grid"><div><span>数据基线中枢</span><strong>'+money(baseline.center)+'</strong></div><div><span>当前假设中枢</span><strong>'+money(f.center)+'</strong></div><div><span>假设带来的变化</span><strong>'+(priceDelta>0?'+':'')+priceDelta.toFixed(2)+' 元/克</strong></div></div>'+
-        '<p>当前情景带 '+money(f.low)+' — '+money(f.high)+'。数据基线由历史检验选择持平或衰减趋势路径；手动因子只表达相对基线的变化。改变假设不会改变已记录的市场价格。</p><h3>下一次回看</h3><p>先保存此刻的情景和理由，再比较之后的有效报价。短期数据基线可查看逐次历史检验；手动假设与长期外推不沿用历史覆盖率。</p>';
+        '<p>当前情景带 '+money(f.low)+' — '+money(f.high)+'。数据基线来自量价集成模型，外部因子使用有时效的存档修正；手动因子只表达相对基线的变化。改变假设不会改变已记录的市场价格。</p><h3>下一次回看</h3><p>先保存此刻的情景和理由，再比较之后的有效报价。短期数据基线可查看逐次历史检验；手动假设与长期外推不沿用历史覆盖率。</p>';
     } else if (state.promptType === "news") {
-      html = '<h3>回到原文核实</h3><p>'+(state.news.failedSources.length ? '部分来源暂不可用，以下保留原发布时间，不代表刚刚发生。' : '下面按官方原文发布时间整理，不从关键词直接推断金价方向。')+'</p>'+
+      html = '<h3>回到原文核实</h3><p>'+(state.news.failedSources.length ? '部分来源暂不可用，以下保留原发布时间，不代表刚刚发生。' : '下面按发布者原文时间整理，不从关键词直接推断金价方向。')+'</p>'+
         (state.news.items.length ? '<ol class="report-reading">'+state.news.items.slice(0,5).map(function(item){return '<li><a href="'+safeUrl(item.url)+'" target="_blank" rel="noreferrer">'+escapeHtml(item.title)+' ↗</a><small>'+escapeHtml(item.source+' · '+formatDateTime(item.publishedAt))+'</small></li>';}).join('')+'</ol>' : '<p>暂无有效官方条目，请从来源目录核验。</p>')+
         '<h3>阅读时分开三件事</h3><p>原文确认了什么、哪些传导仍是假设、还需要观察什么数据。资讯的主题相关程度不等于价格影响方向。</p>';
     } else {
@@ -1336,7 +1413,9 @@
       },
       modelAudit: selectedAudit() ? {model:selectedAudit().model,days:selectedAudit().days,count:selectedAudit().count,
         maePct:selectedAudit().mae,naiveMaePct:selectedAudit().naiveMae,coveragePct:selectedAudit().coverage,
-        historicalOnly:true,manualShift:Math.abs(state.scenarioModel.scoreDelta)>.0001,method:"prequential-disjoint-blocks-v1"} : null,
+        directionPct:selectedAudit().direction,externalArchiveTests:selectedAudit().augmentedCount,
+        historicalOnly:true,manualShift:Math.abs(state.scenarioModel.scoreDelta)>.0001,method:"point-in-time-ridge-ensemble-v2"} : null,
+      predictionEvidence:{calculatedAt:state.quantProfile.context?.asOf,drivers:state.quantProfile.context?.drivers||[],events:state.quantProfile.context?.events||[],externalCoefficients:"fixed-prior-not-fitted"},
       selectedHorizon: state.forecasts[state.forecastHorizon],
       forecasts: state.forecasts,
       factors: state.factors,
@@ -2539,13 +2618,14 @@
         var f = state.forecasts[state.forecastHorizon];
         if (!f) throw Error("有效历史与报价不足，暂时无法记录情景。");
         return {price:state.quote.priceCnyGram, quoteAsOf:state.quote.asOf, source:state.quote.source, dataTier:state.quote.dataTier,
-          horizon:f.label, days:f.days, center:f.center, low:f.low, high:f.high, method:"AURUM Quant v1 · 向前检验 / EWMA",
+          horizon:f.label, days:f.days, center:f.center, low:f.low, high:f.high, method:"AURUM Quant v2 · 正则化集成 / 时点事件 / EWMA",
           factors:state.factors.map(function (factor) { return {id:factor.id,name:factor.name,value:factor.value,
             origin:state.factorOverrides[factor.id] ? "manual" : factor.id === "sgeMomentum" ? "history" : "assumption"}; })};
       }
     });
     bindEvents();
     $("exportBacktest").addEventListener("click",exportBacktest);
+    $("runReplay").addEventListener("click",runReplay);
     $("riskBudgetPct").addEventListener("input",renderRiskLab);
     $("stressMove").addEventListener("change",renderRiskLab);
     $("fillRiskSize").addEventListener("click",function(){

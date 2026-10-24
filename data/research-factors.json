@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-10-24T01:52:05.631Z",
+  "status": [
+    {
+      "id": "ecb",
+      "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml",
+      "checkedAt": "2026-10-24T01:52:05.631Z",
+      "ok": true,
+      "error": null
+    },
+    {
+      "id": "treasury",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_real_yield_curve&field_tdr_date_value=2026",
+      "checkedAt": "2026-10-24T01:52:05.631Z",
+      "ok": true,
+      "error": null
+    },
+    {
+      "id": "cboe",
+      "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+      "checkedAt": "2026-10-24T01:52:05.631Z",
+      "ok": true,
+      "error": null
+    }
+  ],
+  "snapshots": [
+    {
+      "capturedAt": "2026-10-24T01:52:05.631Z",
+      "factors": [
+        {
+          "source": "ecb",
+          "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml",
+          "observedAt": "2026-10-23T23:59:59Z",
+          "availableAt": "2026-10-24T01:52:05.631Z",
+          "id": "cny",
+          "label": "人民币 / 美元",
+          "value": 6.670240328776915,
+          "change": -0.6404221119996167,
+          "unit": "%",
+          "signal": -0.25699264484486845,
+          "weight": 1.2,
+          "detail": "20 个参考日变化；人民币走弱对国内克价偏正向"
+        },
+        {
+          "source": "ecb",
+          "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml",
+          "observedAt": "2026-10-23T23:59:59Z",
+          "availableAt": "2026-10-24T01:52:05.631Z",
+          "id": "usd",
+          "label": "美元 / 欧元代理",
+          "value": 0.893415527561869,
+          "change": 1.8761726078799335,
+          "unit": "%",
+          "signal": -0.46469739420227457,
+          "weight": 0.6,
+          "detail": "双边汇率代理，不是美元指数；美元走强偏负向"
+        },
+        {
+          "source": "treasury",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_real_yield_curve&field_tdr_date_value=2026",
+          "observedAt": "2026-10-23T23:59:59Z",
+          "availableAt": "2026-10-24T01:52:05.631Z",
+          "id": "realRates",
+          "label": "美国 10 年实际收益率",
+          "value": 2.66,
+          "change": -0.18999999999999995,
+          "unit": "百分点",
+          "signal": 0.3799999999999999,
+          "weight": 1,
+          "detail": "20 个参考日变动；实际收益率上升偏负向"
+        },
+        {
+          "source": "cboe",
+          "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+          "observedAt": "2026-10-23T23:59:59Z",
+          "availableAt": "2026-10-24T01:52:05.631Z",
+          "id": "risk",
+          "label": "VIX 风险情绪",
+          "value": 19.45,
+          "change": 30.800268997982517,
+          "unit": "%",
+          "signal": 0.5370026191847832,
+          "weight": 0.5,
+          "detail": "权益波动代理；流动性冲击下相关关系可能改变"
+        }
+      ]
+    }
+  ]
+}

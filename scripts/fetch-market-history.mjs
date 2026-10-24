@@ -10,13 +10,13 @@ try {
   const dailyResult = await fetchDailyHistory();
   const previous = await readExisting();
   const prior=Core.closedDaily(previous?.daily || [],previous?.generatedAt);
-  const incoming=Core.closedDaily(dailyResult.points.map(point=>({...point,observedAt:dailyObservedAt})),dailyObservedAt);
+  const incoming=Core.closedDaily(dailyResult.points.map(point=>({...point,observedAt:dailyObservedAt,volumeSource:dailyResult.source})),dailyObservedAt);
   const daily = Core.normalizePoints([...prior.closed,...incoming.closed]);
   const keptDays=new Set(daily.map(point=>point.time));
   const excludedUnclosedDays=[...new Set([...(previous?.excludedUnclosedDays || []),...prior.pending.map(point=>point.time),...incoming.pending.map(point=>point.time)])].filter(day=>!keptDays.has(day));
   const intraday = await fetchKlinesWithRetry({ interval: 5, limit: 576 }).catch((error) => {
     console.warn(`Intraday history unavailable: ${error.message}`);
-    return [];
+    return Core.normalizePoints(previous?.intraday||[]);
   });
 
   if (daily.length < 30) {
@@ -99,7 +99,7 @@ async function fetchKlinesWithRetry(options) {
 
 async function fetchDailyHistory() {
   try {
-    const points = await fetchKlinesWithRetry({ interval: 101, limit: 420 });
+    const points = await fetchKlinesWithRetry({ interval: 101, limit: 1800 });
     return {
       points,
       source: "东方财富 AU9999 历史行情（上金所）",
