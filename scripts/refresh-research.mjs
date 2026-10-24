@@ -1,0 +1,25 @@
+import {readFile,writeFile,rename} from 'node:fs/promises';import {spawn} from 'node:child_process';
+import {historyDue,buildHealth} from './pipeline-utils.mjs';
+const json=async p=>{try{return JSON.parse(await readFile(p,'utf8'));}catch{return {};}};
+const previous=await json('data/pipeline-health.json'),started=new Date().toISOString();
+const history=await json('data/market-history.json'),force=process.argv.includes('--force-history');
+async function run(key,file,timeoutMs=160000){
+ const begin=Date.now();let output='';
+ return new Promise(resolve=>{const child=spawn(process.execPath,[file],{stdio:['ignore','pipe','pipe']});
+  const record=data=>{const chunk=data.toString();process.stdout.write(`[${key}] ${chunk}`);output=(output+chunk).slice(-1800);};child.stdout.on('data',record);child.stderr.on('data',record);
+  const timer=setTimeout(()=>child.kill('SIGTERM'),timeoutMs);
+  child.on('error',error=>{clearTimeout(timer);resolve({key,status:'failed',checkedAt:new Date().toISOString(),error:error.message,durationMs:Date.now()-begin});});
+  child.on('close',(code,signal)=>{clearTimeout(timer);resolve({key,status:code===0?'ok':'failed',checkedAt:new Date().toISOString(),durationMs:Date.now()-begin,error:code===0?null:`${signal||code}: ${output.slice(-350)}`});});
+ });
+}
+const historyAttempt=historyDue(history,previous,started,force)?run('history','scripts/fetch-market-history.mjs',210000):Promise.resolve({key:'history',status:'skipped',checkedAt:previous.stages?.history?.checkedAt||null,reason:'Confirmed closes are current; waiting for next capture window'});
+const attempts=await Promise.all([run('news','scripts/fetch-official-news.mjs'),run('factors','scripts/fetch-research-factors.mjs'),run('quote','scripts/fetch-market-snapshot.mjs'),historyAttempt]);
+attempts.push(await run('ledger','scripts/build-prediction-ledger.mjs'));
+const [news,research,latestHistory,market]=await Promise.all(['data/news.json','data/research-factors.json','data/market-history.json','data/market-snapshot.json'].map(json));
+const runUrl=process.env.GITHUB_RUN_ID?`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`:null;
+async function saveHealth(){const health=buildHealth(previous,attempts,new Date().toISOString(),{news,research,history:latestHistory,market,runUrl});await writeFile('data/pipeline-health.json.tmp',JSON.stringify(health,null,2)+'\n');await rename('data/pipeline-health.json.tmp','data/pipeline-health.json');return health;}
+await saveHealth();attempts.push(await run('assembly','scripts/build-embedded-data.mjs'));const final=await saveHealth();
+// Rebuild once with the final assembly receipt so embedded and JSON bundle report the same heartbeat.
+if(attempts.at(-1).status==='ok'){const assembled=await run('assembly-final','scripts/build-embedded-data.mjs');if(assembled.status==='failed'){attempts[attempts.length-1]={...assembled,key:'assembly'};await saveHealth();process.exitCode=1;}}
+console.log(JSON.stringify({status:final.status,issues:final.issues,runUrl,completedAt:final.generatedAt}));
+if(final.status==='failed')console.error('::warning::Collection failed; retained dated inputs and published the failure receipt.');

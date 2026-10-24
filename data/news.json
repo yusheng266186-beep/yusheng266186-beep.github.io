@@ -1,68 +1,306 @@
 {
-  "generatedAt": "2026-10-24T02:22:38.775Z",
+  "generatedAt": "2026-10-24T02:34:22.077Z",
+  "checkedAt": "2026-10-24T02:34:22.077Z",
   "failedSources": [
     "BLS CPI",
     "BLS PPI",
-    "BLS Employment"
+    "BLS Employment",
+    "BBC World"
   ],
   "sourceStatus": [
     {
       "source": "Federal Reserve",
       "ok": true,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 3,
+      "error": null
     },
     {
       "source": "Fed Monetary Policy",
       "ok": true,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 15,
+      "error": null
     },
     {
       "source": "BLS CPI",
       "ok": false,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": null,
+      "failureStreak": 1,
+      "received": 0,
+      "error": "HTTP 403"
     },
     {
       "source": "BLS PPI",
       "ok": false,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": null,
+      "failureStreak": 1,
+      "received": 0,
+      "error": "HTTP 403"
     },
     {
       "source": "BLS Employment",
       "ok": false,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": null,
+      "failureStreak": 1,
+      "received": 0,
+      "error": "HTTP 403"
     },
     {
       "source": "Fed Speeches",
       "ok": true,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 15,
+      "error": null
     },
     {
       "source": "European Central Bank",
       "ok": true,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 15,
+      "error": null
     },
     {
       "source": "BEA Economic Releases",
       "ok": true,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 15,
+      "error": null
     },
     {
       "source": "BBC World",
-      "ok": true,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "ok": false,
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": null,
+      "failureStreak": 1,
+      "received": 0,
+      "error": "fetch failed"
     },
     {
       "source": "CNBC Economy",
       "ok": true,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 16,
+      "error": null
+    },
+    {
+      "source": "CNBC Top News",
+      "ok": true,
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 7,
+      "error": null
+    },
+    {
+      "source": "WSJ Markets",
+      "ok": true,
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 16,
+      "error": null
+    },
+    {
+      "source": "MarketWatch",
+      "ok": true,
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 3,
+      "error": null
     },
     {
       "source": "上海黄金交易所",
       "ok": true,
-      "checkedAt": "2026-10-24T02:22:38.775Z"
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 7,
+      "error": null
+    },
+    {
+      "source": "新浪财经滚动",
+      "ok": true,
+      "checkedAt": "2026-10-24T02:34:22.077Z",
+      "lastSuccessAt": "2026-10-24T02:34:22.077Z",
+      "failureStreak": 0,
+      "received": 18,
+      "error": null
     }
   ],
   "items": [
+    {
+      "id": "sina-902219730",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "10月24日隔夜要闻：美股三大指数收跌 油价大涨 金价下跌 特朗普称可能对伊发动一次小规模“史诗怒火”行动",
+      "summary": "市场 10月24日收盘：美股三大指数收跌 道指跌超600点 布油创4月以来新高 市场抛售范围扩大 10月24日热门中概股涨跌不一，台积电涨1.49%...",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnya2334385.shtml",
+      "publishedAt": "2026-10-23T22:55:28.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902219604",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "报道：美国将部分外交人员及其家属撤离中东驻地",
+      "summary": "据多名知情人士透露，随着地区局势升级的威胁迫近，美国正匆忙从多个中东驻地撤离部分外交官及其家属。 这些撤离被描述为令人沮丧且混乱的“似曾相识”——许多离开的人不久前...",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnxy1602777.shtml",
+      "publishedAt": "2026-10-23T22:53:55.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902214471",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "大宗商品综述：油价大涨 铜价收窄周跌幅 金价下跌",
+      "summary": "布伦特原油本周收于4月份以来最高水平，因为沙特阿拉伯遭到的袭击愈演愈烈，加剧了此前已因美伊战争而升温的供应担忧。铜价周五上涨并收窄周跌幅...",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8286322.shtml",
+      "publishedAt": "2026-10-23T22:11:54.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902214067",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "CFTC：对冲基金削减日元空头 增持澳元多头",
+      "summary": "美国商品期货交易委员会（CFTC）周五公布的数据显示，截至10月20日当周，对冲基金削减日元空头头寸。日元连续第二周上涨，周五兑美元则小幅走弱。",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2448937.shtml",
+      "publishedAt": "2026-10-23T22:07:24.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902213159",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "10月24日外盘头条：俄乌同意奥列什基停火 特朗普拟豁免更多加拿大产品关税 美国将氦列入关键材料清单",
+      "summary": "全球财经媒体昨夜今晨共同关注的头条新闻主要有： 1、俄乌同意奥列什基停火，泽连斯基称11月举行新一轮和平会谈 2、共和党参议员选情告急 特朗普拟豁免更多加拿大产品关税...",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhry5046368.shtml",
+      "publishedAt": "2026-10-23T21:54:06.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902212938",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "俄乌同意奥列什基停火，泽连斯基称11月举行新一轮和平会谈",
+      "summary": "乌克兰和俄罗斯周五表示，双方已同意在俄罗斯占领的乌克兰城镇奥列什基实现停火，该停火由美国第一夫人梅拉尼娅·特朗普斡旋促成。",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2440163.shtml",
+      "publishedAt": "2026-10-23T21:48:56.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "wsj-markets-2026-10-23-37",
+      "source": "WSJ Markets",
+      "title": "WSJ Dollar Index Falls 0.25% This Week to 96.84",
+      "url": "https://www.wsj.com/finance/currencies/dollar-likely-to-remain-in-155-160-yen-range-in-near-term-4e69b51a?mod=rss_markets_main",
+      "publishedAt": "2026-10-23T21:24:00.000Z",
+      "summary": "The WSJ Dollar Index edged higher, snapping a three-trading-day losing streak.",
+      "impact": "neutral",
+      "weight": 66,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902210510",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "观点综述：中期选举前宜押注美债涨、做空美元 避险情绪或延至11月中",
+      "summary": "富国策略师建议，在11月3日中期选举前押注美国久期资产上涨，并做空美元。美国银行策略师Michael Hartnett表示，投资者的避险情绪可能持续至11月晚些时候，进一步显示...",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2422304.shtml",
+      "publishedAt": "2026-10-23T21:21:32.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902208604",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "共和党参议员选情告急 特朗普拟豁免更多加拿大产品关税",
+      "summary": "特朗普政府准备扩大对加拿大产品的关税豁免范围，而此举可能有助于提升共和党参议员苏珊·柯林斯在缅因州的连任选情。 科林斯周五在一份声明中宣布...",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8226106.shtml",
+      "publishedAt": "2026-10-23T21:03:36.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "cnbc-top-2026-10-23-7",
+      "source": "CNBC Top News",
+      "title": "In hunt for Starlink alternative, Ukraine partners with Nokia and satellite maker ICEYE",
+      "url": "https://www.cnbc.com/2026/10/23/ukraine-partners-with-nokia-and-iceye-for-starlink-alternative.html",
+      "publishedAt": "2026-10-23T20:52:23.000Z",
+      "summary": "With SpaceX imposing speed limits on Starlink in Ukraine and hampering military operations, Kyiv is looking for alternatives.",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902205916",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "原油：中东供应风险推动布伦特原油逼近117美元 创6个月高点",
+      "summary": "布伦特原油本周收于4月份以来最高水平，因为沙特阿拉伯遭到的袭击愈演愈烈，加剧了此前已因美伊战争而升温的供应担忧。",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398290.shtml",
+      "publishedAt": "2026-10-23T20:35:29.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "cnbc-top-2026-10-23-24",
+      "source": "CNBC Top News",
+      "title": "10-year Treasury yield drops back to 5% this week as investors seek cover from AI worries",
+      "url": "https://www.cnbc.com/2026/10/23/bonds-yields-us-treasurys.html",
+      "publishedAt": "2026-10-23T20:20:58.000Z",
+      "summary": "The 10-year Treasury yield was just below 5% Friday after AI-driven tech selling sent investors into the safety of government bonds.",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "cnbc-top-2026-10-23-8",
+      "source": "CNBC Top News",
+      "title": "Musk&apos;s SpaceX is still restricting Starlink in Ukraine and the toll is rising",
+      "url": "https://www.cnbc.com/2026/10/23/ukraine-says-starlink-restrictions-remain-despite-trump-assurances.html",
+      "publishedAt": "2026-10-23T19:50:26.000Z",
+      "summary": "Since last week, Ukraine has reported restrictions on Starshield, a version of SpaceX's Starlink, hampering its military operations against Russia.",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
     {
       "id": "bbc-world-2026-10-23-4",
       "source": "BBC World",
@@ -76,6 +314,18 @@
       "firstSeenAt": "2026-10-24T02:14:08.587Z"
     },
     {
+      "id": "cnbc-top-2026-10-23-9",
+      "source": "CNBC Top News",
+      "title": "Qatar deal to buy U.S. natural gas shows how Iran war has redrawn global energy markets",
+      "url": "https://www.cnbc.com/2026/10/23/cheniere-qatar-energy-lng-natural-gas-iran-war-strait-hormuz.html",
+      "publishedAt": "2026-10-23T19:19:08.000Z",
+      "summary": "The Iran war is transforming global energy markets and benefiting U.S. companies, especially liquefied natural gas exporters.",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
       "id": "bbc-world-2026-10-23-7",
       "source": "BBC World",
       "title": "Ukraine says Starlink still restricted after Trump says limits lifted",
@@ -86,6 +336,102 @@
       "weight": 42,
       "category": "macro",
       "firstSeenAt": "2026-10-24T02:14:08.587Z"
+    },
+    {
+      "id": "wsj-markets-2026-10-23-34",
+      "source": "WSJ Markets",
+      "title": "Precious Metals Lose Ground As Oil Prices Press Higher",
+      "url": "https://www.wsj.com/finance/commodities-futures/gold-is-flat-likely-to-consolidate-in-near-term-1fb03f5c?mod=rss_markets_main",
+      "publishedAt": "2026-10-23T18:41:00.000Z",
+      "summary": "Precious metals extended losses with silver reaching a new low for the year and gold settling below the $4,000 level.",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902196317",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "缅因共和党参议员透露特朗普将降低部分加拿大产品关税",
+      "summary": "特朗普政府准备扩大对部分加拿大产品的关税豁免，而此举可能有助于提升共和党参议员苏珊·柯林斯在缅因州的连任竞选。 科林斯周五在一份声明中宣布...",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwhaiy8239574.shtml",
+      "publishedAt": "2026-10-23T18:19:01.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "wsj-markets-2026-10-23-16",
+      "source": "WSJ Markets",
+      "title": "Treasury Yields Rise, Eurozone Bond Yields Fall Amid French Concerns",
+      "url": "https://www.wsj.com/finance/investing/u-s-treasury-yields-edge-up-bond-market-focus-to-stay-on-france-8b28a326?mod=rss_markets_main",
+      "publishedAt": "2026-10-23T18:11:00.000Z",
+      "summary": "U.S. Treasury yields rose as investors sought safety from the turmoil in French government bonds ahead of a closely watched interest-rate decision.",
+      "impact": "neutral",
+      "weight": 66,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902193832",
+      "source": "新浪财经滚动",
+      "publisher": "环球市场播报",
+      "title": "为助力缅因州参议员，特朗普拟取消部分加拿大商品50%关税",
+      "summary": "美国总统特朗普政府据悉准备调整针对加拿大商品征收的50%关税，计划取消部分农业及林业产品的高额关税，以帮助缅因州共和党参议员苏珊·柯林斯（Susan...",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwfwae5126132.shtml",
+      "publishedAt": "2026-10-23T17:54:52.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902184958",
+      "source": "新浪财经滚动",
+      "publisher": "央视",
+      "title": "俄军宣布27日起在赫尔松方向停火并实行“静默状态”",
+      "summary": "总台记者23日获悉，俄罗斯武装力量总参谋长、国防部第一副部长瓦列里·格拉西莫夫大将宣布，俄罗斯武装力量自莫斯科时间2026年10月27日4时起...",
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwah1796343.shtml",
+      "publishedAt": "2026-10-23T15:57:54.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "sina-902180564",
+      "source": "新浪财经滚动",
+      "publisher": "央视",
+      "title": "中东与欧洲八国外长反对扩大地区冲突 呼吁外交对话",
+      "summary": "当地时间10月23日傍晚，土耳其外长费丹在伊斯坦布尔主持土埃巴沙与英法德意八国外长会议后，召开新闻发布会。费丹介绍，当天，中东地区四国外长首先就地区局势...",
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwae5026898.shtml",
+      "publishedAt": "2026-10-23T15:36:01.000Z",
+      "weight": 70,
+      "category": "domestic",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "cnbc-top-2026-10-23-29",
+      "source": "CNBC Top News",
+      "title": "Higher interest rates have made family offices pickier about investing in real estate",
+      "url": "https://www.cnbc.com/2026/10/23/high-interest-rates-raise-the-bar-for-real-estate-deals.html",
+      "publishedAt": "2026-10-23T12:15:03.000Z",
+      "summary": "Higher interest rates have made family offices more selective about investing in real estate.",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "cnbc-top-2026-10-23-26",
+      "source": "CNBC Top News",
+      "title": "Russia and Ukraine trade fresh strikes despite renewed push for U.S.-brokered peace talks",
+      "url": "https://www.cnbc.com/2026/10/23/russia-ukraine-strikes-peace-talks.html",
+      "publishedAt": "2026-10-23T11:16:30.000Z",
+      "summary": "Both Putin and Zelenskyy said Thursday they were open for peace negotiations, even as they continued strikes overnight.",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
     },
     {
       "id": "ecb-2026-10-23-0",
@@ -110,6 +456,30 @@
       "weight": 42,
       "category": "macro",
       "firstSeenAt": "2026-10-24T02:14:08.587Z"
+    },
+    {
+      "id": "wsj-markets-2026-10-22-39",
+      "source": "WSJ Markets",
+      "title": "WSJ Dollar Index Falls 0.12% to 96.80",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-focus-on-mideast-developments-716c953b?mod=rss_markets_main",
+      "publishedAt": "2026-10-22T21:27:00.000Z",
+      "summary": "The WSJ Dollar Index edged 0.1% lower, down for three consecutive trading days.",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "wsj-markets-2026-10-21-40",
+      "source": "WSJ Markets",
+      "title": "WSJ Dollar Index Falls 0.04% to 96.92",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-but-may-be-supported-by-mild-risk-appetite-1384b72e?mod=rss_markets_main",
+      "publishedAt": "2026-10-21T22:31:00.000Z",
+      "summary": "The WSJ Dollar Index edged lower, down for two consecutive trading days.",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
     },
     {
       "id": "cnbc-economy-2026-10-21-4",
@@ -158,6 +528,18 @@
       "weight": 42,
       "category": "macro",
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
+    },
+    {
+      "id": "wsj-markets-2026-10-20-41",
+      "source": "WSJ Markets",
+      "title": "WSJ Dollar Index Falls 0.25% to 96.96",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-mixed-signals-6b3593e6?mod=rss_markets_main",
+      "publishedAt": "2026-10-20T21:29:00.000Z",
+      "summary": "The WSJ Dollar Index fell 0.3% &#x2014; down three of the past four trading days.",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
     },
     {
       "id": "ecb-2026-10-20-3",
@@ -268,6 +650,18 @@
       "firstSeenAt": "2026-10-24T01:55:49.934Z"
     },
     {
+      "id": "cnbc-economy-2026-10-15-21",
+      "source": "CNBC Economy",
+      "title": "IMF sees milder global slowdown as AI boom offsets war hit — warns resilience is nearing limits",
+      "url": "https://www.cnbc.com/2026/10/12/imf-world-bank-annual-meetings-october-bangkok-asia-.html",
+      "publishedAt": "2026-10-15T06:35:31.000Z",
+      "summary": "The IMF raised its 2026 global growth forecast to 3.1%, warning that resilience is tested by energy constraints and looming fiscal risks.",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
       "id": "fed-speeches-2026-10-15-0",
       "source": "Fed Speeches",
       "title": "Bowman, Supervisory Modernization After Silicon Valley Bank",
@@ -328,6 +722,18 @@
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
     },
     {
+      "id": "cnbc-economy-2026-10-13-18",
+      "source": "CNBC Economy",
+      "title": "The latest inflation data is expected to show price increases are accelerating",
+      "url": "https://www.cnbc.com/2026/10/13/september-consumer-price-index-inflation.html",
+      "publishedAt": "2026-10-13T18:05:57.000Z",
+      "summary": "Economists expect the consumer price index for September to rise 0.6% on the month and 3.6% year over year.",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
       "id": "fed-monetary-2026-10-13-0",
       "source": "Fed Monetary Policy",
       "title": "Minutes of the Board's discount rate meetings on August 17, September 9, and September 16, 2026",
@@ -338,6 +744,54 @@
       "weight": 54,
       "category": "macro",
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
+    },
+    {
+      "id": "cnbc-economy-2026-10-13-24",
+      "source": "CNBC Economy",
+      "title": "World Bank jobs council urges &apos;crisis-era&apos; employment support measures as IMF warns of AI ‘tsunami’",
+      "url": "https://www.cnbc.com/2026/10/12/imf-world-bank-ai-jobs-inflation-.html",
+      "publishedAt": "2026-10-13T13:09:55.000Z",
+      "summary": "IMF Chief Kristalina Georgieva warned AI is hitting the global labor market like a “slow-moving tsunami,” with young workers entering the job market the most exposed.",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "cnbc-economy-2026-10-13-20",
+      "source": "CNBC Economy",
+      "title": "IMF warns bond yields could see a &apos;disorderly&apos; spike as debt, inflation risks worsen",
+      "url": "https://www.cnbc.com/2026/10/13/treasury-yields-imf-debt-inflation-.html",
+      "publishedAt": "2026-10-13T04:54:07.000Z",
+      "summary": "The IMF says risks in the government bond market have worsened and that yields could jump sharply and disorderly.",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "cnbc-economy-2026-10-12-23",
+      "source": "CNBC Economy",
+      "title": "Nobel prize in economics awarded to Robert E. Hall and Michael Woodford",
+      "url": "https://www.cnbc.com/2026/10/12/nobel-economics-prize-winner-woodford-hall.html",
+      "publishedAt": "2026-10-12T14:09:02.000Z",
+      "summary": "The U.S. economists were awarded for work that underpins the models used by central banks and governments to stabilize the economy.",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "cnbc-economy-2026-10-12-22",
+      "source": "CNBC Economy",
+      "title": "India’s retail inflation jumps to 5.54% in September, above estimates",
+      "url": "https://www.cnbc.com/2026/10/12/india-inflation-oil-energy-iran-war.html",
+      "publishedAt": "2026-10-12T10:49:24.000Z",
+      "summary": "India inflations jumps for the 11-straight month, raising prospects of a further interest rate hike",
+      "impact": "neutral",
+      "weight": 66,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
     },
     {
       "id": "ecb-2026-10-08-8",
@@ -388,6 +842,18 @@
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
     },
     {
+      "id": "ecb-2026-10-07-10",
+      "source": "European Central Bank",
+      "title": "Results of the September 2026 survey on credit terms and conditions in euro-denominated securities financing and OTC derivatives markets (SESFOD)",
+      "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr261007~6447350434.en.html",
+      "publishedAt": "2026-10-07T08:00:00.000Z",
+      "summary": "Results of the September 2026 survey on credit terms and conditions in euro-denominated securities financing and OTC derivatives markets (SESFOD)",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
       "id": "fed-speeches-2026-10-06-2",
       "source": "Fed Speeches",
       "title": "Bowman, Modernizing the Regulatory and Supervisory Landscape",
@@ -400,6 +866,30 @@
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
     },
     {
+      "id": "ecb-2026-10-06-11",
+      "source": "European Central Bank",
+      "title": "Frank Elderson: Effective supervision through timely remediation",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261006_1~0df91e4e44.en.html",
+      "publishedAt": "2026-10-06T13:00:00.000Z",
+      "summary": "Frank Elderson: Effective supervision through timely remediation",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "ecb-2026-10-06-12",
+      "source": "European Central Bank",
+      "title": "Piero Cipollone: Money in the digital age: digital euro, tokenisation and the role of central banks",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261006~0da978f159.en.html",
+      "publishedAt": "2026-10-06T13:00:00.000Z",
+      "summary": "Piero Cipollone: Money in the digital age: digital euro, tokenisation and the role of central banks",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
       "id": "bea-2026-10-06-0",
       "source": "BEA Economic Releases",
       "title": "U.S. International Trade in Goods and Services, August 2026",
@@ -410,6 +900,30 @@
       "weight": 42,
       "category": "macro",
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
+    },
+    {
+      "id": "ecb-2026-10-06-13",
+      "source": "European Central Bank",
+      "title": "Philip R. Lane: Interview with Ansa",
+      "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261006~bc94400297.en.html",
+      "publishedAt": "2026-10-06T07:00:00.000Z",
+      "summary": "Philip R. Lane: Interview with Ansa",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "ecb-2026-10-05-14",
+      "source": "European Central Bank",
+      "title": "Philip R. Lane: Diagnostic Challenges for ECB Monetary Policy",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261005~1d8d998ef4.en.html",
+      "publishedAt": "2026-10-05T08:00:00.000Z",
+      "summary": "Philip R. Lane: Diagnostic Challenges for ECB Monetary Policy",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
     },
     {
       "id": "fed-speeches-2026-10-01-3",
@@ -508,6 +1022,18 @@
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
     },
     {
+      "id": "fed-speeches-2026-09-28-10",
+      "source": "Fed Speeches",
+      "title": "Cook, An Update on AI and the Economy",
+      "url": "https://www.federalreserve.gov/newsevents/speech/cook20260928a.htm",
+      "publishedAt": "2026-09-28T17:25:00.000Z",
+      "summary": "Speech At the Oakland Tech Week Opening Keynote, cohosted by the Kapor Center, Oakland, California",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
       "id": "bea-2026-09-24-2",
       "source": "BEA Economic Releases",
       "title": "U.S. International Transactions and Investment Position, 2nd Quarter 2026",
@@ -520,6 +1046,18 @@
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
     },
     {
+      "id": "fed-speeches-2026-09-23-11",
+      "source": "Fed Speeches",
+      "title": "Barr, A Long-Term View on the Costs of Shelter",
+      "url": "https://www.federalreserve.gov/newsevents/speech/barr20260923a.htm",
+      "publishedAt": "2026-09-23T14:05:00.000Z",
+      "summary": "Speech At “Housing Affordability 2026: A Community Development Summit,” hosted by the Federal Reserve Bank of Chicago, Chicago, Illinois",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
       "id": "sge-notice-2026-09-23-7",
       "source": "上海黄金交易所",
       "title": "关于做好2026年中秋节与国庆节期间市场风险控制工作的通知",
@@ -530,6 +1068,42 @@
       "weight": 82,
       "category": "domestic",
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
+    },
+    {
+      "id": "fed-speeches-2026-09-22-12",
+      "source": "Fed Speeches",
+      "title": "Jefferson, Discount Window Modernization and Treasury Market Functioning",
+      "url": "https://www.federalreserve.gov/newsevents/speech/jefferson20260922a.htm",
+      "publishedAt": "2026-09-22T14:20:00.000Z",
+      "summary": "Speech At the 2026 U.S. Treasury Market Conference, Federal Reserve Bank of New York, New York, New York",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "fed-speeches-2026-09-18-13",
+      "source": "Fed Speeches",
+      "title": "Bowman, Initial Findings from Independent Review of Silicon Valley Bank",
+      "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260918b.htm",
+      "publishedAt": "2026-09-18T13:30:00.000Z",
+      "summary": "Speech At the Luncheon of the Lord Mayor City of London at Mansion House, London, United Kingdom",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "fed-speeches-2026-09-18-14",
+      "source": "Fed Speeches",
+      "title": "Bowman, The Final Chapter on Modernizing Bank Regulatory Stress Testing",
+      "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260918a.htm",
+      "publishedAt": "2026-09-18T13:30:00.000Z",
+      "summary": "Speech At the Luncheon of the Lord Mayor City of London at Mansion House, London, United Kingdom",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
     },
     {
       "id": "fed-monetary-2026-09-16-2",
@@ -748,6 +1322,30 @@
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
     },
     {
+      "id": "fed-monetary-2026-06-17-10",
+      "source": "Fed Monetary Policy",
+      "title": "Federal Reserve issues FOMC statement",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260617a.htm",
+      "publishedAt": "2026-06-17T18:00:00.000Z",
+      "summary": "Federal Reserve issues FOMC statement",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "fed-monetary-2026-06-17-11",
+      "source": "Fed Monetary Policy",
+      "title": "Federal Reserve Board and Federal Open Market Committee release economic projections from the June 16-17 FOMC meeting",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260617b.htm",
+      "publishedAt": "2026-06-17T18:00:00.000Z",
+      "summary": "Federal Reserve Board and Federal Open Market Committee release economic projections from the June 16-17 FOMC meeting",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
       "id": "sge-notice-2026-06-15-6",
       "source": "上海黄金交易所",
       "title": "关于做好2026年端午节期间市场风险控制工作",
@@ -782,6 +1380,138 @@
       "weight": 54,
       "category": "macro",
       "firstSeenAt": "2026-10-24T01:52:08.903Z"
+    },
+    {
+      "id": "fed-monetary-2026-05-26-12",
+      "source": "Fed Monetary Policy",
+      "title": "Minutes of the Board's discount rate meeting on April 20 and 29, 2026",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260526a.htm",
+      "publishedAt": "2026-05-26T18:00:00.000Z",
+      "summary": "Minutes of the Board's discount rate meeting on April 20 and 29, 2026",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "fed-monetary-2026-05-20-13",
+      "source": "Fed Monetary Policy",
+      "title": "Minutes of the Federal Open Market Committee, April 28-29, 2026",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260520a.htm",
+      "publishedAt": "2026-05-20T18:00:00.000Z",
+      "summary": "Minutes of the Federal Open Market Committee, April 28-29, 2026",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "fed-monetary-2026-04-29-14",
+      "source": "Fed Monetary Policy",
+      "title": "Federal Reserve issues FOMC statement",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260429a.htm",
+      "publishedAt": "2026-04-29T18:00:00.000Z",
+      "summary": "Federal Reserve issues FOMC statement",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "bea-2026-03-13-10",
+      "source": "BEA Economic Releases",
+      "title": "Personal Income and Outlays, January 2026",
+      "url": "https://www.bea.gov/news/2026/personal-income-and-outlays-january-2026",
+      "publishedAt": "2026-03-13T12:31:00.000Z",
+      "summary": "Personal income increased $113.8 billion (0.4 percent at a monthly rate) in January, according to estimates released today by the U.S. Bureau of Economic Analysis. Disposable personal income (DPI)-personal income less personal current taxes-increased $219.9 billion (0.9 percent), and personal consumption expenditures (PCE) increased $81.1 billion (0.4 percent). Personal outlays-the sum of PCE, personal interest payments, and personal current transfer payments-increased $85.8 billion in January. Personal saving was $1.05 trillion in January, and the personal saving rate-personal saving as a percentage of disposable personal income-was 4.5 percent. <!--Full Text Link--><a href='https://www.bea.gov/news/2026/personal-income-and-outlays-january-2026'>Full Text</a><!--Full Text Link-->",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "bea-2026-03-05-11",
+      "source": "BEA Economic Releases",
+      "title": "Outdoor Recreation Economic Statistics, U.S. and States, 2024",
+      "url": "https://www.bea.gov/news/2026/outdoor-recreation-economic-statistics-us-and-states-2024",
+      "publishedAt": "2026-03-05T15:00:00.000Z",
+      "summary": "The value added of the outdoor recreation economy accounted for 2.4 percent ($696.7 billion) of current-dollar gross domestic product (GDP) for the nation in 2024. Across states and the District of Columbia, value added for outdoor recreation as a share of state GDP ranged from 6.1 percent in Hawaii to 1.0 percent in the District of Columbia. <!--Full Text Link--><a href='https://www.bea.gov/news/2026/outdoor-recreation-economic-statistics-us-and-states-2024'>Full Text</a><!--Full Text Link-->",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "bea-2026-02-20-12",
+      "source": "BEA Economic Releases",
+      "title": "Personal Income and Outlays, December 2025",
+      "url": "https://www.bea.gov/news/2026/personal-income-and-outlays-december-2025",
+      "publishedAt": "2026-02-20T13:30:00.000Z",
+      "summary": "Personal income increased $86.2 billion (0.3 percent at a monthly rate) in December, according to estimates released today by the U.S. Bureau of Economic Analysis. Disposable personal income (DPI)-personal income less personal current taxes-increased $75.7 billion (0.3 percent), and personal consumption expenditures (PCE) increased $91.0 billion (0.4 percent). Personal outlays-the sum of PCE, personal interest payments, and personal current transfer payments-increased $90.2 billion in December. Personal saving was $830.8 billion in December, and the personal saving rate-personal saving as a percentage of disposable personal income-was 3.6 percent. <!--Full Text Link--><a href='https://www.bea.gov/news/2026/personal-income-and-outlays-december-2025'>Full Text</a><!--Full Text Link-->",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "bea-2026-02-19-14",
+      "source": "BEA Economic Releases",
+      "title": "Real Personal Consumption Expenditures by State and Real Personal Income by State, 2024",
+      "url": "https://www.bea.gov/news/2026/real-personal-consumption-expenditures-state-and-real-personal-income-state-2024",
+      "publishedAt": "2026-02-19T13:30:00.000Z",
+      "summary": "Real personal consumption expenditures (PCE) by state increased in 48 states and the District of Columbia in 2024, with the percent change ranging from 5.3 percent in Massachusetts to -0.2 percent in Montana. Real PCE for the nation increased 2.9 percent in 2024. Real personal income increased in 46 states and the District of Columbia in 2024, with the percent change ranging from 5.5 percent in California to -2.2 percent in North Dakota. Real personal income for the nation increased 2.9 percent in 2024. <!--Full Text Link--><a href='https://www.bea.gov/news/2026/real-personal-consumption-expenditures-state-and-real-personal-income-state-2024'>Full Text</a><!--Full Text Link-->",
+      "impact": "neutral",
+      "weight": 42,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "bea-2026-02-05-15",
+      "source": "BEA Economic Releases",
+      "title": "Gross Domestic Product by County and Personal Income by County, 2024",
+      "url": "https://www.bea.gov/news/2026/gross-domestic-product-county-and-personal-income-county-2024",
+      "publishedAt": "2026-02-05T13:30:00.000Z",
+      "summary": "Real gross domestic product (GDP) increased in 2,273 counties, decreased in 809 counties, and was unchanged in 24 counties in 2024. County-level changes ranged from a 76.6 percent increase in Carter County, MT, to a 46.3 percent decline in Baca County, CO. Personal income, in current dollars, increased in 2,768 counties, decreased in 331, and was unchanged in 7 counties in 2024. County-level changes ranged from a 22.6 percent increase in Harding County, SD, to a 23.3 percent decline in Issaquena County, MS. <!--Full Text Link--><a href='https://www.bea.gov/news/2026/gross-domestic-product-county-and-personal-income-county-2024'>Full Text</a><!--Full Text Link-->",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "marketwatch-2024-12-12-2",
+      "source": "MarketWatch",
+      "title": "Swiss National Bank cuts interest rates by a half point to 0.5%",
+      "url": "https://www.marketwatch.com/story/swiss-national-bank-cuts-interest-rates-by-a-half-point-to-0-5-ed1fce78?mod=mw_rss_realtimeheadlines",
+      "publishedAt": "2024-12-12T08:32:00.000Z",
+      "summary": "Swiss National Bank cuts interest rates by a half point to 0.5%",
+      "impact": "bullish",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "marketwatch-2024-12-12-3",
+      "source": "MarketWatch",
+      "title": "Dollar jumps 0.5% to 0.8890 francs",
+      "url": "https://www.marketwatch.com/story/dollar-jumps-0-5-to-0-8890-francs-047c6b4d?mod=mw_rss_realtimeheadlines",
+      "publishedAt": "2024-12-12T08:32:00.000Z",
+      "summary": "Dollar jumps 0.5% to 0.8890 francs",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
+    },
+    {
+      "id": "marketwatch-2024-07-31-6",
+      "source": "MarketWatch",
+      "title": "Powell says labor market not a source of significant inflation pressure",
+      "url": "https://www.marketwatch.com/story/powell-says-labor-market-not-a-source-of-significant-inflation-pressure-cc3b1297?mod=mw_rss_realtimeheadlines",
+      "publishedAt": "2024-07-31T18:48:00.000Z",
+      "summary": "Powell says labor market not a source of significant inflation pressure",
+      "impact": "neutral",
+      "weight": 54,
+      "category": "macro",
+      "firstSeenAt": "2026-10-24T02:34:22.077Z"
     }
   ]
 }

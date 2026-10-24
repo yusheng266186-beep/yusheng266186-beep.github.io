@@ -1,0 +1,33 @@
+name: Research Recovery Watchdog
+on:
+  schedule:
+    - cron: "1,31 * * * *"
+  workflow_dispatch:
+    inputs:
+      force_recovery:
+        description: Run a recovery collection even when heartbeat is current
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: aurum-research-watchdog
+  cancel-in-progress: false
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    outputs:
+      recover: ${{ steps.check.outputs.recover }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - id: check
+        env:
+          FORCE_RECOVERY: ${{ inputs.force_recovery || false }}
+        run: |
+          node --input-type=module -e 'import fs from "node:fs";let h={};try{h=JSON.parse(fs.readFileSync("data/pipeline-health.json"));}catch{}const age=Date.now()-Date.parse(h.generatedAt),recover=process.env.FORCE_RECOVERY==="true"||!Number.isFinite(age)||age>25*60000||h.status==="failed";fs.appendFileSync(process.env.GITHUB_OUTPUT,"recover="+recover+"\n");console.log(JSON.stringify({ageMinutes:age/60000,recover}));'
+  recover:
+    needs: heartbeat
+    if: needs.heartbeat.outputs.recover == 'true'
+    uses: ./.github/workflows/refresh-research.yml
