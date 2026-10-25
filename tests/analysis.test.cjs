@@ -1,5 +1,5 @@
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),Analysis=require('../assets/analysis-engine.js'),Notes=require('../assets/analysis-notebook.js');
-const load=p=>JSON.parse(fs.readFileSync(__dirname+'/../data/'+p+'.json')),source=()=>({history:load('market-history'),news:load('news'),research:load('research-factors'),publication:load('forecast-publication')}),now=Date.parse('2026-10-25T20:00:00Z');
+const test=require('node:test'),assert=require('node:assert/strict'),Analysis=require('../assets/analysis-engine.js'),Notes=require('../assets/analysis-notebook.js');
+const frozen=require('./fixtures/analysis-input.json'),source=()=>structuredClone(frozen),now=Date.parse(frozen._fixture.asOf);
 const memory=()=>{const map=new Map();return {getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v)};},bar=(time,close)=>({time,open:close,close,high:close+1,low:close-1,observedAt:time+'T08:00:00Z'});
 const history=()=>({generatedAt:'2026-10-30T09:00:00Z',daily:[bar('2026-10-23',100),bar('2026-10-26',111),bar('2026-10-27',114),bar('2026-10-28',89),bar('2026-10-29',108),bar('2026-10-30',109)]});
 const note=(extra={},created=Date.parse('2026-10-25T10:00:00Z'))=>Notes.snapshot({anchor:{origin:'2026-10-23',close:100,observedAt:'2026-10-23T08:00:00Z'},direction:'up',steps:5,threshold:110,invalidation:95,inputKey:'frozen',facts:[],...extra},created,'test-observation');
