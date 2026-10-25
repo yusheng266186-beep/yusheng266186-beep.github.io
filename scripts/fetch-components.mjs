@@ -1,0 +1,12 @@
+import {readFile,writeFile,rename} from 'node:fs/promises';import Vintage from '../assets/vintage-store.js';
+import {fetchText} from './fetch-utils.mjs';import {parseSinaSpot,parseSinaFx,parseEcbFx,rowsToArchive} from './component-utils.mjs';
+const json=async p=>{try{return JSON.parse(await readFile(p,'utf8'));}catch{return {};}};
+const now=new Date().toISOString(),previous=await json('data/component-history.json'),archive=await json('data/observation-vintages.json');
+// Date-level prices are deliberately lagged. Current-day incomplete bars are never archived as closes.
+const specs=[['goldUsdOz','sina-xau','https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_data=/GlobalFuturesService.getGlobalFuturesDailyKLine?symbol=XAU',parseSinaSpot],['usdCny','ecb-fx','https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml',parseEcbFx],['usdCnyBackup','sina-fx','https://vip.stock.finance.sina.com.cn/forex/api/jsonp.php/var%20_data=/NewForexService.getDayKLine?symbol=fx_susdcny',parseSinaFx]];
+if(previous.generatedAt&&Date.now()-Date.parse(previous.generatedAt)<6*3600000&&!process.argv.includes('--force')){console.log('Component closes checked within 6h; retained original capture times');process.exit(0);}
+const results=await Promise.allSettled(specs.map(async([series,source,url,parse])=>{const rows=parse(await fetchText(url,{timeoutMs:25000,maxChars:12000000,headers:{Referer:'https://finance.sina.com.cn/'}}));if(rows.length<100)throw Error('Too few valid dated observations');return rowsToArchive(rows,{series,source,url,now});}));
+const status=specs.map(([series,source,url],i)=>({series,source,url,checkedAt:now,ok:results[i].status==='fulfilled',error:results[i].status==='rejected'?String(results[i].reason.message).slice(0,160):null}));
+const incoming=results.flatMap(r=>r.status==='fulfilled'?r.value:[]),out=Vintage.merge(archive,incoming,now);
+for(const [path,value]of [['data/observation-vintages.json',out],['data/component-history.json',{schema:1,generatedAt:incoming.length?now:previous.generatedAt||null,checkedAt:now,status,coverage:Vintage.summary(out),convention:'Prior completed date references; difference includes asynchronous markets, not executable spot premium'}]]){await writeFile(path+'.tmp',JSON.stringify(value)+'\n');await rename(path+'.tmp',path);}
+console.log(JSON.stringify({sources:status,records:out.records.length,coverage:Vintage.summary(out)}));if(!incoming.length)process.exitCode=1;

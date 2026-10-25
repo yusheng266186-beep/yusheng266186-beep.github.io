@@ -9,7 +9,7 @@ export function historyDue(history,health,now,force=false){
 export function buildHealth(previous,attempts,now,{news,research,history,market,runUrl}={}){
  const stages={};
  for(const a of attempts){const old=previous?.stages?.[a.key]||{};stages[a.key]={...a,lastSuccessAt:a.status==='ok'?a.checkedAt:old.lastSuccessAt||null,failureStreak:a.status==='failed'?(old.failureStreak||0)+1:a.status==='skipped'?old.failureStreak||0:0};}
- const collectors=['news','factors','quote'],allFailed=collectors.every(k=>stages[k]?.status==='failed'),assemblyFailed=['ledger','assembly'].some(k=>stages[k]?.status==='failed');
+ const collectors=['news','factors','quote'],allFailed=collectors.every(k=>stages[k]?.status==='failed'),assemblyFailed=['ledger','assembly','publication','archive'].some(k=>stages[k]?.status==='failed');
  const issues=Object.values(stages).filter(s=>s.status==='failed').map(s=>s.key);
  return {schema:1,generatedAt:now,runUrl:runUrl||null,status:allFailed||assemblyFailed?'failed':issues.length?'partial':'ok',issues,stages,
   news:{checkedAt:news?.checkedAt||news?.generatedAt,lastPublishedAt:news?.items?.[0]?.publishedAt,items:news?.items?.length||0,available:(news?.sourceStatus||[]).filter(s=>s.ok).length,total:news?.sourceStatus?.length||0},
