@@ -70,15 +70,17 @@
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "kind": "quote",
+      "asOf": "2026-10-23T18:29:55.000Z",
+      "latencyMs": 2184
     },
     {
       "source": "Sina AU9999",
       "ok": true,
       "kind": "quote",
       "asOf": "2026-10-23T15:59:35.000Z",
-      "latencyMs": 1218
+      "latencyMs": 1577
     },
     {
       "source": "SGE delayed",
@@ -87,7 +89,7 @@
     }
   ],
   "officialReference": null,
-  "collectionMs": 1592,
+  "collectionMs": 2185,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
