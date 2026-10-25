@@ -8,6 +8,10 @@ on:
         description: Refresh confirmed history as well
         type: boolean
         default: false
+      force_components:
+        description: Recheck international spot and FX even inside six-hour window
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       force_history:
@@ -33,6 +37,7 @@ jobs:
       - name: Collect independently and retain dated fallbacks
         env:
           FORCE_HISTORY: ${{ inputs.force_history || false }}
+          FORCE_COMPONENTS: ${{ inputs.force_components || false }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: |
           if [ "$FORCE_HISTORY" = "true" ]; then
