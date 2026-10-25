@@ -1,42 +1,14 @@
 name: Refresh Official News
-
 on:
   workflow_dispatch:
-
 permissions:
   contents: write
-
-concurrency:
-  group: aurum-data-refresh
-  cancel-in-progress: false
-
+  actions: write
 jobs:
-  refresh-news:
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Fetch official RSS snapshot
-        continue-on-error: true
-        run: node scripts/fetch-official-news.mjs
-      - name: Fetch timestamped market factors
-        if: always()
-        run: node scripts/fetch-research-factors.mjs
-      - name: Rebuild direct-open data
-        run: |
-          node scripts/build-prediction-ledger.mjs
-          node scripts/build-embedded-data.mjs
-      - name: Commit snapshot
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: refresh official gold macro news"
-          file_pattern: data/news.json data/research-factors.json data/forecast-ledger.json data/embedded-data.js
-
+  refresh:
+    uses: ./.github/workflows/refresh-research.yml
+    with:
+      rounds: '1'
+      continue_service: false
+      force_history: false
+    secrets: inherit

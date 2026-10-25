@@ -1,35 +1,59 @@
 name: Refresh Research Pipeline
 on:
   schedule:
-    - cron: "2,7,12,17,22,27,32,37,42,47,52,57 * * * *"
+    # Backup starts; active windows collect every five minutes independently of cron.
+    - cron: "9,29,49 * * * *"
   workflow_dispatch:
     inputs:
+      rounds:
+        description: Collection rounds in this finite window (five minutes apart)
+        type: choice
+        options: ['8', '2', '1']
+        default: '8'
+      continue_service:
+        description: Start the next finite window automatically
+        type: boolean
+        default: true
       force_history:
-        description: Refresh confirmed history as well
+        description: Recheck confirmed history on the first round
         type: boolean
         default: false
       force_components:
-        description: Recheck international spot and FX even inside six-hour window
+        description: Recheck international spot and FX on the first round
         type: boolean
         default: false
       force_analysis_ai:
-        description: Rebuild evidence interpretation once inside the daily cap
+        description: Rebuild evidence interpretation once inside the existing daily cap
         type: boolean
         default: false
   workflow_call:
     inputs:
+      rounds:
+        type: string
+        default: '1'
+      continue_service:
+        type: boolean
+        default: false
       force_history:
+        type: boolean
+        default: false
+      force_components:
+        type: boolean
+        default: false
+      force_analysis_ai:
         type: boolean
         default: false
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: aurum-data-refresh
   cancel-in-progress: false
 jobs:
   refresh:
+    if: vars.AURUM_UPDATES_PAUSED != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,25 +62,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Collect independently and retain dated fallbacks
+      - name: Collect, publish each round, and hand off the next window
         env:
+          GH_TOKEN: ${{ github.token }}
+          UPDATE_ROUNDS: ${{ inputs.rounds || '8' }}
+          CONTINUE_SERVICE: ${{ github.event_name == 'schedule' || inputs.continue_service }}
           FORCE_HISTORY: ${{ inputs.force_history || false }}
           FORCE_COMPONENTS: ${{ inputs.force_components || false }}
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           FORCE_ANALYSIS_AI: ${{ inputs.force_analysis_ai || false }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           AURUM_CODEBUDDY_API_KEY: ${{ secrets.AURUM_CODEBUDDY_API_KEY }}
-        run: |
-          if [ "$FORCE_HISTORY" = "true" ]; then
-            node scripts/refresh-research.mjs --force-history
-          else
-            node scripts/refresh-research.mjs
-          fi
-      - name: Commit inputs and health receipt
-        if: always()
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: refresh AURUM research and collector health"
-          file_pattern: data/*.json data/embedded-data.js
-      - name: Report collector failures after preserving recovery data
-        run: |
-          node --input-type=module -e 'import fs from "node:fs";const h=JSON.parse(fs.readFileSync("data/pipeline-health.json"));fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,JSON.stringify(h,null,2));if(h.status==="failed")process.exit(1);if(h.status==="partial")console.log("::warning::Partial source failure; dated inputs retained. See pipeline-health.json.");'
+        run: node scripts/run-update-service.mjs

@@ -13,13 +13,20 @@ try {previous=JSON.parse(await readFile(outputPath,"utf8"));} catch {}
 const providers=[["Eastmoney AU9999",fetchEastmoneyDomestic],["Sina AU9999",fetchSinaDomestic],["SGE delayed",fetchSgeOfficialDelayed]];
 const started=Date.now();
 const [collected,international] = await Promise.all([
-  collectQuotes({providers,previous}),
+  collectQuotes({providers,previous}).catch(async error=>{
+    // A failed check is still a check, but never a new market observation.
+    if(previous.priceCnyGram>0)await writeFile(outputPath,JSON.stringify({...previous,checkedAt:new Date().toISOString(),sourceHealth:error.sourceHealth||previous.sourceHealth,collectionError:error.message},null,2));
+    throw error;
+  }),
   fetchYahooGoldFuture().catch(error=>{console.warn(`International reference failed: ${error.message}`);return null;})
 ]);
 const domestic=collected.quote,sourceHealth=collected.sourceHealth;
 
 const snapshot = {
   ...domestic,
+  checkedAt:new Date().toISOString(),
+  lastSuccessAt:new Date().toISOString(),
+  collectionError:null,
   sourceHealth,
   officialReference:collected.references[0] || null,
   collectionMs: Date.now()-started,

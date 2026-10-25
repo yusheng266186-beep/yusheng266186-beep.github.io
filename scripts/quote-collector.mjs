@@ -14,7 +14,9 @@ export async function collectQuotes({providers,previous,now=Date.now()}) {
   }));
   const candidates=results.filter(r=>r.status==="fulfilled"&&r.value.kind==="quote").map(r=>r.value.quote);
   const references=results.filter(r=>r.status==="fulfilled"&&r.value.kind==="reference").map(r=>r.value.quote);
-  if(!candidates.length)throw Error("All domestic sources failed; previous snapshot and its timestamp retained.");
+  const sourceHealth=results.map((r,i)=>{const old=previous?.sourceHealth?.find(s=>s.source===providers[i][0]);return {source:providers[i][0],ok:r.status==="fulfilled",checkedAt:new Date(now).toISOString(),lastSuccessAt:r.status==="fulfilled"?new Date(now).toISOString():old?.lastSuccessAt||(old?.ok?old.checkedAt:null)||null,
+    ...(r.status==="fulfilled"?{kind:r.value.kind,asOf:r.value.quote.asOf,referenceDate:r.value.quote.referenceDate,latencyMs:r.value.latencyMs}:{error:String(r.reason.message).slice(0,160)})};});
+  if(!candidates.length)throw Object.assign(Error("All domestic sources failed; previous snapshot and its timestamp retained."),{sourceHealth});
   const selection=Core.selectQuote(candidates,previous,now);
   let quote=selection.quote;
   const official=candidates.find(q=>q.dataTier==="official-delayed");
@@ -25,8 +27,6 @@ export async function collectQuotes({providers,previous,now=Date.now()}) {
         officialPriceCnyGram:official.priceCnyGram,differencePct},
       delay:Math.abs(differencePct)>2.5?"同窗口来源价格分歧，保留来源报价并等待核验":quote.delay+"；已用同期上金所延时价对照"};
   }
-  const sourceHealth=results.map((r,i)=>({source:providers[i][0],ok:r.status==="fulfilled",
-    ...(r.status==="fulfilled"?{kind:r.value.kind,asOf:r.value.quote.asOf,referenceDate:r.value.quote.referenceDate,latencyMs:r.value.latencyMs}:{error:String(r.reason.message).slice(0,160)})}));
   return {quote,sourceHealth,retained:selection.retained,references};
 }
 

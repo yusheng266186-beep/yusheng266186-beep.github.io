@@ -4,7 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.1.1";
+  var RELEASE_VERSION = "5.1.2";
   var FORECAST_METHOD = "752c60e6f32864c02cc096856c18b25bbb1f1bc6e5bd174982aaf7d397fbe2e5";
   var portfolioSignature = null;
   var storageNotice = "";
@@ -84,6 +84,7 @@
     config: loadConfig(),
     portfolio: loadPortfolio(),
     quote: normalizeQuote(Object.assign({}, DATA.market || fallbackQuote(), { dataTier: "snapshot" })),
+    publishedMarket: DATA.market || null,
     history: normalizeHistory(DATA.history),
     news: normalizeNews(DATA.news),
     research: DATA.research || {snapshots:[]},
@@ -231,9 +232,7 @@
       fetchJson("data/market-snapshot.json?_=" + stamp),
       fetchJson("data/research-bundle.json?_=" + stamp)
     ]);
-    if (settled[0].status === "fulfilled" && state.config.priceProvider === "domestic") {
-      var picked=Core.selectQuote([{...settled[0].value,dataTier:"snapshot"}],state.quote);if(picked.quote)state.quote=picked.quote;
-    }
+    if (settled[0].status === "fulfilled") adoptPublishedMarket(settled[0].value);
     if (settled[1].status === "fulfilled") {try{adoptResearchBundle(settled[1].value);}catch(error){state.researchFailures=[0,1,2,3];}}
     state.lastResearchAt=Date.now();
   }
@@ -245,7 +244,7 @@
     renderResearchHealth();
     try {
       var results=await Promise.allSettled(["data/research-bundle.json","data/pipeline-health.json"].map(async function(url){
-        var response=await fetch(url,{cache:"no-cache",signal:AbortSignal.timeout(12000)});
+        var response=await fetch(url+"?_="+Math.floor(Date.now()/60000),{cache:"no-cache",signal:AbortSignal.timeout(12000)});
         if(!response.ok)throw Error("HTTP "+response.status);return response.json();
       }));
       state.researchFailures=results[0].status==='rejected'?[0,1,2,3]:[];
@@ -261,9 +260,20 @@
   function adoptPipelineHealth(value){
     if(value?.schema===1&&Core.ageHours(value.generatedAt)!==Infinity&&Date.parse(value.generatedAt)>=(Date.parse(state.pipelineHealth?.generatedAt)||0))state.pipelineHealth=value;
   }
+  function adoptPublishedMarket(value){
+    if(!(value?.priceCnyGram>0)||Core.ageHours(value.asOf)===Infinity)return false;
+    var old=state.publishedMarket;
+    if(old&&(Date.parse(value.asOf)<Date.parse(old.asOf)||(value.asOf===old.asOf&&Date.parse(value.checkedAt||value.asOf)<Date.parse(old.checkedAt||old.asOf))))return false;
+    state.publishedMarket=value;
+    if(state.config.priceProvider==='manual')return false;
+    var selected=Core.selectQuote([{...value,dataTier:'snapshot'}],state.quote).quote;
+    if(!selected)return false;
+    var changed=selected.asOf!==state.quote.asOf||selected.priceCnyGram!==state.quote.priceCnyGram;
+    state.quote=selected;return changed;
+  }
   function adoptResearchBundle(bundle){
     if(bundle?.schema!==1||!Array.isArray(bundle.history?.daily)||!Array.isArray(bundle.news?.items)||!Array.isArray(bundle.research?.snapshots)||!Array.isArray(bundle.ledger?.entries))throw Error("研究快照未通过结构校验");
-    var changed=false;
+    var changed=bundle.market?adoptPublishedMarket(bundle.market):false;
     if(Core.ageHours(bundle.history.generatedAt)!==Infinity&&Date.parse(bundle.history.generatedAt)>Date.parse(state.history.generatedAt)&&bundle.history.daily.length>=30){state.history=normalizeHistory(bundle.history);changed=true;}
     if(Core.ageHours(bundle.news.checkedAt||bundle.news.generatedAt)!==Infinity&&Date.parse(bundle.news.checkedAt||bundle.news.generatedAt)>(Date.parse(state.news.checkedAt||state.news.generatedAt)||0)){
       var news=normalizeNews(bundle.news);if(JSON.stringify(news.items)===JSON.stringify(state.news.items))news.items=state.news.items;state.news=news;changed=true;
@@ -304,8 +314,7 @@
         nextQuote = manualQuote();
         state.sourceHealth.push({ name: "手动校准", ok: true });
       } else if (state.config.priceProvider === "snapshot") {
-        nextQuote = normalizeQuote(Object.assign({}, DATA.market || state.quote, { dataTier: "snapshot" }));
-        nextQuote.fetchedAt = new Date().toISOString();
+        nextQuote = normalizeQuote(Object.assign({}, state.publishedMarket || state.quote, { dataTier: "snapshot" }));
         state.sourceHealth.push({ name: "本地快照", ok: true });
       } else {
         nextQuote = await fetchDomesticQuote(generation);
@@ -678,7 +687,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.1.1");
+      var worker=new Worker("assets/prediction-worker.js?v=5.1.2");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -761,8 +770,10 @@
     setText("sideSource", shortSource(state.quote.source)); setText("sideHealth", sourceHealthText());
     var banner = $("statusBanner");
     banner.classList.toggle("hidden", !state.feedFailures && !state.quote.sourceConflict && !offline && !quality.stale && !state.refreshing && quality.key === "live");
+    var quoteCheck=state.pipelineHealth?.quote?.checkedAt||state.publishedMarket?.checkedAt;
+    var checkedNote=quoteCheck?" 行情来源最近核对 "+formatDateTime(quoteCheck)+"。":"";
     setText("statusBannerText", state.quote.sourceConflict ? "同时间窗口的来源报价分歧较大，暂停模拟成交，请先核验来源。" : offline ? "当前离线，保留本机行情和记录。联网后重新核对来源与报价时点。" : quality.stale
-      ? (state.quote.asOf ? "数据截至 " + formatDateTime(state.quote.asOf) + "，已过去 " + ageText(state.quote.asOf) + "。当前仅供历史观察。" : "尚无可核实的报价时点，请检查数据来源。")
+      ? (state.quote.asOf ? (session.open?"行情报价截至 "+formatDateTime(state.quote.asOf)+"，已过去 "+ageText(state.quote.asOf)+"，仅供历史观察。":"当前为常规非交易时段，最近报价为 "+formatDateTime(state.quote.asOf)+"；资讯独立更新。")+checkedNote : "尚无可核实的报价时点，请检查数据来源。")
       : state.refreshing ? "正在核对公开行情；报价时间决定数据是否更新。" : state.feedFailures ? "公开链路暂不可用，保留最近报价并延后核对；时点见上方。" : "当前为延时行情或部署快照，报价时点见上方。");
     setText("pollLabel", state.refreshing ? "正在刷新" : offline ? "离线 · 本机记录" : state.config.priceProvider !== "domestic" ? "按需核对" : (state.feedFailures ? "备用状态 · " : "") + "下次核对 " + Math.ceil(state.pollRemaining) + "s");
     $("pollProgress").style.transform = "scaleX(" + clamp(state.pollRemaining / Core.refreshDelay(state.config.refreshSeconds,state.feedFailures), 0, 1) + ")";
@@ -1018,7 +1029,7 @@
   function renderPredictionEvidence(){
     var ctx=state.quantProfile.context,e=selectedAudit(),contributions=e?.contributions||[];
     setText("evidenceSummary",(ctx?.drivers.length||0)+" 项市场输入 · "+(ctx?.events.length||0)+" 条明确事件 · 可追溯时点");
-    setText("evidenceClock","资讯核对 "+formatDateTime(state.news.generatedAt)+" · 市场因子核对 "+formatDateTime(state.research.generatedAt)+"。已收录 "+state.news.items.length+" 条原文；本次资讯渠道 "+state.news.sourceStatus.filter(function(s){return s.ok;}).length+" / "+state.news.sourceStatus.length+" 可用。"+(state.news.failedSources.length?"未获取："+state.news.failedSources.join("、")+"。":"")+"后台目标每 5 分钟采集，前台每 1 分钟核对；调度及源站可能延迟，非逐笔实时资讯。没有明确方向的消息不会强行打分。");
+    setText("evidenceClock","资讯核对 "+formatDateTime(state.news.checkedAt||state.news.generatedAt)+" · 市场因子核对 "+formatDateTime(state.research.generatedAt)+"。已收录 "+state.news.items.length+" 条原文；本次资讯渠道 "+state.news.sourceStatus.filter(function(s){return s.ok;}).length+" / "+state.news.sourceStatus.length+" 可用。"+(state.news.failedSources.length?"未获取："+state.news.failedSources.join("、")+"。":"")+"后台每轮目标间隔 5 分钟，前台每 1 分钟核对；调度及源站可能延迟，非逐笔实时资讯。没有明确方向的消息不会强行打分。");
     var rows=contributions.map(function(c){return '<div class="evidence-row"><span>'+escapeHtml(c.label)+'</span><b>'+signedPercent(Math.expm1(c.move)*100)+'</b><small>量价模型 · 对数贡献换算</small></div>';});
     rows=rows.concat((ctx?.drivers||[]).map(function(d){return '<a class="evidence-row" href="'+safeUrl(d.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(d.label)+'</span><b>'+signedNumber(Math.round(d.value*100))+'</b><small>'+escapeHtml(d.detail+' · 观测 '+d.observedAt.slice(0,10))+'</small></a>';}));
     rows=rows.concat((ctx?.events||[]).slice(0,8).map(function(event){return '<a class="evidence-row" href="'+safeUrl(event.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(event.label)+'</span><b>'+signedNumber(Math.round(event.value*100))+'</b><small>'+escapeHtml(event.source+' · '+formatDateTime(event.publishedAt))+'</small></a>';}));
@@ -1230,14 +1241,14 @@
     }).join("");
   }
   function renderResearchHealth(){
-    var health=state.pipelineHealth?.news&&state.pipelineHealth?.factors?state.pipelineHealth:null,age=Core.ageHours(health?.generatedAt),delayed=age>25/60,offline=navigator.onLine===false;
+    var health=state.pipelineHealth?.news&&state.pipelineHealth?.factors?state.pipelineHealth:null,age=Core.ageHours(health?.generatedAt),delayed=age>12/60,offline=navigator.onLine===false;
     var partial=health?.status==='partial'||(health?.news?.available<health?.news?.total)||(health?.factors?.available<health?.factors?.total);
     var label=offline?"离线 · 保留最近记录":!health?"等待采集回执":delayed?"采集回执已延迟":health.status==='failed'?"采集异常 · 保留有效输入":partial?"更新运行中 · 部分渠道降级":"自动更新运行正常";
     setText("researchPipelineStatus",label);$("researchUpdateBar").dataset.state=offline||delayed||health?.status==='failed'?'warning':partial?'partial':'ok';
-    setText("researchPipelineDetail",(health?"资讯渠道 "+health.news.available+" / "+health.news.total+" 可用，市场来源 "+health.factors.available+" / "+health.factors.total+"。":"")+(delayed&&health?"已 "+Math.floor(age*60)+" 分钟没有新回执，后台补抓会重试；旧数据保留原时点。":"后台目标每 5 分钟采集，页面每 1 分钟核对已发布快照；源站和调度可能延迟。")+((state.researchFailures||[]).length?" 本次页面核对失败，将退避重试。":"")+(state.lastResearchCheckedAt?" 本页核对 "+formatDateTime(state.lastResearchCheckedAt)+"。":""));
+    setText("researchPipelineDetail",(health?"资讯渠道 "+health.news.available+" / "+health.news.total+" 可用，市场来源 "+health.factors.available+" / "+health.factors.total+"。":"")+(delayed&&health?"已 "+Math.floor(age*60)+" 分钟没有新回执，自动恢复任务会检查断档；旧数据保留原时点。":"后台持续采集，每轮目标间隔 5 分钟；页面每 1 分钟核对。")+(state.news.failedSources.length?" 暂未获取："+state.news.failedSources.slice(0,3).join("、")+(state.news.failedSources.length>3?"等 "+state.news.failedSources.length+" 个渠道":"")+"。":"")+((state.researchFailures||[]).length?" 本次页面核对失败，将退避重试。":"")+(state.lastResearchCheckedAt?" 本页核对 "+formatDateTime(state.lastResearchCheckedAt)+"。":""));
     setText("researchPipelineClock",health?.generatedAt?formatDateTime(health.generatedAt):"尚无回执");
     setText("researchPublishedClock",state.news.items[0]?.publishedAt?formatDateTime(state.news.items[0].publishedAt):"暂无原文");
-    setText("researchDailyClock",state.history.daily.at(-1)?.time||"暂无收盘");
+    setText("researchDailyClock",state.news.checkedAt||state.news.generatedAt?formatDateTime(state.news.checkedAt||state.news.generatedAt):"暂无核对记录");
     $("refreshResearchBtn").disabled=state.researchRefreshing||offline;setText("refreshResearchBtn",state.researchRefreshing?"正在核对…":"核对最新快照 ↻");
     $("researchRunLink").hidden=!health?.runUrl;$("researchRunLink").href=safeUrl(health?.runUrl);
   }
