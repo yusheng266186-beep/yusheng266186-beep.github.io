@@ -1,34 +1,37 @@
 name: Research Recovery Watchdog
 on:
   schedule:
-    - cron: "1,31 * * * *"
+    - cron: "4,14,24,34,44,54 * * * *"
+  workflow_run:
+    workflows: ["Refresh Research Pipeline"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       force_recovery:
-        description: Run a recovery collection even when heartbeat is current
+        description: Start collection when no active window exists
         type: boolean
         default: false
 permissions:
-  contents: write
+  contents: read
+  actions: write
 concurrency:
   group: aurum-research-watchdog
   cancel-in-progress: false
 jobs:
   heartbeat:
+    if: vars.AURUM_UPDATES_PAUSED != 'true' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
-    outputs:
-      recover: ${{ steps.check.outputs.recover }}
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - id: check
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Restore a missing or stalled collection window
         env:
+          GH_TOKEN: ${{ github.token }}
           FORCE_RECOVERY: ${{ inputs.force_recovery || false }}
-        run: |
-          node --input-type=module -e 'import fs from "node:fs";let h={};try{h=JSON.parse(fs.readFileSync("data/pipeline-health.json"));}catch{}const age=Date.now()-Date.parse(h.generatedAt),recover=process.env.FORCE_RECOVERY==="true"||!Number.isFinite(age)||age>25*60000||h.status==="failed";fs.appendFileSync(process.env.GITHUB_OUTPUT,"recover="+recover+"\n");console.log(JSON.stringify({ageMinutes:age/60000,recover}));'
-  recover:
-    needs: heartbeat
-    if: needs.heartbeat.outputs.recover == 'true'
-    uses: ./.github/workflows/refresh-research.yml
-    secrets: inherit
+          UPSTREAM_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: node scripts/check-update-service.mjs

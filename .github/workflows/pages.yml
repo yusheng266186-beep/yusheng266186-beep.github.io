@@ -5,7 +5,7 @@ on:
     branches: ["main"]
   workflow_dispatch:
   workflow_run:
-    workflows: ["Refresh Market Snapshot", "Refresh Market History", "Refresh Official News", "Refresh Research Pipeline", "Research Recovery Watchdog"]
+    workflows: ["Refresh Market Snapshot", "Refresh Market History", "Refresh Official News"]
     types: [completed]
 
 permissions:

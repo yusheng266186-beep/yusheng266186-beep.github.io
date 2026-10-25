@@ -33,7 +33,7 @@ const output = [
 
 await writeFile(path.resolve(root, "data/embedded-data.js.tmp"), output);
 await rename(path.resolve(root,"data/embedded-data.js.tmp"),path.resolve(root,"data/embedded-data.js"));
-const bundle={schema:1,generatedAt:payload.health?.generatedAt||new Date().toISOString(),history:payload.history,news:payload.news,research:payload.research,ledger:payload.ledger,health:payload.health,publication:payload.publication,analysisDesk:payload.analysisDesk};
+const bundle={schema:1,generatedAt:payload.health?.generatedAt||new Date().toISOString(),market:payload.market,history:payload.history,news:payload.news,research:payload.research,ledger:payload.ledger,health:payload.health,publication:payload.publication,analysisDesk:payload.analysisDesk};
 await writeFile(path.resolve(root,'data/research-bundle.json.tmp'),JSON.stringify(bundle).replace(/</g,'\\u003c')+'\n');
 await rename(path.resolve(root,'data/research-bundle.json.tmp'),path.resolve(root,'data/research-bundle.json'));
 console.log("Updated data/embedded-data.js.");

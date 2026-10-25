@@ -41,3 +41,8 @@ test('a reference for tomorrow is rejected even inside the quote clock tolerance
  const r=await collectQuotes({providers:[['public',async()=>({...quote('public'),asOf:new Date(edge).toISOString()})],['future-day',async()=>reference]],now:edge});
  assert.equal(r.references.length,0);assert.equal(r.sourceHealth[1].ok,false);
 });
+test('failed quote checks retain per-source recovery clocks without inventing success',async()=>{
+ const fail=async()=>{throw Error('offline');},previous={...quote('saved'),sourceHealth:[{source:'bad',ok:false,checkedAt:new Date(now-60000).toISOString()}]};
+ await assert.rejects(collectQuotes({providers:[['bad',fail]],previous,now}),error=>{assert.equal(error.sourceHealth[0].checkedAt,new Date(now).toISOString());assert.equal(error.sourceHealth[0].lastSuccessAt,null);return true;});
+ const r=await collectQuotes({providers:[['good',async()=>quote('good',-3600000)]],now});assert.equal(r.sourceHealth[0].checkedAt,new Date(now).toISOString());assert.equal(r.quote.asOf,new Date(now-3600000).toISOString());
+});

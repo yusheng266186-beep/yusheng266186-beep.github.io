@@ -15,5 +15,10 @@ test('collector receipt exposes total and partial outages, preserving success ti
  const now='2026-10-24T02:00:00Z',old={stages:{news:{lastSuccessAt:'2026-10-23T20:00:00Z',failureStreak:1}}},input={news:{sourceStatus:[{ok:true},{ok:false}],items:[]},research:{status:[{ok:true}]},history:{daily:[{time:'2026-10-23'}]}};
  const failed=['news','factors','quote'].map(key=>({key,status:'failed',checkedAt:now}));const health=buildHealth(old,failed,now,input);assert.equal(health.status,'failed');assert.equal(health.stages.news.failureStreak,2);assert.equal(health.stages.news.lastSuccessAt,old.stages.news.lastSuccessAt);
  const partial=buildHealth(old,failed.map(x=>x.key==='quote'?{...x,status:'ok'}:x),now,input);assert.equal(partial.status,'partial');assert.equal(partial.news.available,1);assert.equal(partial.news.total,2);
- const recovered=buildHealth(health,failed.map(x=>({...x,status:'ok'})),now,input);assert.equal(recovered.status,'ok');assert.equal(recovered.stages.news.failureStreak,0);assert.equal(recovered.stages.news.lastSuccessAt,now);
+ const recovered=buildHealth(health,failed.map(x=>({...x,status:'ok'})),now,{...input,news:{sourceStatus:[{ok:true},{ok:true}],items:[]}});assert.equal(recovered.status,'ok');assert.equal(recovered.stages.news.failureStreak,0);assert.equal(recovered.stages.news.lastSuccessAt,now);
+});
+test('a successful script cannot hide failed channels; quote checks and market times stay separate',()=>{
+ const now='2026-10-25T16:00:00Z',asOf='2026-10-23T18:29:55Z',attempts=['news','factors','quote'].map(key=>({key,status:'ok',checkedAt:now}));
+ const h=buildHealth({},attempts,now,{market:{asOf,checkedAt:now,sourceHealth:[{ok:true},{ok:false}]},news:{sourceStatus:[{ok:false}]},research:{status:[{ok:true}]}});
+ assert.equal(h.status,'partial');assert.deepEqual(h.issues,['news-sources','quote-sources']);assert.equal(h.quote.asOf,asOf);assert.equal(h.quote.checkedAt,now);assert.equal(h.quote.available,1);
 });
