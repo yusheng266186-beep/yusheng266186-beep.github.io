@@ -4,7 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.1.0";
+  var RELEASE_VERSION = "5.1.1";
   var FORECAST_METHOD = "752c60e6f32864c02cc096856c18b25bbb1f1bc6e5bd174982aaf7d397fbe2e5";
   var portfolioSignature = null;
   var storageNotice = "";
@@ -678,7 +678,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.1.0");
+      var worker=new Worker("assets/prediction-worker.js?v=5.1.1");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -923,7 +923,7 @@
     });
     if (!state.forecasts.length) {var empty=state.profilePending?"正在后台训练各周期预测，页面可以继续浏览。":"有效日线不足 30 个，暂不推演情景。";if(container.textContent!==empty)container.innerHTML='<div class="panel forecast-empty">'+empty+'</div>';}
     var sameCenter=state.forecasts.length>1 && state.forecasts.every(function(f){return Math.abs(f.center-state.forecasts[0].center)<.005;});
-    setText("forecastBasisNote", "中枢由各周期独立训练的正则化收益模型与衰减趋势组成；可用的汇率、实际利率、风险情绪和明确事件作有上限的时效修正。"+(sameCenter?"当前输入接近平稳，模型未强制制造方向差异。":"")+"6 个月以上含长期外推。展开‘预测依据’查看输入与贡献。"+(Math.abs(state.scenarioModel.scoreDelta)>.0001?"手动假设会平移路径，不能沿用原历史覆盖率。":""));
+    setText("forecastBasisNote", "数据路径由历史量价与可用存档计算；6 个月以上含长期外推。"+(sameCenter?"当前输入接近平稳，未强制制造方向差异。":"")+(Math.abs(state.scenarioModel.scoreDelta)>.0001?"手动假设会平移路径，不沿用历史覆盖率。":""));
     var focus = state.forecasts[state.forecastHorizon];
     $("captureScenario").disabled = !focus || !state.quote.asOf;
     $("scenarioFocus").innerHTML = focus ? '<div><span>当前观察 · '+focus.label+'</span><strong>'+toFixedPrice(focus.center)+'<small>元 / 克</small></strong></div><p>波动情景带 <b>'+toFixedPrice(focus.low)+' — '+toFixedPrice(focus.high)+'</b><small>历史波动与误差刻度 · 不保证未来覆盖</small></p>' : '';
@@ -944,7 +944,8 @@
     renderModelAudit();
     renderValidation();
     renderPredictionEvidence();
-    $("actionList").innerHTML = strategyActions().map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("");
+    var scenarioActions = strategyActions().slice(0,2).concat(["调整驱动假设后，保存当前情景和复盘条件，再看后续变化。"]);
+    $("actionList").innerHTML = scenarioActions.map(function (a) { return '<li>' + escapeHtml(a) + '</li>'; }).join("");
     $("useStrategyBtn").disabled = !state.forecasts.length;
   }
 
@@ -954,6 +955,7 @@
   }
   function renderModelAudit() {
     var e=selectedAudit(),f=state.forecasts[state.forecastHorizon];
+    setText("forecastDetailsSummary",f?(f.label+" · "+(e?.count>=6?"历史模型误差 "+e.mae.toFixed(2)+"% / 持平 "+e.naiveMae.toFixed(2)+"%":"当前周期历史样本不足，展开查看依据")):"核对历史表现、输入依据，或选择过去一天回放。");
     setText("modelAuditTitle", f ? f.label+" · 把模型放回历史里" : "等待有效历史");
     var model=e?.model==="trend"?"收缩趋势":"正则化量价集成";
     setText("forecastModel",state.profilePending?"预测引擎 · 后台重算中":"预测引擎 · "+(state.profileBackend?"后台发布参数 / ":"本机备用计算 / ")+model);
@@ -1062,7 +1064,7 @@
     return [
       audit?.count>=6 && audit.mae>=audit.naiveMae ? "历史检验尚未优于持平基准，先比较误差再讨论方向。" : "先查看所选周期的向前历史检验；样本不足时不判断模型优劣。",
       quality.stale ? "先核实报价时间；当前是历史输入，情景也以该时点为起点。" : "先核对来源与报价时点，再比较趋势和波动。",
-      "展开预测依据，检查自动因子的时点、来源与事件修正；再用历史日期回放验证判断。",
+      "在“依据与检验”核对输入时点与来源，需要时再回放过去日期。",
       "模拟单笔上限设为权益的 " + state.config.maxPosition + "%，费用、价差与仓位一并计算。",
       "记录假设与复盘条件；止损 " + state.config.stopLoss + "% 与止盈 " + state.config.takeProfit + "% 是自设提醒，不会自动成交。"
     ];
