@@ -1,0 +1,57 @@
+{
+  "version": "5.0.0",
+  "createdAt": "2026-10-25T07:49:19.637Z",
+  "dataHash": "9f9ca366cd60ec3f9515f84e8c559e220767114c392aad5aebd28eacf32f4885",
+  "protocolHash": "8f0321832d240eb48cab3f36ed7efcdecdf3e783bae4265bfb2b75b0c1bf17bf",
+  "kernel": {
+    "core.js": "7e4d0ef0a2dd96e4975a166b8a77038dec701149fb26f1c4ff5f25b2b24b673e",
+    "quant.js": "da4a7294ec44e8e5c34c2502fc2f925e07086de895f29a01f4b701013eddeef9",
+    "evidence.js": "38eab0af9e5a98f6623a2954021ecb7dfa6732914cfbd41454a2a1217869f094",
+    "vintage-store.js": "25119f5a4c7e8bf50529c665a9c4d5ff63a5c2f977f575222b3eb7cbe7bdf71b",
+    "event-engine.js": "22c87f15c499ae0723fcd51e85248b6e907c4cb175b312b3f71036757851dfa1",
+    "forecast-system.js": "0da7b8dc2abc897c0c6e6badec225f79c763005d5de15155e176c333e28d4cc0"
+  },
+  "horizons": [
+    7,
+    30,
+    180,
+    365,
+    1095
+  ],
+  "variants": [
+    "full",
+    "no-components",
+    "no-state",
+    "no-events"
+  ],
+  "modes": [
+    "strict",
+    "snapshot"
+  ],
+  "splits": {
+    "development": {
+      "start": "2019-01-01",
+      "end": "2022-12-31"
+    },
+    "validation": {
+      "start": "2023-01-01",
+      "end": "2024-12-31"
+    },
+    "holdout": {
+      "start": "2025-01-01",
+      "end": "2026-10-23"
+    }
+  },
+  "gate": {
+    "minCount": 20,
+    "mapeGain": 0.02,
+    "rmseRatio": 1.02,
+    "directionDelta": -0.03,
+    "tailGain": 0.01
+  },
+  "cost": {
+    "feePct": 0.1,
+    "spreadPct": 0.3
+  },
+  "note": "Previously studied historical prices; snapshot diagnostics are not point-in-time macro/news tests. Adoption must not use snapshot-only component results."
+}

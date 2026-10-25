@@ -8,13 +8,15 @@ export function updateLedger(previous,{daily,forecasts,shadowForecasts=[],now,ve
    if(f.result||!target||Date.parse(target.time+'T15:30:00+08:00')<=Date.parse(e.createdAt)||Date.parse(target.time+'T15:30:00+08:00')>time)continue;
    const capture=Date.parse(target.observedAt||historyAsOf);if(!Number.isFinite(capture)||capture<Date.parse(target.time+'T15:30:00+08:00')||capture>time)continue;
    f.result={target:target.time,actual:target.close,verifiedAt:now,error:Math.abs(f.center/target.close-1)*100,baselineError:Math.abs(e.start/target.close-1)*100,
-    directionHit:Math.sign(f.center-e.start)===Math.sign(target.close-e.start),hit:target.close>=f.low&&target.close<=f.high};
+    directionHit:Math.sign(f.center-e.start)===Math.sign(target.close-e.start),hit:target.close>=f.low&&target.close<=f.high,
+    ...(Number.isFinite(f.up)?{brier:(f.up-(target.close>e.start?1:target.close<e.start?0:.5))**2}:{}),
+    ...(f.quantiles?.length?{pinball:f.quantiles.reduce((s,q)=>{const error=Math.log(target.close/q.value);return s+error*(q.level-(error<0?1:0));},0)/f.quantiles.length}:{})};
   }
  }
  if(last&&forecasts.length&&Date.parse(last.time+'T15:30:00+08:00')<=time&&time-Date.parse(last.time+'T15:30:00+08:00')<7*86400000&&!entries.some(e=>e.origin===last.time&&e.methodHash===methodHash)){
   entries.push({id:methodHash+'|'+last.time,origin:last.time,start:last.close,createdAt:now,version,methodHash,inputHash,
    forecasts:forecasts.map(f=>({days:f.days,steps:Math.max(1,Math.round(f.days*252/365)),center:f.center,low:f.low,high:f.high})),
-   ...(shadowForecasts.length?{shadowForecasts:shadowForecasts.map(f=>({model:f.model,days:f.days,steps:Math.max(1,Math.round(f.days*252/365)),center:f.center,low:f.low,high:f.high}))}:{})});
+   ...(shadowForecasts.length?{shadowForecasts:shadowForecasts.map(f=>({model:f.model,days:f.days,steps:Math.max(1,Math.round(f.days*252/365)),center:f.center,low:f.low,high:f.high,...(f.up!==undefined?{up:f.up,quantiles:f.quantiles,calibrationCount:f.calibrationCount,regime:f.regime,mode:f.mode}:{})}))}:{})});
  }
  return {generatedAt:now,methodHash,version,entries:entries.slice(-1800)};
 }

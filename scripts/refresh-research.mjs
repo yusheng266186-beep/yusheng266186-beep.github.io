@@ -13,7 +13,9 @@ async function run(key,file,timeoutMs=160000){
  });
 }
 const historyAttempt=historyDue(history,previous,started,force)?run('history','scripts/fetch-market-history.mjs',210000):Promise.resolve({key:'history',status:'skipped',checkedAt:previous.stages?.history?.checkedAt||null,reason:'Confirmed closes are current; waiting for next capture window'});
-const attempts=await Promise.all([run('news','scripts/fetch-official-news.mjs'),run('factors','scripts/fetch-research-factors.mjs'),run('quote','scripts/fetch-market-snapshot.mjs'),historyAttempt]);
+const attempts=await Promise.all([run('news','scripts/fetch-official-news.mjs'),run('factors','scripts/fetch-research-factors.mjs'),run('quote','scripts/fetch-market-snapshot.mjs'),run('components','scripts/fetch-components.mjs'),historyAttempt]);
+attempts.push(await run('archive','scripts/archive-inputs.mjs'));
+attempts.push(await run('publication','scripts/build-forecast-publication.mjs'));
 attempts.push(await run('ledger','scripts/build-prediction-ledger.mjs'));
 const [news,research,latestHistory,market]=await Promise.all(['data/news.json','data/research-factors.json','data/market-history.json','data/market-snapshot.json'].map(json));
 const runUrl=process.env.GITHUB_RUN_ID?`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`:null;

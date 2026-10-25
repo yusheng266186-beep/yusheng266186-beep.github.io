@@ -10,7 +10,9 @@ const files = {
   ledger: "data/forecast-ledger.json",
   health: "data/pipeline-health.json",
   validation: "data/model-validation.json",
-  modelResearch: "data/model-research.json"
+  modelResearch: "data/model-research.json",
+  publication: "data/forecast-publication.json",
+  systemValidation: "data/system-validation.json"
 };
 
 const payload = {};
@@ -30,7 +32,7 @@ const output = [
 
 await writeFile(path.resolve(root, "data/embedded-data.js.tmp"), output);
 await rename(path.resolve(root,"data/embedded-data.js.tmp"),path.resolve(root,"data/embedded-data.js"));
-const bundle={schema:1,generatedAt:payload.health?.generatedAt||new Date().toISOString(),history:payload.history,news:payload.news,research:payload.research,ledger:payload.ledger,health:payload.health};
+const bundle={schema:1,generatedAt:payload.health?.generatedAt||new Date().toISOString(),history:payload.history,news:payload.news,research:payload.research,ledger:payload.ledger,health:payload.health,publication:payload.publication};
 await writeFile(path.resolve(root,'data/research-bundle.json.tmp'),JSON.stringify(bundle).replace(/</g,'\\u003c')+'\n');
 await rename(path.resolve(root,'data/research-bundle.json.tmp'),path.resolve(root,'data/research-bundle.json'));
 console.log("Updated data/embedded-data.js.");
