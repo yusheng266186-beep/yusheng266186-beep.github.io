@@ -3,12 +3,14 @@
   "use strict";
   const host = document.getElementById("goldWorld"), Helix = window.AurumHelix, Policy = window.AurumRenderPolicy;
   if (!host || !Helix || !Policy) return;
-  const canvas = host.querySelector("canvas"), base = new URL(".", document.currentScript.src);
+  let canvas = host.querySelector("canvas");
+  const scriptURL = new URL(document.currentScript.src), base = new URL(".", scriptURL), release = scriptURL.searchParams.get("v") || "local";
   const media = matchMedia("(prefers-reduced-motion: reduce)"), touch = matchMedia("(pointer: coarse)");
   let THREE, renderer, scene, sculpture, material, geometry, camera, environment, normalMap, roughnessMap;
   let ready = false, lost = false, disposed = false, frame = 0, last = 0, lastPaint = null, elapsed = 0;
   let resizePending = true, bufferWidth = 0, bufferHeight = 0, bufferRatio = 0, projectionShift = NaN;
   let preparationWorker = null, preparationTimer = 0, environmentData = null, restoreFrame = 0, lastRenderStamp = 0;
+  let loading = false, attempt = 0, reconnectRetries = 0, compatibility = false, renderState = "loading", failureReason = "", stage = "engine";
   const governor = Policy.governor(), poseKeys = ["angle", "distance", "lift", "framing"];
   const wayfinder = document.querySelector(".scene-wayfinder");
   let progressNow = -1, drawCount = 0;
@@ -28,17 +30,54 @@
     host.dataset.performance = JSON.stringify({ fps: +(frameTimes.length*1000/total).toFixed(1), p95: +sorted[Math.floor(sorted.length*.95)].toFixed(1), slowFrames: frameTimes.filter(ms=>ms>25).length, frames: frameTimes.length, draws: drawCount, buffers: bufferChanges, losses: contextLosses, dpr: renderer.getPixelRatio() });
     sampleStart = now; frameTimes = []; drawCount = 0;
   }
-  try {
-    const saved = localStorage.getItem("aurum-motion-v1") === "reduced";
-    reduced = reduced || saved;
-    if (saved) document.body.classList.add("light-motion");
-  } catch {}
+  function storedMotion() { try { return localStorage.getItem("aurum-motion-v1"); } catch { return null; } }
+  reduced = Policy.motionReduced(storedMotion(), media.matches);
+  document.body.classList.toggle("light-motion", reduced);
+  function status() {
+    if (host.dataset.renderState !== renderState) host.dataset.renderState = renderState;
+    if (host.dataset.failureReason !== failureReason) host.dataset.failureReason = failureReason;
+    host.dataset.motion = reduced ? "reduced" : paused ? "paused" : ready && !lost ? "active" : "waiting";
+    const title = document.getElementById("sceneStatus"), detail = document.getElementById("sceneStatusDetail"), retry = document.getElementById("retryScene");
+    let label, message;
+    if (loading) {
+      label = stage === "engine" ? "正在加载三维引擎" : "正在准备黄金材质";
+      message = "首次打开需下载三维资源，准备期间显示静态主视觉；加载完成后自动切换。";
+    } else if (renderState === "lost") {
+      label = "三维加速暂时中断"; message = "浏览器恢复图形环境后会自动继续，也可以重新加载雕塑。";
+    } else if (renderState === "fallback") {
+      label = failureReason === "graphics" ? "当前浏览器未提供三维加速" : "三维资源未能完整加载";
+      message = failureReason === "graphics" ? "需要 WebGL 2。可检查浏览器的图形加速设置，或换用支持三维加速的浏览器；当前保留静态主视觉。" : "可能是连接超时、资源被拦截或渲染初始化失败。已保留静态主视觉，网络恢复后可在这里重试。";
+      if (failureReason === "engine") message = "三维引擎未下载成功，可能是连接超时或资源被拦截。网络恢复后可重新加载，页面数据不受影响。";
+      if (failureReason === "material") message = "黄金材质未下载完整或准备失败。网络恢复后可再次加载，页面数据不受影响。";
+    } else if (reduced) {
+      label = "雕塑已就绪 · 减少动效";
+      message = storedMotion() === "reduced" ? "此设备已选择减少动效。切换为标准动效即可恢复旋转。" : "系统开启了减少动效。可在本站选择标准动效恢复旋转，或继续跟随系统。";
+    } else {
+      label = compatibility ? "三维雕塑已就绪 · 兼容模式" : "三维雕塑已就绪";
+      message = "雕塑随章节和滚动缓慢旋转。阅读面板打开或页面进入后台时暂停，关闭面板或回到页面后继续。";
+    }
+    if (title && title.textContent !== label) title.textContent = label;
+    if (detail && detail.textContent !== message) detail.textContent = message;
+    if (retry) { retry.hidden = !["fallback","lost"].includes(renderState); retry.disabled = loading; }
+  }
+  async function loadModule(path) {
+    for (let n = 0; ; n++) {
+      let timer;
+      try {
+        return await Promise.race([
+          import(new URL(path + (attempt > 1 || n ? "?retry=" + release + "-" + attempt + "-" + n : ""), base)),
+          new Promise((_, reject) => { timer = setTimeout(() => reject(Error("Scene engine download timed out")), 30000); })
+        ]);
+      } catch (error) { if (n >= 1 || disposed) throw error; await new Promise(resolve => setTimeout(resolve, 750)); }
+      finally { clearTimeout(timer); }
+    }
+  }
 
   async function prepareSculpture() {
     if (typeof Worker !== "undefined" && location.protocol !== "file:") {
       try {
         return await new Promise((resolve, reject) => {
-          const worker = preparationWorker = new Worker(new URL("gold-worker.js", base));
+          const worker = preparationWorker = new Worker(new URL("gold-worker.js?v=" + release, base));
           const finish = () => { clearTimeout(preparationTimer); worker.terminate(); preparationWorker = null; };
           preparationTimer = setTimeout(() => { finish(); reject(Error("Sculpture preparation timed out")); }, 30000);
           worker.onmessage = e => {
@@ -46,13 +85,13 @@
             if (e.data.error) reject(Error(e.data.error)); else resolve(e.data);
           };
           worker.onerror = e => { e.preventDefault(); finish(); reject(Error("Sculpture worker unavailable")); };
-          worker.postMessage({ size: touch.matches ? 1024 : 2048, segments: touch.matches ? 720 : 1200 });
+          worker.postMessage({ size: touch.matches || compatibility ? 1024 : 2048, segments: touch.matches || compatibility ? 720 : 1200 });
         });
       } catch (error) { console.warn("AURUM preparation fallback:", error.message); }
     }
     // Direct-file / restricted-browser fallback uses the smaller material map.
     await new Promise(resolve => setTimeout(resolve, 0));
-    return { mesh: Helix.create({ segments: touch.matches ? 720 : 1200 }), maps: window.AurumGoldSurface.create(1024) };
+    return { mesh: Helix.create({ segments: touch.matches || compatibility ? 720 : 1200 }), maps: window.AurumGoldSurface.create(1024) };
   }
   function brushedMetalMaps(data) {
     function map(bytes) {
@@ -80,31 +119,53 @@
     } finally { hdr.dispose(); pmrem.dispose(); }
   }
 
+  async function loadStudio() {
+    const bytes = await Policy.fetchBuffer(new URL("environment/studio-lighting-1k.webp", base), { timeoutMs: 20000 });
+    const blob = new Blob([bytes], { type: "image/webp" });
+    let image, objectURL;
+    try {
+      if (typeof createImageBitmap === "function") image = await createImageBitmap(blob, { colorSpaceConversion: "none", premultiplyAlpha: "none" });
+      else {
+        objectURL = URL.createObjectURL(blob); image = new Image();
+        await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = () => reject(Error("Studio image decode failed")); image.src = objectURL; });
+      }
+      const surface = document.createElement("canvas"); surface.width = image.width; surface.height = image.height;
+      const context = surface.getContext("2d", { willReadFrequently: true });
+      if (!context || surface.width !== 1024 || surface.height !== 512) throw Error("Invalid studio lighting image");
+      context.drawImage(image, 0, 0);
+      return { data: context.getImageData(0, 0, surface.width, surface.height).data, width: surface.width, height: surface.height };
+    } finally { image?.close?.(); if (objectURL) URL.revokeObjectURL(objectURL); }
+  }
   async function setup() {
+    let studioError;
+    // Start the small lighting download alongside the engine rather than behind it.
+    const studio = loadStudio().catch(error => { studioError = error; return null; });
+    THREE = await loadModule("vendor/three.module.min.js");
+    if (disposed) return;
+    stage = "graphics";
+    const context = Policy.createContext(canvas); compatibility = context.compatibility;
+    renderer = new THREE.WebGLRenderer({ canvas, context: context.context, alpha: false, antialias: !compatibility });
+    stage = "material"; status();
     let preparationError;
     const prepared = prepareSculpture().catch(error => { preparationError = error; return null; });
-    THREE = await import("./vendor/three.module.min.js");
-    const { HDRLoader } = await import("./vendor/HDRLoader.js");
-    if (disposed) return;
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true, powerPreference: "high-performance" });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
     renderer.setClearColor(0x080909, 1);
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(38, 1, .1, 100);
-    const response = await fetch(new URL("environment/studio-small-03-1k.hdr", base), { signal: AbortSignal.timeout(15000) });
-    if (!response.ok) throw Error("Studio environment unavailable");
-    const hdri = new HDRLoader().parse(await response.arrayBuffer());
+    const pixels = await studio;
+    if (!pixels) throw studioError;
     if (disposed) return;
-    // Retain the studio's shapes while protecting gold detail in the brightest
-    // softboxes. Unbounded capture peaks otherwise clip the metal to white.
-    const half = hdri.type === THREE.HalfFloatType;
-    for (let i = 0; i < hdri.data.length; i += 4) {
-      const rgb = [0,1,2].map(c => half ? THREE.DataUtils.fromHalfFloat(hdri.data[i+c]) : hdri.data[i+c]);
-      const scale = 4.5 / (4.5 + Math.max(...rgb));
-      for (let c = 0; c < 3; c++) hdri.data[i+c] = half ? THREE.DataUtils.toHalfFloat(rgb[c]*scale) : rgb[c]*scale;
+    // The original studio was highlight-compressed to 4.5 before PMREM. The
+    // compact asset stores those same values in sRGB; restore linear HDR range.
+    const linear = Float32Array.from({ length: 256 }, (_, i) => { const v = i / 255; return 4.5 * (v <= .04045 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4)); });
+    const lightingData = new Uint16Array(pixels.data.length);
+    for (let i = 0; i < lightingData.length; i += 4) {
+      for (let c = 0; c < 3; c++) lightingData[i+c] = THREE.DataUtils.toHalfFloat(linear[pixels.data[i+c]]);
+      lightingData[i+3] = THREE.DataUtils.toHalfFloat(1);
     }
+    const hdri = { data: lightingData, width: pixels.width, height: pixels.height, type: THREE.HalfFloatType };
     environmentData = hdri; rebuildEnvironment();
     scene.environmentRotation.set(.7, .6, .1);
     scene.environmentIntensity = 1;
@@ -141,6 +202,7 @@
     sculpture.rotation.z = -.04; scene.add(sculpture);
     const key = new THREE.DirectionalLight(0xffedce, 1.4); key.position.set(-3, 5, 6); scene.add(key);
     const rim = new THREE.DirectionalLight(0xffd18a, 1.0); rim.position.set(4, 3, -4); scene.add(rim);
+    if (lost) throw Object.assign(Error("Graphics context lost while preparing"), { worldReason: "graphics" });
     ready = true; host.dataset.renderer = "physical-gold-helix";
     applySize(); render(); document.body.classList.add("world-ready"); wake();
   }
@@ -197,7 +259,12 @@
     } else { pose = Helix.cameraAt(chapter, 0, 0); pointerNow = [0, 0]; }
     const paintTime = Policy.nextPaint(now, lastPaint);
     if (paintTime !== null || resized || reduced) {
-      const started = performance.now(); render();
+      const started = performance.now();
+      try { render(); } catch (error) {
+        releaseResources(); renderState = "fallback"; failureReason = "graphics";
+        host.dataset.renderer = "poster"; document.body.classList.remove("world-ready"); status();
+        console.warn("AURUM render interrupted:", error.message); return;
+      }
       const cost = performance.now() - started, paintInterval = lastRenderStamp ? now - lastRenderStamp : 0;
       if (!reduced && governor.sample(Math.max(paintInterval, cost))) resizePending = true;
       lastRenderStamp = now; lastPaint = paintTime ?? now;
@@ -209,7 +276,7 @@
     if (!reduced) frame = requestAnimationFrame(tick);
   }
   function wake() {
-    host.dataset.motion = reduced ? "reduced" : paused ? "paused" : "active";
+    status();
     if (!frame && !paused && !lost && !disposed && ready) { last = 0; lastPaint = null; lastRenderStamp = 0; frame = requestAnimationFrame(tick); }
   }
   function setChapter(id) {
@@ -222,30 +289,59 @@
     scrollTarget = Math.min(5, Math.max(0, scrollY / Math.max((height > 1 ? height : innerHeight) * .9, 1)));
     wake();
   }
-  function cleanup() {
-    disposed = true; if (frame) cancelAnimationFrame(frame);
-    overlayObserver.disconnect();
-    if (restoreFrame) cancelAnimationFrame(restoreFrame); environmentData = null;
+  function releaseResources() {
+    if (frame) cancelAnimationFrame(frame); frame = 0; ready = false;
+    if (restoreFrame) cancelAnimationFrame(restoreFrame); restoreFrame = 0; environmentData = null;
     clearTimeout(preparationTimer); preparationWorker?.terminate(); preparationWorker = null;
     geometry?.dispose(); material?.dispose(); normalMap?.dispose(); roughnessMap?.dispose(); environment?.dispose(); renderer?.dispose();
+    geometry = material = normalMap = roughnessMap = environment = renderer = scene = sculpture = camera = null;
+    bufferWidth = bufferHeight = bufferRatio = 0; resizePending = true; projectionShift = NaN;
   }
-  canvas.addEventListener("webglcontextlost", e => {
+  function cleanup() { disposed = true; overlayObserver.disconnect(); releaseResources(); }
+  function onContextLost(e) {
     e.preventDefault(); contextLosses++; lost = true; if (frame) cancelAnimationFrame(frame); frame = 0;
     if (restoreFrame) cancelAnimationFrame(restoreFrame); restoreFrame = 0;
     document.body.classList.remove("world-ready"); host.dataset.renderer = "poster";
-  });
-  canvas.addEventListener("webglcontextrestored", () => {
-    // Three.js restores its GL state later in this same event dispatch. Rebuild
-    // the render-target pixels next frame, before revealing the metal again.
+    renderState = "lost"; failureReason = "graphics"; status();
+  }
+  function onContextRestored() {
+    // Three.js restores its GL state later in this same event dispatch.
     restoreFrame = requestAnimationFrame(() => {
       restoreFrame = 0; if (disposed) return;
       if (!ready) { lost = false; return; }
       try {
         rebuildEnvironment(); lost = false; bufferRatio = 0; applySize(); render(); governor.reset();
-        host.dataset.renderer = "physical-gold-helix"; document.body.classList.add("world-ready"); wake();
-      } catch (error) { lost = true; host.dataset.renderer = "poster"; console.warn("AURUM environment recovery:", error.message); }
+        host.dataset.renderer = "physical-gold-helix"; renderState = "ready"; failureReason = "";
+        document.body.classList.add("world-ready"); wake();
+      } catch (error) { lost = true; host.dataset.renderer = "poster"; renderState = "lost"; status(); console.warn("AURUM environment recovery:", error.message); }
     });
-  });
+  }
+  function bindCanvas() {
+    canvas.addEventListener("webglcontextlost", onContextLost);
+    canvas.addEventListener("webglcontextrestored", onContextRestored);
+  }
+  async function start() {
+    if (loading || disposed) return;
+    loading = true; attempt++; renderState = "loading"; failureReason = ""; stage = "engine"; status();
+    releaseResources(); lost = false;
+    if (attempt > 1) {
+      // Context attributes cannot be changed on an existing canvas. A retry gets a clean surface.
+      const previous = canvas; canvas = previous.cloneNode(false);
+      previous.removeEventListener("webglcontextlost", onContextLost);
+      previous.removeEventListener("webglcontextrestored", onContextRestored);
+      previous.replaceWith(canvas); bindCanvas();
+    }
+    document.body.classList.remove("world-ready"); host.dataset.renderer = "poster";
+    try {
+      await setup(); if (disposed) return;
+      renderState = "ready"; failureReason = "";
+    } catch (error) {
+      releaseResources(); renderState = "fallback"; failureReason = error.worldReason || stage;
+      document.body.classList.remove("world-ready"); host.dataset.renderer = "poster";
+      console.warn("AURUM sculpture fallback:", error.message);
+    } finally { loading = false; if (!disposed) status(); }
+  }
+  bindCanvas();
   addEventListener("resize", resize, { passive: true }); addEventListener("scroll", onScroll, { passive: true });
   addEventListener("pointermove", e => {
     if (e.pointerType !== "touch" && !touch.matches && !readingOverlay()) pointer = [(e.clientX / innerWidth - .5) * 2, (.5 - e.clientY / innerHeight) * 2];
@@ -261,20 +357,24 @@
   overlayObserver.observe(document.body,{attributes:true,attributeFilter:["class"]});
   document.addEventListener("visibilitychange",syncReadingState);
   addEventListener("aurum:motion", e => setMotion(e.detail));
-  media.addEventListener("change", () => setMotion(media.matches || document.body.classList.contains("light-motion")));
+  media.addEventListener("change", () => setMotion(Policy.motionReduced(storedMotion(), media.matches)));
   addEventListener("pagehide", e => { if (e.persisted) { paused = true; if (frame) cancelAnimationFrame(frame); frame = 0; } else cleanup(); });
   addEventListener("pageshow", e => { if (e.persisted) { paused = document.hidden || readingOverlay(); wake(); } });
-  window.AurumWorld = { setChapter, setMotion };
+  window.AurumWorld = { setChapter, setMotion, retry: start };
+  document.getElementById("retryScene")?.addEventListener("click", start);
+  addEventListener("online", () => {
+    if (renderState === "fallback" && ["engine","material"].includes(failureReason) && reconnectRetries < 1) { reconnectRetries++; start(); }
+  });
   if (!document.querySelector(".chapter-nav")) {
     const button = document.getElementById("motionToggle");
     function sync() { button?.setAttribute("aria-pressed", String(reduced)); button?.setAttribute("aria-label", reduced ? "恢复标准动效" : "减少动态效果"); }
     if (button) button.onclick = () => {
       const next = !reduced; document.body.classList.toggle("light-motion", next);
       try { localStorage.setItem("aurum-motion-v1", next ? "reduced" : "standard"); } catch {}
-      setMotion(next || media.matches); sync();
+      setMotion(next); sync();
     };
     sync();
   }
   setChapter(location.hash.slice(1) || host.dataset.scene || "overview"); onScroll();
-  setup().catch(error => { cleanup(); host.dataset.renderer = "poster"; document.body.classList.remove("world-ready"); console.warn("AURUM sculpture fallback:", error.message); });
+  start();
 })();

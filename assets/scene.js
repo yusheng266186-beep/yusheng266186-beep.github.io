@@ -5,7 +5,9 @@
   const pages = ["overview", "history", "forecast", "trading", "intelligence"];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)"), phone = matchMedia("(max-width: 979px)");
   const animations = new Map(); let current = "overview", held = null;
-  function enabled() { return !reduce.matches && !document.body.classList.contains("light-motion"); }
+  let motionPreference = "auto";
+  try { motionPreference = localStorage.getItem("aurum-motion-v1") || "auto"; } catch {}
+  function enabled() { return !window.AurumRenderPolicy.motionReduced(motionPreference, reduce.matches); }
   function animate(el, frames, duration = 420, spring = false, delay = 0) {
     if (!el || !enabled() || !el.animate) return;
     animations.get(el)?.cancel();
@@ -98,19 +100,22 @@
   ["pointerup", "pointercancel", "blur"].forEach(type => window.addEventListener(type, release));
   document.addEventListener("visibilitychange", () => { if (document.hidden) { release(); animations.forEach(a => a.cancel()); document.body.classList.add("scene-paused"); } else document.body.classList.remove("scene-paused"); });
   function syncMotion() {
-    const minimized = !enabled(), button = Q("#motionToggle");
+    const minimized = !enabled(), button = Q("#motionToggle"), select = Q("#motionPreference");
+    document.body.classList.toggle("light-motion", minimized);
     button.setAttribute("aria-pressed", String(minimized));
     button.setAttribute("aria-label", minimized ? "恢复标准动效" : "减少动态效果");
-    button.title = reduce.matches ? "系统已启用减少动态效果" : minimized ? "恢复标准动效" : "减少动态效果";
+    button.title = minimized ? (motionPreference === "auto" && reduce.matches ? "系统减少动效已开启 · 点击恢复本站动效" : "恢复标准动效") : "减少动态效果";
+    if (select) select.value = ["standard","reduced"].includes(motionPreference) ? motionPreference : "auto";
     if (minimized) { animations.forEach(a => a.cancel()); document.getAnimations().forEach(a => a.cancel()); }
     dispatchEvent(new CustomEvent("aurum:motion", { detail: minimized }));
   }
-  try { if (localStorage.getItem("aurum-motion-v1") === "reduced") document.body.classList.add("light-motion"); } catch {}
-  Q("#motionToggle").onclick = () => {
-    const on = document.body.classList.toggle("light-motion");
-    try { localStorage.setItem("aurum-motion-v1", on ? "reduced" : "standard"); } catch {}
+  function chooseMotion(preference) {
+    motionPreference = ["standard","reduced"].includes(preference) ? preference : "auto";
+    try { if (motionPreference === "auto") localStorage.removeItem("aurum-motion-v1"); else localStorage.setItem("aurum-motion-v1", motionPreference); } catch {}
     syncMotion();
-  };
+  }
+  Q("#motionToggle").onclick = () => chooseMotion(enabled() ? "reduced" : "standard");
+  Q("#motionPreference")?.addEventListener("change", e => chooseMotion(e.target.value));
   reduce.addEventListener("change", syncMotion);
   // Reading surfaces remain fully visible during native scrolling. Fading or
   // translating a large translucent panel changes its compositor surface and

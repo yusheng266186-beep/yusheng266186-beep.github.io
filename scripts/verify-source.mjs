@@ -21,7 +21,9 @@ async function checkModule(file){
   for(const match of source.matchAll(/(?:import\s*\(\s*|from\s*)["'](\.[^"']+)["']/g))await checkModule(resolve(dirname(file),match[1]));
 }
 await checkModule('assets/gold-world.js');
+await checkModule('assets/vendor/three.module.min.js');
 await access('assets/environment/studio-small-03-1k.hdr');
+await access('assets/environment/studio-lighting-1k.webp');
 for(const match of html.matchAll(/(?:src|href)="(assets\/[^"?#]+)(?:[?#][^"]*)?"/g))await access(match[1]);
 const fonts=await readFile('assets/fonts.css','utf8');
 for(const match of fonts.matchAll(/url\(["']?([^\s)'"?#]+)/g))await access(resolve('assets',match[1]));

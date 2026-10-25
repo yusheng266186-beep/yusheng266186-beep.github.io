@@ -41,5 +41,33 @@
       }
     };
   }
-  return { pixelRatio, nextPaint, governor };
+  function motionReduced(preference, systemReduced) {
+    return preference === "reduced" || (preference !== "standard" && !!systemReduced);
+  }
+  function createContext(canvas) {
+    // Some integrated GPUs reject a high-performance/MSAA context but support a lean one.
+    for (const options of [{ antialias: true, powerPreference: "high-performance" }, { antialias: false, powerPreference: "default" }]) {
+      try {
+        const context = canvas.getContext("webgl2", { alpha: false, ...options });
+        if (context) return { context, compatibility: !options.antialias };
+      } catch {}
+    }
+    throw Object.assign(Error("WebGL 2 unavailable"), { worldReason: "graphics" });
+  }
+  async function fetchBuffer(url, { timeoutMs = 15000, retries = 1, fetchImpl = fetch, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
+    for (let attempt = 0; ; attempt++) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetchImpl(url, { signal: controller.signal, cache: attempt ? "reload" : "default" });
+        if (!response.ok) throw Object.assign(Error("Scene resource HTTP " + response.status), { retryable: response.status === 429 || response.status >= 500 });
+        // The deadline includes body download, not just receipt of headers.
+        return await response.arrayBuffer();
+      } catch (error) {
+        if (attempt >= retries || error.retryable === false) throw error;
+      } finally { clearTimeout(timer); }
+      await wait(500 * (attempt + 1));
+    }
+  }
+  return { pixelRatio, nextPaint, governor, motionReduced, createContext, fetchBuffer };
 });
