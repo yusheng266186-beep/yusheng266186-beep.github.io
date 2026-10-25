@@ -1,0 +1,17 @@
+import {readFile,writeFile,rename} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {decision,generate,aiInput,canonicalize} from './analysis-ai.mjs';
+const require=createRequire(import.meta.url),Analysis=require('../assets/analysis-engine.js'),json=async file=>{try{return JSON.parse(await readFile(file,'utf8'));}catch{return null;}},save=async(file,data)=>{await writeFile(file+'.tmp',JSON.stringify(data,null,2)+'\n');await rename(file+'.tmp',file);};
+const [history,news,research,publication,previous,oldUsage]=await Promise.all(['data/market-history.json','data/news.json','data/research-factors.json','data/forecast-publication.json','data/analysis-desk.json','data/analysis-ai-usage.json'].map(json)),now=Date.now(),desk=Analysis.build({history,news,research,publication},now),usage={schema:1,attempts:Array.isArray(oldUsage?.attempts)?oldUsage.attempts.slice(-150):[]};
+if(previous?.narration?.inputKey===desk.inputKey&&['ready','partial'].includes(previous.narration.status)){try{const clean=canonicalize(previous.narration,aiInput(desk)),warnings=[...new Set([...(previous.narration.warnings||[]),...clean.warnings])];previous.narration={...previous.narration,...clean,warnings,status:warnings.length?'partial':'ready'};}catch{delete previous.narration;}}
+const selection=decision({desk,previous,usage,now,configured:!!process.env.AURUM_CODEBUDDY_API_KEY});
+if(process.argv.includes('--refresh-ai')&&process.env.AURUM_CODEBUDDY_API_KEY&&usage.attempts.filter(a=>a.day===new Date(now+8*3600000).toISOString().slice(0,10)).length<12){selection.call=true;selection.day=new Date(now+8*3600000).toISOString().slice(0,10);}
+if(process.argv.includes('--repair-protocol')&&process.env.AURUM_CODEBUDDY_API_KEY&&usage.attempts.at(-1)?.error==='MODEL_HTTP_400'&&usage.attempts.filter(a=>a.day===new Date(now+8*3600000).toISOString().slice(0,10)).length<12){selection.call=true;selection.day=new Date(now+8*3600000).toISOString().slice(0,10);}
+if(previous?.narration?.inputKey===desk.inputKey&&['ready','partial'].includes(previous.narration.status))desk.narration=previous.narration;
+else desk.narration={status:'structured',inputKey:desk.inputKey,reason:selection.reason||'本次按结构化证据生成'};
+if(selection.call){const attempt={day:selection.day,startedAt:new Date(now).toISOString(),inputKey:desk.inputKey,status:'dispatched'};usage.attempts.push(attempt);await save('data/analysis-ai-usage.json',usage);
+ try{desk.narration=await generate(desk,{key:process.env.AURUM_CODEBUDDY_API_KEY,now});attempt.status=desk.narration.status;attempt.completedAt=new Date().toISOString();attempt.usage=desk.narration.usage;}
+ catch(error){attempt.status='failed';attempt.completedAt=new Date().toISOString();attempt.error=/^[A-Z_0-9]+$/.test(error.message)?error.message:error.name==='TimeoutError'?'MODEL_TIMEOUT':'MODEL_CONTENT_ERROR';if(error.detail)attempt.detail=error.detail;desk.narration={status:'structured',inputKey:desk.inputKey,reason:'模型解读暂不可用；价格、证据与观察条件继续更新',lastAttempt:attempt.completedAt,error:attempt.error};}
+ await save('data/analysis-ai-usage.json',usage);
+}
+desk.aiPolicy={toolsRegistered:0,maxCallsPerDay:12,minimumIntervalMinutes:60,usedToday:usage.attempts.filter(a=>a.day===new Date(now+8*3600000).toISOString().slice(0,10)).length,mode:'只解读证据，不生成目标价或交易指令'};await save('data/analysis-desk.json',desk);console.log(JSON.stringify({ready:desk.ready,origin:desk.price?.origin,evidence:desk.facts.length,inputKey:desk.inputKey,narration:desk.narration.status,callMade:selection.call,usedToday:desk.aiPolicy.usedToday}));

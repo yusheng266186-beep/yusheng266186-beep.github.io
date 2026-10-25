@@ -31,3 +31,4 @@ jobs:
     needs: heartbeat
     if: needs.heartbeat.outputs.recover == 'true'
     uses: ./.github/workflows/refresh-research.yml
+    secrets: inherit
