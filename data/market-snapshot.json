@@ -50,48 +50,46 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-10-25T22:46:36.083Z",
-  "lastSuccessAt": "2026-10-25T22:46:36.083Z",
+  "checkedAt": "2026-10-25T22:51:35.409Z",
+  "lastSuccessAt": "2026-10-25T22:51:35.409Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-10-25T22:46:34.086Z",
+      "ok": false,
+      "checkedAt": "2026-10-25T22:51:34.232Z",
       "lastSuccessAt": "2026-10-25T22:46:34.086Z",
-      "kind": "quote",
-      "asOf": "2026-10-23T18:29:55.000Z",
-      "latencyMs": 1995
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-10-25T22:46:34.086Z",
-      "lastSuccessAt": "2026-10-25T22:46:34.086Z",
+      "checkedAt": "2026-10-25T22:51:34.232Z",
+      "lastSuccessAt": "2026-10-25T22:51:34.232Z",
       "kind": "quote",
       "asOf": "2026-10-25T12:00:00.000Z",
-      "latencyMs": 1888
+      "latencyMs": 839
     },
     {
       "source": "SGE delayed",
       "ok": false,
-      "checkedAt": "2026-10-25T22:46:34.086Z",
+      "checkedAt": "2026-10-25T22:51:34.232Z",
       "lastSuccessAt": null,
       "error": "Official page has no valid Au99.99 reference"
     }
   ],
   "officialReference": null,
-  "collectionMs": 1997,
+  "collectionMs": 1177,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 4013.5,
+    "priceUsdOz": 4016.60009765625,
     "previousUsdOz": 4007.89990234375,
     "priceCnyGram": null,
-    "asOf": "2026-10-25T22:36:31.000Z",
+    "asOf": "2026-10-25T22:41:26.000Z",
     "source": "Yahoo Finance GC=F delayed futures reference",
     "delay": "international delayed reference"
   }
