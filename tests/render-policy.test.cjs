@@ -42,3 +42,48 @@ test('sustained frame pressure lowers cost, isolated stalls do not, recovery is 
   assert.equal(g.quality, .7);
   g.sample(60000); assert.equal(g.quality, .7);
 });
+
+test('explicit site motion preference overrides system reduction, auto follows the system', () => {
+  assert.equal(P.motionReduced('standard', true), false);
+  assert.equal(P.motionReduced('reduced', false), true);
+  assert.equal(P.motionReduced('auto', true), true);
+  assert.equal(P.motionReduced(null, false), false);
+});
+
+test('a rejected high-performance context retries a lean WebGL 2 context', () => {
+  const calls=[], context={};
+  const result=P.createContext({getContext(type,options){calls.push({type,...options});if(calls.length===1)throw Error('GPU request rejected');return context;}});
+  assert.equal(result.context,context);assert.equal(result.compatibility,true);
+  assert.deepEqual(calls.map(x=>[x.type,x.antialias,x.powerPreference]),[['webgl2',true,'high-performance'],['webgl2',false,'default']]);
+  assert.throws(()=>P.createContext({getContext(){return null;}}),e=>e.worldReason==='graphics');
+});
+
+test('lighting retries a truncated body and succeeds without AbortSignal.timeout', async () => {
+  const vm=require('node:vm'),fs=require('node:fs');
+  const sandbox={module:{exports:{}},AbortController,AbortSignal:{},setTimeout,clearTimeout};
+  vm.runInNewContext(fs.readFileSync(require.resolve('../assets/render-policy.js'),'utf8'),sandbox);
+  const compatibilityPolicy=sandbox.module.exports;
+  let calls=0;const buffer=new ArrayBuffer(4);
+  const result=await compatibilityPolicy.fetchBuffer('studio',{wait:async()=>{},fetchImpl:async()=>{
+    calls++;return{ok:true,arrayBuffer:async()=>{if(calls===1)throw Error('connection reset midway');return buffer;}};
+  }});
+  assert.equal(result,buffer);assert.equal(calls,2);
+});
+
+test('scene downloads have a full-body deadline and a finite retry budget', async () => {
+  let calls=0,aborts=0;
+  await assert.rejects(P.fetchBuffer('studio',{timeoutMs:5,wait:async()=>{},fetchImpl:async(_,options)=>{
+    calls++;return{ok:true,arrayBuffer:()=>new Promise((resolve,reject)=>options.signal.addEventListener('abort',()=>{aborts++;reject(Error('body timed out'));},{once:true}))};
+  }}),/body timed out/);
+  assert.equal(calls,2);assert.equal(aborts,2);
+});
+
+test('blocked or missing resources fail promptly, transient server failures retry', async () => {
+  for(const status of [403,404]){
+    let calls=0;
+    await assert.rejects(P.fetchBuffer('studio',{wait:async()=>{},fetchImpl:async()=>{calls++;return{ok:false,status};}}),new RegExp(String(status)));
+    assert.equal(calls,1);
+  }
+  let calls=0;await P.fetchBuffer('studio',{wait:async()=>{},fetchImpl:async()=>++calls===1?{ok:false,status:503}:{ok:true,arrayBuffer:async()=>new ArrayBuffer(1)}});
+  assert.equal(calls,2);
+});
