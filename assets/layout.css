@@ -274,3 +274,41 @@
 .system-components .system-unit{font-size:13px;line-height:1.8;white-space:nowrap;color:var(--muted);margin:6px 0 14px}.system-components strong,.system-quantiles strong{font-variant-numeric:tabular-nums;white-space:nowrap;overflow-wrap:normal}@media(max-width:420px){.system-quantiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 @media(max-width:420px){.system-quantiles>div{padding:16px 0}}
+
+/* Keep the scenario flow small; full research records live on the research page. */
+#forecast>.assumption-console,#forecast>.forecast-details{margin-top:24px}
+.forecast-details,.forecast-archive{padding:0}
+#forecast>.assumption-console>.assumption-summary{padding:24px 28px;min-height:0;gap:20px}
+#forecast>.assumption-console .assumption-heading h2{font-size:22px;margin:0 0 6px;line-height:1.5}
+#forecast>.assumption-console .assumption-heading p{font-size:11px}
+#forecast>.assumption-console .assumption-score strong{font-size:27px}
+.forecast-details>summary,.forecast-archive>summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 28px;list-style:none;cursor:pointer}
+.forecast-details>summary::-webkit-details-marker,.forecast-archive>summary::-webkit-details-marker{display:none}
+.forecast-details>summary>div,.forecast-archive>summary>div{min-width:0}
+.forecast-details>summary h2,.forecast-archive>summary h2{font-size:22px;line-height:1.5;margin:0 0 8px}
+.forecast-details>summary p,.forecast-archive>summary p{font-size:11px;line-height:1.9;margin:0;color:var(--muted)}
+.forecast-details>summary>span,.forecast-archive>summary>span{font-size:11px;color:var(--gold);flex-shrink:0}
+.forecast-details:not([open]) .when-open,.forecast-details[open] .when-closed,.forecast-archive:not([open]) .when-open,.forecast-archive[open] .when-closed{display:none}
+.forecast-details-body{padding:0 28px 26px;min-width:0}
+.forecast-detail-tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:17px;margin-bottom:24px}
+.forecast-detail-tabs button{padding:9px 17px;border-radius:22px;border:1px solid transparent;color:var(--muted);font-size:12px;line-height:1.7}
+.forecast-detail-tabs button[aria-selected=true]{border-color:#d5b77766;background:#d5b7770c;color:var(--gold)}
+.forecast-detail-pane{min-width:0}
+.forecast-detail-pane[hidden]{display:none!important}
+.forecast-detail-pane>details{margin:0;padding:0;border:0;background:none;box-shadow:none;border-radius:0}
+.forecast-detail-pane>details>summary{display:none}
+.forecast-detail-pane .evidence-content,.forecast-detail-pane .lab-content{padding:0}
+.forecast-detail-pane .lab-footer{margin-bottom:16px}
+.forecast-detail-pane>.prospective-audit{margin:20px 0 0;font-size:11px;line-height:1.9}
+.forecast-archive-link{display:inline-block;margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:11px}
+.forecast-archive{margin:28px 0}
+.forecast-archive>summary .eyebrow{font-size:9px;margin-bottom:10px}
+.forecast-archive-body{padding:0 28px 26px;min-width:0}
+.forecast-archive-nav{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:20px;font-size:12px;color:var(--gold)}
+.forecast-archive-body>details{margin:0;border:0;border-top:1px solid var(--line);border-radius:0;background:none;box-shadow:none}
+.forecast-archive-body>details>summary{padding:22px 0;gap:18px}
+.forecast-archive-body .replay-lab>summary h2{font-size:20px;margin:0 0 7px;line-height:1.65}
+.forecast-archive-body .replay-lab>summary .eyebrow{display:none}
+.forecast-archive-body .replay-lab>summary p{font-size:11px;line-height:1.9}
+.forecast-archive-body .method-card{padding:0}
+@media(max-width:600px){#forecast>.assumption-console>.assumption-summary,.forecast-details>summary,.forecast-archive>summary{padding:21px 20px;gap:14px}.forecast-details>summary{align-items:flex-start}.forecast-details>summary h2,.forecast-archive>summary h2,#forecast>.assumption-console .assumption-heading h2{font-size:20px}.forecast-details-body,.forecast-archive-body{padding:0 20px 22px}.forecast-detail-tabs{gap:5px}.forecast-detail-tabs button{padding:8px 11px;font-size:11px;flex:1}.forecast-detail-pane .audit-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.forecast-archive>summary{align-items:flex-start}.forecast-archive>summary>span{padding-top:10px}}
