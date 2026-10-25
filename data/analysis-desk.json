@@ -1,0 +1,3073 @@
+{
+  "schema": 1,
+  "engine": "analysis-desk-1",
+  "ready": true,
+  "generatedAt": "2026-10-25T15:33:15.093Z",
+  "inputKey": "5264b5d72eda2c53",
+  "sourceTimes": {
+    "history": "2026-10-25T15:16:17.227Z",
+    "news": "2026-10-25T15:16:15.558Z",
+    "research": "2026-10-25T15:16:13.277Z",
+    "publication": "2026-10-25T15:16:17.473Z"
+  },
+  "price": {
+    "origin": "2026-10-23",
+    "close": 864,
+    "observedAt": "2026-10-25T15:16:13.304Z",
+    "source": "东方财富 AU9999 历史行情（上金所）",
+    "url": "https://quote.eastmoney.com/q/118.AU9999.html",
+    "count": 1799,
+    "ma20": 904.912,
+    "ma60": 928.794,
+    "high20": 951.5,
+    "low20": 856.01,
+    "atr14": 14.937857142857142,
+    "sigma20": 0.0113003491624699,
+    "return5": -4.16717503909847,
+    "return20": -7.574801296520139,
+    "rangePosition": 0.08367368310817895,
+    "drawdown60": -13.9622190577668
+  },
+  "facts": [
+    {
+      "id": "P-CLOSE",
+      "kind": "price",
+      "label": "最近已确认收盘",
+      "value": 864,
+      "unit": "元 / 克",
+      "publishedAt": "2026-10-23T15:30:00+08:00",
+      "knownAt": "2026-10-25T15:16:13.304Z",
+      "source": "东方财富 AU9999 历史行情（上金所）",
+      "url": "https://quote.eastmoney.com/q/118.AU9999.html",
+      "group": "价格",
+      "direction": 0
+    },
+    {
+      "id": "P-RETURN20",
+      "kind": "price",
+      "label": "20个交易记录涨跌",
+      "value": -7.574801296520139,
+      "unit": "%",
+      "publishedAt": "2026-10-23T15:30:00+08:00",
+      "knownAt": "2026-10-25T15:16:13.304Z",
+      "source": "东方财富 AU9999 历史行情（上金所）",
+      "url": "https://quote.eastmoney.com/q/118.AU9999.html",
+      "group": "价格",
+      "direction": 0
+    },
+    {
+      "id": "F-cny",
+      "kind": "factor",
+      "factorId": "cny",
+      "label": "人民币 / 美元",
+      "value": 6.670240328776915,
+      "change": -0.6404221119996167,
+      "unit": "人民币 / 美元",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-24T02:34:06.122Z",
+      "source": "ecb",
+      "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml",
+      "timePrecision": "date-only",
+      "group": "汇率",
+      "direction": -1,
+      "note": "20 个参考日变化；人民币走弱对国内克价偏正向",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": false
+    },
+    {
+      "id": "F-usd",
+      "kind": "factor",
+      "factorId": "usd",
+      "label": "美元 / 欧元代理",
+      "value": 0.893415527561869,
+      "change": 1.8761726078799335,
+      "unit": "美元 / 欧元",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-24T02:34:06.122Z",
+      "source": "ecb",
+      "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml",
+      "timePrecision": "date-only",
+      "group": "汇率",
+      "direction": -1,
+      "note": "双边汇率代理，不是美元指数；美元走强偏负向",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": false
+    },
+    {
+      "id": "F-realRates",
+      "kind": "factor",
+      "factorId": "realRates",
+      "label": "美国 10 年实际收益率",
+      "value": 2.66,
+      "change": -0.18999999999999995,
+      "unit": "%",
+      "changeUnit": "百分点",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "treasury",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_real_yield_curve&field_tdr_date_value=2026",
+      "timePrecision": "date-only",
+      "group": "利率",
+      "direction": 1,
+      "note": "20 个参考日变动；实际收益率上升偏负向",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": false
+    },
+    {
+      "id": "F-risk",
+      "kind": "factor",
+      "factorId": "risk",
+      "label": "VIX 风险情绪",
+      "value": 19.45,
+      "change": 30.800268997982517,
+      "unit": "点",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-24T02:34:06.122Z",
+      "source": "cboe",
+      "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+      "timePrecision": "date-only",
+      "group": "风险",
+      "direction": 1,
+      "note": "权益波动代理；流动性冲击下相关关系可能改变",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": false
+    },
+    {
+      "id": "F-nominal2y",
+      "kind": "factor",
+      "factorId": "nominal2y",
+      "label": "美国 2 年名义收益率",
+      "value": 4.69,
+      "change": -0.17999999999999972,
+      "unit": "%",
+      "changeUnit": "百分点",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "nominal",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value=2026",
+      "timePrecision": "date-only",
+      "group": "利率",
+      "direction": 0,
+      "note": "短端利率监测代理；避免与实际收益率重复施加方向先验",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": true
+    },
+    {
+      "id": "F-yieldCurve",
+      "kind": "factor",
+      "factorId": "yieldCurve",
+      "label": "10 年减 2 年利差",
+      "value": 0.3099999999999996,
+      "change": 0,
+      "unit": "百分点",
+      "changeUnit": "百分点",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "nominal",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value=2026",
+      "timePrecision": "date-only",
+      "group": "利率",
+      "direction": 0,
+      "note": "监测经济周期，不预设固定黄金涨跌方向；档案充足后才可估计系数",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": true
+    },
+    {
+      "id": "F-oil",
+      "kind": "factor",
+      "factorId": "oil",
+      "label": "WTI 原油",
+      "value": 107.89,
+      "change": 11.907478477336376,
+      "unit": "美元 / 桶",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-20T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "oil",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+      "timePrecision": "date-only",
+      "group": "能源",
+      "direction": 0,
+      "note": "通胀与增长的混合代理，监测输入；不预设固定利好利坏",
+      "ageDays": 5.648091354166667,
+      "monitorOnly": true
+    },
+    {
+      "id": "F-positioning",
+      "kind": "factor",
+      "factorId": "positioning",
+      "label": "CFTC 管理资金净持仓占比",
+      "value": 25.903912458766182,
+      "change": null,
+      "unit": "%",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-20T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "positioning",
+      "url": "https://www.cftc.gov/dea/newcot/f_disagg.txt",
+      "timePrecision": "date-only",
+      "group": "资金持仓",
+      "direction": 0,
+      "note": "COMEX 黄金期货、仅期货；周度头寸可能滞后，不把拥挤方向等同于未来涨跌",
+      "ageDays": 5.648091354166667,
+      "monitorOnly": true
+    },
+    {
+      "id": "F-inflation",
+      "kind": "factor",
+      "factorId": "inflation",
+      "label": "10 年盈亏平衡通胀近似",
+      "value": 2.34,
+      "change": 0.010000000000000231,
+      "unit": "%",
+      "changeUnit": "百分点",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "treasury-derived",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value=2026",
+      "timePrecision": "date-only",
+      "group": "通胀",
+      "direction": 0,
+      "note": "同日名义减实际收益率，含风险与流动性溢价；监测输入，不作纯通胀预期",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": true
+    },
+    {
+      "id": "N-f00c8895e753b41d",
+      "kind": "event",
+      "label": "Russia to host first Olympic federation world event since Ukraine invasion",
+      "summary": "The International Weightlifting Federation becomes the first Olympic federation to choose Russia to host a world championships since its invasion of Ukraine.",
+      "publishedAt": "2026-10-25T14:34:33.000Z",
+      "knownAt": "2026-10-25T15:16:15.558Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/sport/olympics/articles/cmq5ny00gzy0o?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/sport/olympics/articles/cmq5ny00gzy0o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.04076496527777778,
+      "weight": 42
+    },
+    {
+      "id": "N-d6649a9a173a92ea",
+      "kind": "event",
+      "label": "Saudi Arabia says it intercepted missiles and drones from Iran-backed Houthis",
+      "summary": "Saudi Arabia says it intercepted Houthi missiles and drones, while the Houthis claimed attacks on airports and energy sites amid rising regional supply risks.",
+      "publishedAt": "2026-10-25T13:41:37.000Z",
+      "knownAt": "2026-10-25T15:16:15.558Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/25/saudi-arabia-houthi-missile-drone-interceptions.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/25/saudi-arabia-houthi-missile-drone-interceptions.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.07752422453703704,
+      "weight": 42
+    },
+    {
+      "id": "N-377d76083d83b890",
+      "kind": "event",
+      "label": "消息：伊朗并未通过巴基斯坦向美国提交新方案",
+      "summary": "一名知情人士称，有关伊朗提议以重新开放霍尔木兹海峡换取美国解除海上封锁的报道“虚假且纯属幻想”。 这名消息人士说：“从根本上说...",
+      "publishedAt": "2026-10-25T13:38:09.000Z",
+      "knownAt": "2026-10-25T15:16:15.558Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-25/doc-iniwncyk2872683.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-25/doc-iniwncyk2872683.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.07993163194444444,
+      "weight": 70
+    },
+    {
+      "id": "N-04fdee93b1599697",
+      "kind": "event",
+      "label": "Musk says SpaceX restricted Ukraine's Starlink connection as service restored",
+      "summary": "The tech billionaire accuses Ukraine of violating its terms of service by using the network for military activity.",
+      "publishedAt": "2026-10-25T08:15:24.000Z",
+      "knownAt": "2026-10-25T08:24:34.712Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/cvx28ljp8n4xo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cvx28ljp8n4xo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.30406357638888887,
+      "weight": 42
+    },
+    {
+      "id": "N-a3e77558d513caea",
+      "kind": "event",
+      "label": "Why is Ukraine so reliant on Starlink and can Europe plug the gap?",
+      "summary": "Ukraine needs another satellite internet service, but a decent alternative to Elon Musk's network doesn't exist - yet.",
+      "publishedAt": "2026-10-25T05:45:31.000Z",
+      "knownAt": "2026-10-25T06:29:59.313Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/c65yn97xe7ypo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/c65yn97xe7ypo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.40814922453703706,
+      "weight": 42
+    },
+    {
+      "id": "N-fddfc9162a9cd8d2",
+      "kind": "event",
+      "label": "伊朗否认以霍尔木兹海峡换解除封锁的报道，称系\"谎言与幻想\"",
+      "summary": "知情人士称，伊朗未向巴基斯坦调停人提出任何新方案，并拒绝所谓以重新开放霍尔木兹海峡换取美国解除海上封锁的报道。该消息人士驳斥阿拉伯卫星电视台关于德黑兰已向华盛顿...",
+      "publishedAt": "2026-10-24T21:37:39.000Z",
+      "knownAt": "2026-10-24T23:21:59.241Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkrxa3325699.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkrxa3325699.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.7469455208333333,
+      "weight": 70
+    },
+    {
+      "id": "N-82d554a31f1cfc3d",
+      "kind": "event",
+      "label": "After SpaceX restores high-speed service, Musk claims Ukraine violated Starlink agreement",
+      "summary": "Ukraine says restrictions on Starlink and Starshield have been lifted, restoring connectivity to fast-moving military systems after disruptions.",
+      "publishedAt": "2026-10-24T20:38:30.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/24/ukraine-starlink-starshield-service-restored.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/24/ukraine-starlink-starshield-service-restored.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.7880219097222222,
+      "weight": 42
+    },
+    {
+      "id": "N-8ecfc6f57072f4ff",
+      "kind": "event",
+      "label": "特朗普称与马斯克谈过乌克兰局势",
+      "summary": "特朗普表示，他已与SpaceX创始人马斯克就乌克兰局势进行了交流。 特朗普拒绝透露与马斯克谈话的具体内容。",
+      "publishedAt": "2026-10-24T20:34:51.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkmre3445545.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkmre3445545.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.7905566319444445,
+      "weight": 70
+    },
+    {
+      "id": "N-5f2022b0d5a78b3c",
+      "kind": "event",
+      "label": "美国和以色列迎来关键选举 中东局势再度逼近危险关口",
+      "summary": "美国总统特朗普曾表示中东战争将在几周内结束，然而，这场战争如今已进入第八个月，而且看起来势将进一步升级。 特朗普多次暗示，在11月3日美国中期选举结束后...",
+      "publishedAt": "2026-10-24T19:51:04.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-25/doc-iniwkmre3436349.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-25/doc-iniwkmre3436349.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 0.8209617245370371,
+      "weight": 70
+    },
+    {
+      "id": "N-a488b1e95a2f8669",
+      "kind": "event",
+      "label": "伊朗航司外汇供给中断，机票涨价约40%",
+      "summary": "伊朗航空协会秘书长马吉德·阿赫拉吉周六称，受运营成本上涨、外汇短缺影响，伊朗机票价格上涨约40%。 阿赫拉吉表示，航空公司超半数运营开支需要以外币结算；银行已经一个...",
+      "publishedAt": "2026-10-24T18:22:30.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkfik0326184.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkfik0326184.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.8824663541666666,
+      "weight": 70
+    },
+    {
+      "id": "N-07af4f89ba46b4e3",
+      "kind": "event",
+      "label": "以色列央行驳斥内塔尼亚胡利用加密货币规避制裁的提议",
+      "summary": "以色列总理内塔尼亚胡提出，可以借助加密货币规避以色列可能遭遇的金融制裁，该想法遭到以色列央行的严厉反驳。 以色列央行周六发布声明称：“加密货币无法用来规避针对以色...",
+      "publishedAt": "2026-10-24T17:52:41.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkfik0320147.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkfik0320147.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 0.9031723726851851,
+      "weight": 70
+    },
+    {
+      "id": "N-c8d998acce4cefec",
+      "kind": "event",
+      "label": "俄官员：“尚难判断”局部停火是否影响乌克兰问题谈判",
+      "summary": "俄罗斯联邦武装力量总参谋长瓦列里·格拉西莫夫23日宣布，俄军将在赫尔松方向停火，并从莫斯科时间10月27日4时起进入“静默”状态，以配合将在赫尔松州阿列什基地区开展的人道...",
+      "publishedAt": "2026-10-24T17:44:26.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-25/doc-iniwkmri6938884.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/jjxw/2026-10-25/doc-iniwkmri6938884.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.9089015393518518,
+      "weight": 70
+    },
+    {
+      "id": "N-878c7907a6dcd25f",
+      "kind": "event",
+      "label": "American embassies tighten security as Iran threat warnings intensify ahead of U.S. midterm elections",
+      "summary": "A memo from DNI director Jay Clayton said Iran is in the \"advanced stages\" of planning attacks against Americans.",
+      "publishedAt": "2026-10-24T15:44:53.000Z",
+      "knownAt": "2026-10-24T16:03:39.170Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/24/iran-threats-us-embassies-middle-east.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/24/iran-threats-us-embassies-middle-east.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.9919223726851852,
+      "weight": 42
+    },
+    {
+      "id": "N-94efa546a366e304",
+      "kind": "event",
+      "label": "Ukraine says Starlink connection 'now stable' after network limits",
+      "summary": "The slowed Starlink connections had affected the Ukraine's military and drone operations for a week.",
+      "publishedAt": "2026-10-24T12:12:40.000Z",
+      "knownAt": "2026-10-24T12:14:04.109Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/cwkg5md14j8go?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cwkg5md14j8go?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.1392950578703704,
+      "weight": 42
+    },
+    {
+      "id": "N-8c3f729e14cdf4be",
+      "kind": "event",
+      "label": "America by the numbers: How voters feel about the economy, inflation, AI and Trump",
+      "summary": "With the U.S. midterm elections looming, Americans are nearly as gloomy about the economy as they were when the nation was emerging from the pandemic.",
+      "publishedAt": "2026-10-24T10:58:30.000Z",
+      "knownAt": "2026-10-24T16:03:39.170Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/america-by-the-numbers-how-voters-feel-about-the-economy-inflation-ai-and-trump.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/america-by-the-numbers-how-voters-feel-about-the-economy-inflation-ai-and-trump.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.1907996875,
+      "weight": 54
+    },
+    {
+      "id": "N-ca827896f907b158",
+      "kind": "event",
+      "label": "Piero Cipollone: Interview with Milano Finanza",
+      "summary": "Piero Cipollone: Interview with Milano Finanza",
+      "publishedAt": "2026-10-24T06:00:00.000Z",
+      "knownAt": "2026-10-24T07:38:05.521Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261024~ee2ba73cf3.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261024~ee2ba73cf3.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.3980913541666666,
+      "weight": 42
+    },
+    {
+      "id": "N-65f8fe5f8f7a53ef",
+      "kind": "event",
+      "label": "White House lifts tariffs on some Canadian goods as midterm elections loom",
+      "summary": "From 30 October, tariffs will be eased on some products, including certain machinery, and placed on others, such as carpets.",
+      "publishedAt": "2026-10-24T00:36:47.000Z",
+      "knownAt": "2026-10-24T07:38:05.521Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/c60qk573yzz8o?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/c60qk573yzz8o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.6225473726851851,
+      "weight": 42
+    },
+    {
+      "id": "N-839e5fe657d3c842",
+      "kind": "event",
+      "label": "10月24日隔夜要闻：美股三大指数收跌 油价大涨 金价下跌 特朗普称可能对伊发动一次小规模“史诗怒火”行动",
+      "summary": "市场 10月24日收盘：美股三大指数收跌 道指跌超600点 布油创4月以来新高 市场抛售范围扩大 10月24日热门中概股涨跌不一，台积电涨1.49%...",
+      "publishedAt": "2026-10-23T22:55:28.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnya2334385.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnya2334385.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.6929061689814815,
+      "weight": 70
+    },
+    {
+      "id": "N-4187a193fb6836dd",
+      "kind": "event",
+      "label": "报道：美国将部分外交人员及其家属撤离中东驻地",
+      "summary": "据多名知情人士透露，随着地区局势升级的威胁迫近，美国正匆忙从多个中东驻地撤离部分外交官及其家属。 这些撤离被描述为令人沮丧且混乱的“似曾相识”——许多离开的人不久前...",
+      "publishedAt": "2026-10-23T22:53:55.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnxy1602777.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnxy1602777.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.6939825578703704,
+      "weight": 70
+    },
+    {
+      "id": "N-c61eaaa9120fb8b5",
+      "kind": "event",
+      "label": "Who actually controls Ukraine's access to Starlink?",
+      "summary": "President Zelensky says limits to the technology continue to affect Ukrainian forces, while US officials and Elon Musk offer conflicting accounts of who controls it.",
+      "publishedAt": "2026-10-23T22:24:36.000Z",
+      "knownAt": "2026-10-24T07:38:05.521Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/videos/cqy7lvv0lvzpo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/videos/cqy7lvv0lvzpo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7143413541666668,
+      "weight": 42
+    },
+    {
+      "id": "N-07b1b6c46bf795ba",
+      "kind": "event",
+      "label": "大宗商品综述：油价大涨 铜价收窄周跌幅 金价下跌",
+      "summary": "布伦特原油本周收于4月份以来最高水平，因为沙特阿拉伯遭到的袭击愈演愈烈，加剧了此前已因美伊战争而升温的供应担忧。铜价周五上涨并收窄周跌幅...",
+      "publishedAt": "2026-10-23T22:11:54.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8286322.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8286322.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.723160798611111,
+      "weight": 70
+    },
+    {
+      "id": "N-3d029efb49ce4013",
+      "kind": "event",
+      "label": "CFTC：对冲基金削减日元空头 增持澳元多头",
+      "summary": "美国商品期货交易委员会（CFTC）周五公布的数据显示，截至10月20日当周，对冲基金削减日元空头头寸。日元连续第二周上涨，周五兑美元则小幅走弱。",
+      "publishedAt": "2026-10-23T22:07:24.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2448937.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2448937.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.726285798611111,
+      "weight": 70
+    },
+    {
+      "id": "N-1ebb87bdfe1846b7",
+      "kind": "event",
+      "label": "10月24日外盘头条：俄乌同意奥列什基停火 特朗普拟豁免更多加拿大产品关税 美国将氦列入关键材料清单",
+      "summary": "全球财经媒体昨夜今晨共同关注的头条新闻主要有： 1、俄乌同意奥列什基停火，泽连斯基称11月举行新一轮和平会谈 2、共和党参议员选情告急 特朗普拟豁免更多加拿大产品关税...",
+      "publishedAt": "2026-10-23T21:54:06.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhry5046368.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhry5046368.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7355219097222223,
+      "weight": 70
+    },
+    {
+      "id": "N-c1a7f9f854ce2362",
+      "kind": "event",
+      "label": "俄乌同意奥列什基停火，泽连斯基称11月举行新一轮和平会谈",
+      "summary": "乌克兰和俄罗斯周五表示，双方已同意在俄罗斯占领的乌克兰城镇奥列什基实现停火，该停火由美国第一夫人梅拉尼娅·特朗普斡旋促成。",
+      "publishedAt": "2026-10-23T21:48:56.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2440163.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2440163.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7391098726851852,
+      "weight": 70
+    },
+    {
+      "id": "N-7a069da14101d98f",
+      "kind": "event",
+      "label": "Trump dropping some Canada tariffs but &apos;replacing&apos; them with other products",
+      "summary": "Sen. Susan Collins announced Canada was dropping Canadian tariffs, but the White House later said it was \"replacing\" the ones removed from the list.",
+      "publishedAt": "2026-10-23T21:26:59.000Z",
+      "knownAt": "2026-10-24T02:47:50.858Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/trump-tariffs-canada-susan-collins.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/trump-tariffs-canada-susan-collins.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7543529282407408,
+      "weight": 54
+    },
+    {
+      "id": "N-7b5c36581cdddf84",
+      "kind": "event",
+      "label": "WSJ Dollar Index Falls 0.25% This Week to 96.84",
+      "summary": "The WSJ Dollar Index edged higher, snapping a three-trading-day losing streak.",
+      "publishedAt": "2026-10-23T21:24:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/currencies/dollar-likely-to-remain-in-155-160-yen-range-in-near-term-4e69b51a?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/currencies/dollar-likely-to-remain-in-155-160-yen-range-in-near-term-4e69b51a?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7564246875,
+      "weight": 66
+    },
+    {
+      "id": "N-8c94aba89e73b464",
+      "kind": "event",
+      "label": "观点综述：中期选举前宜押注美债涨、做空美元 避险情绪或延至11月中",
+      "summary": "富国策略师建议，在11月3日中期选举前押注美国久期资产上涨，并做空美元。美国银行策略师Michael Hartnett表示，投资者的避险情绪可能持续至11月晚些时候，进一步显示...",
+      "publishedAt": "2026-10-23T21:21:32.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2422304.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2422304.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.7581376504629629,
+      "weight": 70
+    },
+    {
+      "id": "N-071e11f05b45d536",
+      "kind": "event",
+      "label": "CFTC：对冲基金欧元空头押注升至2020年3月以来最高",
+      "summary": "对冲基金对欧元的看空押注增至2020年3月以来最高水平，法国政治动荡冲击欧洲市场，并给欧元带来压力。 美国商品期货交易委员会（CFTC）周五公布的数据显示...",
+      "publishedAt": "2026-10-23T21:18:33.000Z",
+      "knownAt": "2026-10-24T02:47:50.858Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8241537.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8241537.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.7602094097222223,
+      "weight": 70
+    },
+    {
+      "id": "N-065ac371836d97af",
+      "kind": "event",
+      "label": "共和党参议员选情告急 特朗普拟豁免更多加拿大产品关税",
+      "summary": "特朗普政府准备扩大对加拿大产品的关税豁免范围，而此举可能有助于提升共和党参议员苏珊·柯林斯在缅因州的连任选情。 科林斯周五在一份声明中宣布...",
+      "publishedAt": "2026-10-23T21:03:36.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8226106.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8226106.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.7705913541666667,
+      "weight": 70
+    },
+    {
+      "id": "N-b4a0599433116fb4",
+      "kind": "event",
+      "label": "In hunt for Starlink alternative, Ukraine partners with Nokia and satellite maker ICEYE",
+      "summary": "With SpaceX imposing speed limits on Starlink in Ukraine and hampering military operations, Kyiv is looking for alternatives.",
+      "publishedAt": "2026-10-23T20:52:23.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/ukraine-partners-with-nokia-and-iceye-for-starlink-alternative.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/ukraine-partners-with-nokia-and-iceye-for-starlink-alternative.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7783807060185186,
+      "weight": 42
+    },
+    {
+      "id": "N-b04e63af8bf9a20d",
+      "kind": "event",
+      "label": "原油：中东供应风险推动布伦特原油逼近117美元 创6个月高点",
+      "summary": "布伦特原油本周收于4月份以来最高水平，因为沙特阿拉伯遭到的袭击愈演愈烈，加剧了此前已因美伊战争而升温的供应担忧。",
+      "publishedAt": "2026-10-23T20:35:29.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398290.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398290.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7901168171296296,
+      "weight": 70
+    },
+    {
+      "id": "N-71f7d7b2bb49fb3a",
+      "kind": "event",
+      "label": "美国债市：国债小幅下跌 科技股抛售压力缓解且法债风险溢价收窄",
+      "summary": "随着AI担忧缓解，法国债务相关风险也有所消退，法国国债相对德国国债的风险溢价收窄，近期避险资金流对美国国债的支撑在周五减弱。",
+      "publishedAt": "2026-10-23T20:34:48.000Z",
+      "knownAt": "2026-10-24T02:47:50.858Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398124.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398124.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7905913541666667,
+      "weight": 70
+    },
+    {
+      "id": "N-ae8b0a516ed581fb",
+      "kind": "event",
+      "label": "10-year Treasury yield drops back to 5% this week as investors seek cover from AI worries",
+      "summary": "The 10-year Treasury yield was just below 5% Friday after AI-driven tech selling sent investors into the safety of government bonds.",
+      "publishedAt": "2026-10-23T20:20:58.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/bonds-yields-us-treasurys.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/bonds-yields-us-treasurys.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.800197835648148,
+      "weight": 54
+    },
+    {
+      "id": "N-720210bc75b45d40",
+      "kind": "event",
+      "label": "Musk&apos;s SpaceX is still restricting Starlink in Ukraine and the toll is rising",
+      "summary": "Since last week, Ukraine has reported restrictions on Starshield, a version of SpaceX's Starlink, hampering its military operations against Russia.",
+      "publishedAt": "2026-10-23T19:50:26.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/ukraine-says-starlink-restrictions-remain-despite-trump-assurances.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/ukraine-says-starlink-restrictions-remain-despite-trump-assurances.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.821401539351852,
+      "weight": 42
+    },
+    {
+      "id": "N-afc544a293144a78",
+      "kind": "event",
+      "label": "White House says Melania Trump brokered truce for Ukraine city 'on brink of disaster'",
+      "summary": "Ukraine and Russia confirm the truce in Russian-occupied Oleshky, where residents have had to eat garden weeds to survive.",
+      "publishedAt": "2026-10-23T19:30:19.000Z",
+      "knownAt": "2026-10-24T02:14:08.587Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/c6vgxkvl4w5eo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/c6vgxkvl4w5eo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.8353714467592592,
+      "weight": 42
+    },
+    {
+      "id": "N-dcac0c1c86bfe13c",
+      "kind": "event",
+      "label": "Qatar deal to buy U.S. natural gas shows how Iran war has redrawn global energy markets",
+      "summary": "The Iran war is transforming global energy markets and benefiting U.S. companies, especially liquefied natural gas exporters.",
+      "publishedAt": "2026-10-23T19:19:08.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/cheniere-qatar-energy-lng-natural-gas-iran-war-strait-hormuz.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/cheniere-qatar-energy-lng-natural-gas-iran-war-strait-hormuz.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.843137650462963,
+      "weight": 42
+    },
+    {
+      "id": "N-059e065b684255ff",
+      "kind": "event",
+      "label": "Ukraine says Starlink still restricted after Trump says limits lifted",
+      "summary": "The network is used by the Ukrainian military, sources say, and Trump says \"if there is a problem, I'll get it straightened out\".",
+      "publishedAt": "2026-10-23T18:52:17.000Z",
+      "knownAt": "2026-10-24T02:14:08.587Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/cq74pjpmx0e8o?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cq74pjpmx0e8o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.8617834837962963,
+      "weight": 42
+    },
+    {
+      "id": "N-3238638beb95166b",
+      "kind": "event",
+      "label": "Precious Metals Lose Ground As Oil Prices Press Higher",
+      "summary": "Precious metals extended losses with silver reaching a new low for the year and gold settling below the $4,000 level.",
+      "publishedAt": "2026-10-23T18:41:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/commodities-futures/gold-is-flat-likely-to-consolidate-in-near-term-1fb03f5c?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/commodities-futures/gold-is-flat-likely-to-consolidate-in-near-term-1fb03f5c?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.8696191319444444,
+      "weight": 42
+    },
+    {
+      "id": "N-12f6fd34c1b01c42",
+      "kind": "event",
+      "label": "缅因共和党参议员透露特朗普将降低部分加拿大产品关税",
+      "summary": "特朗普政府准备扩大对部分加拿大产品的关税豁免，而此举可能有助于提升共和党参议员苏珊·柯林斯在缅因州的连任竞选。 科林斯周五在一份声明中宣布...",
+      "publishedAt": "2026-10-23T18:19:01.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwhaiy8239574.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwhaiy8239574.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.884885335648148,
+      "weight": 70
+    },
+    {
+      "id": "N-238b0b8af5d23442",
+      "kind": "event",
+      "label": "Treasury Yields Rise, Eurozone Bond Yields Fall Amid French Concerns",
+      "summary": "U.S. Treasury yields rose as investors sought safety from the turmoil in French government bonds ahead of a closely watched interest-rate decision.",
+      "publishedAt": "2026-10-23T18:11:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/investing/u-s-treasury-yields-edge-up-bond-market-focus-to-stay-on-france-8b28a326?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/investing/u-s-treasury-yields-edge-up-bond-market-focus-to-stay-on-france-8b28a326?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.8904524652777779,
+      "weight": 66
+    },
+    {
+      "id": "N-1ebb536ab9d69592",
+      "kind": "event",
+      "label": "为助力缅因州参议员，特朗普拟取消部分加拿大商品50%关税",
+      "summary": "美国总统特朗普政府据悉准备调整针对加拿大商品征收的50%关税，计划取消部分农业及林业产品的高额关税，以帮助缅因州共和党参议员苏珊·柯林斯（Susan...",
+      "publishedAt": "2026-10-23T17:54:52.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwfwae5126132.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwfwae5126132.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.9016561689814815,
+      "weight": 70
+    },
+    {
+      "id": "N-ed6faf1b09668915",
+      "kind": "event",
+      "label": "俄军宣布27日起在赫尔松方向停火并实行“静默状态”",
+      "summary": "总台记者23日获悉，俄罗斯武装力量总参谋长、国防部第一副部长瓦列里·格拉西莫夫大将宣布，俄罗斯武装力量自莫斯科时间2026年10月27日4时起...",
+      "publishedAt": "2026-10-23T15:57:54.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwah1796343.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwah1796343.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.9828830208333332,
+      "weight": 70
+    },
+    {
+      "id": "N-37ea1d48a070d428",
+      "kind": "event",
+      "label": "中东与欧洲八国外长反对扩大地区冲突 呼吁外交对话",
+      "summary": "当地时间10月23日傍晚，土耳其外长费丹在伊斯坦布尔主持土埃巴沙与英法德意八国外长会议后，召开新闻发布会。费丹介绍，当天，中东地区四国外长首先就地区局势...",
+      "publishedAt": "2026-10-23T15:36:01.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwae5026898.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwae5026898.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.9980797800925927,
+      "weight": 70
+    },
+    {
+      "id": "N-f2249efb4bc5b0b9",
+      "kind": "event",
+      "label": "泽连斯基：星链和Starshield在乌克兰的使用依然受限",
+      "summary": "在与美国特使威特科夫和库什纳讨论后，乌克兰总统泽连斯基表示，乌克兰使用星链和Starshield仍面临限制。 泽连斯基表示，各方已就举行三方会晤达成一致...",
+      "publishedAt": "2026-10-23T14:45:23.000Z",
+      "knownAt": "2026-10-24T02:47:50.858Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-23/doc-iniwfrun2597015.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-23/doc-iniwfrun2597015.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.0332418171296296,
+      "weight": 70
+    },
+    {
+      "id": "N-cfc3fde760461117",
+      "kind": "event",
+      "label": "Higher interest rates have made family offices pickier about investing in real estate",
+      "summary": "Higher interest rates have made family offices more selective about investing in real estate.",
+      "publishedAt": "2026-10-23T12:15:03.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/high-interest-rates-raise-the-bar-for-real-estate-deals.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/high-interest-rates-raise-the-bar-for-real-estate-deals.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.1376399652777778,
+      "weight": 54
+    },
+    {
+      "id": "N-c7a8f117266717cd",
+      "kind": "event",
+      "label": "Russia and Ukraine trade fresh strikes despite renewed push for U.S.-brokered peace talks",
+      "summary": "Both Putin and Zelenskyy said Thursday they were open for peace negotiations, even as they continued strikes overnight.",
+      "publishedAt": "2026-10-23T11:16:30.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/russia-ukraine-strikes-peace-talks.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/russia-ukraine-strikes-peace-talks.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.1782996875,
+      "weight": 42
+    },
+    {
+      "id": "N-7230e5cb2b01fca3",
+      "kind": "event",
+      "label": "ECB Consumer Expectations Survey results – September 2026",
+      "summary": "ECB Consumer Expectations Survey results – September 2026",
+      "publishedAt": "2026-10-23T08:00:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr261023~a3d201c97c.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr261023~a3d201c97c.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.314758020833333,
+      "weight": 42
+    },
+    {
+      "id": "N-6aaa637b88c9fd09",
+      "kind": "event",
+      "label": "Surveillance and 'constant paranoia': Western diplomats tell BBC of life in war-time Moscow",
+      "summary": "Officials compare working in Russia since its full-scale invasion of Ukraine to the Cold War era.",
+      "publishedAt": "2026-10-22T23:16:20.000Z",
+      "knownAt": "2026-10-24T02:14:08.587Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/cj75p1xr7p7vo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cj75p1xr7p7vo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.678415428240741,
+      "weight": 42
+    },
+    {
+      "id": "N-e1dd7e57952623df",
+      "kind": "event",
+      "label": "WSJ Dollar Index Falls 0.12% to 96.80",
+      "summary": "The WSJ Dollar Index edged 0.1% lower, down for three consecutive trading days.",
+      "publishedAt": "2026-10-22T21:27:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-focus-on-mideast-developments-716c953b?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-focus-on-mideast-developments-716c953b?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.754341354166667,
+      "weight": 54
+    },
+    {
+      "id": "N-7c12f364e7575958",
+      "kind": "event",
+      "label": "WSJ Dollar Index Falls 0.04% to 96.92",
+      "summary": "The WSJ Dollar Index edged lower, down for two consecutive trading days.",
+      "publishedAt": "2026-10-21T22:31:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-but-may-be-supported-by-mild-risk-appetite-1384b72e?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-but-may-be-supported-by-mild-risk-appetite-1384b72e?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 3.709896909722222,
+      "weight": 54
+    },
+    {
+      "id": "N-a68fbaa43c640f38",
+      "kind": "event",
+      "label": "Housing is flashing warning signs just as the Fed weighs more interest rate hikes",
+      "summary": "Housing data deteriorated further in September, according to separate reports Tuesday.",
+      "publishedAt": "2026-10-21T11:20:58.000Z",
+      "knownAt": "2026-10-24T01:55:49.934Z",
+      "source": "CNBC Economy",
+      "url": "https://www.cnbc.com/2026/10/20/housing-mortgage-rates-real-estate-federal-reserve.html",
+      "sources": [
+        {
+          "source": "CNBC Economy",
+          "url": "https://www.cnbc.com/2026/10/20/housing-mortgage-rates-real-estate-federal-reserve.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.175197835648148,
+      "weight": 54
+    },
+    {
+      "id": "N-c2c5a79dd4a57d43",
+      "kind": "event",
+      "label": "Piero Cipollone: Pontes and Appia: unlocking opportunities for banks",
+      "summary": "Piero Cipollone: Pontes and Appia: unlocking opportunities for banks",
+      "publishedAt": "2026-10-21T08:00:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261021_1~d190f2c349.en.pdf",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261021_1~d190f2c349.en.pdf"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.314758020833334,
+      "weight": 54
+    },
+    {
+      "id": "N-5af07a29d6c05f1d",
+      "kind": "event",
+      "label": "UK inflation jumps to 3.5% — cementing rate hike expectations",
+      "summary": "U.K. inflation rose by a hotter-than-expected 3.5% in the 12 months to September, driven by the surging cost of motor fuels.",
+      "publishedAt": "2026-10-21T07:50:10.000Z",
+      "knownAt": "2026-10-24T01:55:49.934Z",
+      "source": "CNBC Economy",
+      "url": "https://www.cnbc.com/2026/10/21/inflation-uk-cpi-interest-rates.html",
+      "sources": [
+        {
+          "source": "CNBC Economy",
+          "url": "https://www.cnbc.com/2026/10/21/inflation-uk-cpi-interest-rates.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.321586724537037,
+      "weight": 66
+    },
+    {
+      "id": "N-92fbda37b5976601",
+      "kind": "event",
+      "label": "Philip R. Lane: Euro liquidity lines and the international monetary system",
+      "summary": "Philip R. Lane: Euro liquidity lines and the international monetary system",
+      "publishedAt": "2026-10-21T04:15:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261021~401d6c4b70.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261021~401d6c4b70.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.471008020833334,
+      "weight": 42
+    },
+    {
+      "id": "N-b31d023ee3f95576",
+      "kind": "event",
+      "label": "WSJ Dollar Index Falls 0.25% to 96.96",
+      "summary": "The WSJ Dollar Index fell 0.3% &#x2014; down three of the past four trading days.",
+      "publishedAt": "2026-10-20T21:29:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-mixed-signals-6b3593e6?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-mixed-signals-6b3593e6?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.752952465277778,
+      "weight": 54
+    },
+    {
+      "id": "N-d5585973bcfc34d7",
+      "kind": "event",
+      "label": "Frank Elderson: Interview with Die Presse",
+      "summary": "Frank Elderson: Interview with Die Presse",
+      "publishedAt": "2026-10-20T07:00:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261020~97e2e4bc38.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261020~97e2e4bc38.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 5.3564246875,
+      "weight": 42
+    },
+    {
+      "id": "N-5c3f6b77b8fa5291",
+      "kind": "event",
+      "label": "Frank Elderson: From climate and nature risks to economic resilience and competitiveness",
+      "summary": "Frank Elderson: From climate and nature risks to economic resilience and competitiveness",
+      "publishedAt": "2026-10-19T06:00:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261019~f0a3e053de.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261019~f0a3e053de.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 6.398091354166667,
+      "weight": 42
+    }
+  ],
+  "factors": [
+    {
+      "id": "F-cny",
+      "kind": "factor",
+      "factorId": "cny",
+      "label": "人民币 / 美元",
+      "value": 6.670240328776915,
+      "change": -0.6404221119996167,
+      "unit": "人民币 / 美元",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-24T02:34:06.122Z",
+      "source": "ecb",
+      "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml",
+      "timePrecision": "date-only",
+      "group": "汇率",
+      "direction": -1,
+      "note": "20 个参考日变化；人民币走弱对国内克价偏正向",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": false
+    },
+    {
+      "id": "F-usd",
+      "kind": "factor",
+      "factorId": "usd",
+      "label": "美元 / 欧元代理",
+      "value": 0.893415527561869,
+      "change": 1.8761726078799335,
+      "unit": "美元 / 欧元",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-24T02:34:06.122Z",
+      "source": "ecb",
+      "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml",
+      "timePrecision": "date-only",
+      "group": "汇率",
+      "direction": -1,
+      "note": "双边汇率代理，不是美元指数；美元走强偏负向",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": false
+    },
+    {
+      "id": "F-realRates",
+      "kind": "factor",
+      "factorId": "realRates",
+      "label": "美国 10 年实际收益率",
+      "value": 2.66,
+      "change": -0.18999999999999995,
+      "unit": "%",
+      "changeUnit": "百分点",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "treasury",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_real_yield_curve&field_tdr_date_value=2026",
+      "timePrecision": "date-only",
+      "group": "利率",
+      "direction": 1,
+      "note": "20 个参考日变动；实际收益率上升偏负向",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": false
+    },
+    {
+      "id": "F-risk",
+      "kind": "factor",
+      "factorId": "risk",
+      "label": "VIX 风险情绪",
+      "value": 19.45,
+      "change": 30.800268997982517,
+      "unit": "点",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-24T02:34:06.122Z",
+      "source": "cboe",
+      "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+      "timePrecision": "date-only",
+      "group": "风险",
+      "direction": 1,
+      "note": "权益波动代理；流动性冲击下相关关系可能改变",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": false
+    },
+    {
+      "id": "F-nominal2y",
+      "kind": "factor",
+      "factorId": "nominal2y",
+      "label": "美国 2 年名义收益率",
+      "value": 4.69,
+      "change": -0.17999999999999972,
+      "unit": "%",
+      "changeUnit": "百分点",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "nominal",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value=2026",
+      "timePrecision": "date-only",
+      "group": "利率",
+      "direction": 0,
+      "note": "短端利率监测代理；避免与实际收益率重复施加方向先验",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": true
+    },
+    {
+      "id": "F-yieldCurve",
+      "kind": "factor",
+      "factorId": "yieldCurve",
+      "label": "10 年减 2 年利差",
+      "value": 0.3099999999999996,
+      "change": 0,
+      "unit": "百分点",
+      "changeUnit": "百分点",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "nominal",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value=2026",
+      "timePrecision": "date-only",
+      "group": "利率",
+      "direction": 0,
+      "note": "监测经济周期，不预设固定黄金涨跌方向；档案充足后才可估计系数",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": true
+    },
+    {
+      "id": "F-oil",
+      "kind": "factor",
+      "factorId": "oil",
+      "label": "WTI 原油",
+      "value": 107.89,
+      "change": 11.907478477336376,
+      "unit": "美元 / 桶",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-20T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "oil",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO",
+      "timePrecision": "date-only",
+      "group": "能源",
+      "direction": 0,
+      "note": "通胀与增长的混合代理，监测输入；不预设固定利好利坏",
+      "ageDays": 5.648091354166667,
+      "monitorOnly": true
+    },
+    {
+      "id": "F-positioning",
+      "kind": "factor",
+      "factorId": "positioning",
+      "label": "CFTC 管理资金净持仓占比",
+      "value": 25.903912458766182,
+      "change": null,
+      "unit": "%",
+      "changeUnit": "%",
+      "publishedAt": "2026-10-20T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "positioning",
+      "url": "https://www.cftc.gov/dea/newcot/f_disagg.txt",
+      "timePrecision": "date-only",
+      "group": "资金持仓",
+      "direction": 0,
+      "note": "COMEX 黄金期货、仅期货；周度头寸可能滞后，不把拥挤方向等同于未来涨跌",
+      "ageDays": 5.648091354166667,
+      "monitorOnly": true
+    },
+    {
+      "id": "F-inflation",
+      "kind": "factor",
+      "factorId": "inflation",
+      "label": "10 年盈亏平衡通胀近似",
+      "value": 2.34,
+      "change": 0.010000000000000231,
+      "unit": "%",
+      "changeUnit": "百分点",
+      "publishedAt": "2026-10-23T00:00:00Z",
+      "knownAt": "2026-10-25T07:08:32.681Z",
+      "source": "treasury-derived",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value=2026",
+      "timePrecision": "date-only",
+      "group": "通胀",
+      "direction": 0,
+      "note": "同日名义减实际收益率，含风险与流动性溢价；监测输入，不作纯通胀预期",
+      "ageDays": 2.6480913541666666,
+      "monitorOnly": true
+    }
+  ],
+  "events": [
+    {
+      "id": "N-f00c8895e753b41d",
+      "kind": "event",
+      "label": "Russia to host first Olympic federation world event since Ukraine invasion",
+      "summary": "The International Weightlifting Federation becomes the first Olympic federation to choose Russia to host a world championships since its invasion of Ukraine.",
+      "publishedAt": "2026-10-25T14:34:33.000Z",
+      "knownAt": "2026-10-25T15:16:15.558Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/sport/olympics/articles/cmq5ny00gzy0o?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/sport/olympics/articles/cmq5ny00gzy0o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.04076496527777778,
+      "weight": 42
+    },
+    {
+      "id": "N-d6649a9a173a92ea",
+      "kind": "event",
+      "label": "Saudi Arabia says it intercepted missiles and drones from Iran-backed Houthis",
+      "summary": "Saudi Arabia says it intercepted Houthi missiles and drones, while the Houthis claimed attacks on airports and energy sites amid rising regional supply risks.",
+      "publishedAt": "2026-10-25T13:41:37.000Z",
+      "knownAt": "2026-10-25T15:16:15.558Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/25/saudi-arabia-houthi-missile-drone-interceptions.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/25/saudi-arabia-houthi-missile-drone-interceptions.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.07752422453703704,
+      "weight": 42
+    },
+    {
+      "id": "N-377d76083d83b890",
+      "kind": "event",
+      "label": "消息：伊朗并未通过巴基斯坦向美国提交新方案",
+      "summary": "一名知情人士称，有关伊朗提议以重新开放霍尔木兹海峡换取美国解除海上封锁的报道“虚假且纯属幻想”。 这名消息人士说：“从根本上说...",
+      "publishedAt": "2026-10-25T13:38:09.000Z",
+      "knownAt": "2026-10-25T15:16:15.558Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-25/doc-iniwncyk2872683.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-25/doc-iniwncyk2872683.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.07993163194444444,
+      "weight": 70
+    },
+    {
+      "id": "N-04fdee93b1599697",
+      "kind": "event",
+      "label": "Musk says SpaceX restricted Ukraine's Starlink connection as service restored",
+      "summary": "The tech billionaire accuses Ukraine of violating its terms of service by using the network for military activity.",
+      "publishedAt": "2026-10-25T08:15:24.000Z",
+      "knownAt": "2026-10-25T08:24:34.712Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/cvx28ljp8n4xo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cvx28ljp8n4xo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.30406357638888887,
+      "weight": 42
+    },
+    {
+      "id": "N-a3e77558d513caea",
+      "kind": "event",
+      "label": "Why is Ukraine so reliant on Starlink and can Europe plug the gap?",
+      "summary": "Ukraine needs another satellite internet service, but a decent alternative to Elon Musk's network doesn't exist - yet.",
+      "publishedAt": "2026-10-25T05:45:31.000Z",
+      "knownAt": "2026-10-25T06:29:59.313Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/c65yn97xe7ypo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/c65yn97xe7ypo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.40814922453703706,
+      "weight": 42
+    },
+    {
+      "id": "N-fddfc9162a9cd8d2",
+      "kind": "event",
+      "label": "伊朗否认以霍尔木兹海峡换解除封锁的报道，称系\"谎言与幻想\"",
+      "summary": "知情人士称，伊朗未向巴基斯坦调停人提出任何新方案，并拒绝所谓以重新开放霍尔木兹海峡换取美国解除海上封锁的报道。该消息人士驳斥阿拉伯卫星电视台关于德黑兰已向华盛顿...",
+      "publishedAt": "2026-10-24T21:37:39.000Z",
+      "knownAt": "2026-10-24T23:21:59.241Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkrxa3325699.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkrxa3325699.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.7469455208333333,
+      "weight": 70
+    },
+    {
+      "id": "N-82d554a31f1cfc3d",
+      "kind": "event",
+      "label": "After SpaceX restores high-speed service, Musk claims Ukraine violated Starlink agreement",
+      "summary": "Ukraine says restrictions on Starlink and Starshield have been lifted, restoring connectivity to fast-moving military systems after disruptions.",
+      "publishedAt": "2026-10-24T20:38:30.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/24/ukraine-starlink-starshield-service-restored.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/24/ukraine-starlink-starshield-service-restored.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.7880219097222222,
+      "weight": 42
+    },
+    {
+      "id": "N-8ecfc6f57072f4ff",
+      "kind": "event",
+      "label": "特朗普称与马斯克谈过乌克兰局势",
+      "summary": "特朗普表示，他已与SpaceX创始人马斯克就乌克兰局势进行了交流。 特朗普拒绝透露与马斯克谈话的具体内容。",
+      "publishedAt": "2026-10-24T20:34:51.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkmre3445545.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkmre3445545.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.7905566319444445,
+      "weight": 70
+    },
+    {
+      "id": "N-5f2022b0d5a78b3c",
+      "kind": "event",
+      "label": "美国和以色列迎来关键选举 中东局势再度逼近危险关口",
+      "summary": "美国总统特朗普曾表示中东战争将在几周内结束，然而，这场战争如今已进入第八个月，而且看起来势将进一步升级。 特朗普多次暗示，在11月3日美国中期选举结束后...",
+      "publishedAt": "2026-10-24T19:51:04.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-25/doc-iniwkmre3436349.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-25/doc-iniwkmre3436349.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 0.8209617245370371,
+      "weight": 70
+    },
+    {
+      "id": "N-a488b1e95a2f8669",
+      "kind": "event",
+      "label": "伊朗航司外汇供给中断，机票涨价约40%",
+      "summary": "伊朗航空协会秘书长马吉德·阿赫拉吉周六称，受运营成本上涨、外汇短缺影响，伊朗机票价格上涨约40%。 阿赫拉吉表示，航空公司超半数运营开支需要以外币结算；银行已经一个...",
+      "publishedAt": "2026-10-24T18:22:30.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkfik0326184.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkfik0326184.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.8824663541666666,
+      "weight": 70
+    },
+    {
+      "id": "N-07af4f89ba46b4e3",
+      "kind": "event",
+      "label": "以色列央行驳斥内塔尼亚胡利用加密货币规避制裁的提议",
+      "summary": "以色列总理内塔尼亚胡提出，可以借助加密货币规避以色列可能遭遇的金融制裁，该想法遭到以色列央行的严厉反驳。 以色列央行周六发布声明称：“加密货币无法用来规避针对以色...",
+      "publishedAt": "2026-10-24T17:52:41.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkfik0320147.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/7x24/2026-10-25/doc-iniwkfik0320147.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 0.9031723726851851,
+      "weight": 70
+    },
+    {
+      "id": "N-c8d998acce4cefec",
+      "kind": "event",
+      "label": "俄官员：“尚难判断”局部停火是否影响乌克兰问题谈判",
+      "summary": "俄罗斯联邦武装力量总参谋长瓦列里·格拉西莫夫23日宣布，俄军将在赫尔松方向停火，并从莫斯科时间10月27日4时起进入“静默”状态，以配合将在赫尔松州阿列什基地区开展的人道...",
+      "publishedAt": "2026-10-24T17:44:26.000Z",
+      "knownAt": "2026-10-24T21:14:34.352Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-25/doc-iniwkmri6938884.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/jjxw/2026-10-25/doc-iniwkmri6938884.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.9089015393518518,
+      "weight": 70
+    },
+    {
+      "id": "N-878c7907a6dcd25f",
+      "kind": "event",
+      "label": "American embassies tighten security as Iran threat warnings intensify ahead of U.S. midterm elections",
+      "summary": "A memo from DNI director Jay Clayton said Iran is in the \"advanced stages\" of planning attacks against Americans.",
+      "publishedAt": "2026-10-24T15:44:53.000Z",
+      "knownAt": "2026-10-24T16:03:39.170Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/24/iran-threats-us-embassies-middle-east.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/24/iran-threats-us-embassies-middle-east.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 0.9919223726851852,
+      "weight": 42
+    },
+    {
+      "id": "N-94efa546a366e304",
+      "kind": "event",
+      "label": "Ukraine says Starlink connection 'now stable' after network limits",
+      "summary": "The slowed Starlink connections had affected the Ukraine's military and drone operations for a week.",
+      "publishedAt": "2026-10-24T12:12:40.000Z",
+      "knownAt": "2026-10-24T12:14:04.109Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/cwkg5md14j8go?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cwkg5md14j8go?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.1392950578703704,
+      "weight": 42
+    },
+    {
+      "id": "N-8c3f729e14cdf4be",
+      "kind": "event",
+      "label": "America by the numbers: How voters feel about the economy, inflation, AI and Trump",
+      "summary": "With the U.S. midterm elections looming, Americans are nearly as gloomy about the economy as they were when the nation was emerging from the pandemic.",
+      "publishedAt": "2026-10-24T10:58:30.000Z",
+      "knownAt": "2026-10-24T16:03:39.170Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/america-by-the-numbers-how-voters-feel-about-the-economy-inflation-ai-and-trump.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/america-by-the-numbers-how-voters-feel-about-the-economy-inflation-ai-and-trump.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.1907996875,
+      "weight": 54
+    },
+    {
+      "id": "N-ca827896f907b158",
+      "kind": "event",
+      "label": "Piero Cipollone: Interview with Milano Finanza",
+      "summary": "Piero Cipollone: Interview with Milano Finanza",
+      "publishedAt": "2026-10-24T06:00:00.000Z",
+      "knownAt": "2026-10-24T07:38:05.521Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261024~ee2ba73cf3.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261024~ee2ba73cf3.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.3980913541666666,
+      "weight": 42
+    },
+    {
+      "id": "N-65f8fe5f8f7a53ef",
+      "kind": "event",
+      "label": "White House lifts tariffs on some Canadian goods as midterm elections loom",
+      "summary": "From 30 October, tariffs will be eased on some products, including certain machinery, and placed on others, such as carpets.",
+      "publishedAt": "2026-10-24T00:36:47.000Z",
+      "knownAt": "2026-10-24T07:38:05.521Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/c60qk573yzz8o?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/c60qk573yzz8o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.6225473726851851,
+      "weight": 42
+    },
+    {
+      "id": "N-839e5fe657d3c842",
+      "kind": "event",
+      "label": "10月24日隔夜要闻：美股三大指数收跌 油价大涨 金价下跌 特朗普称可能对伊发动一次小规模“史诗怒火”行动",
+      "summary": "市场 10月24日收盘：美股三大指数收跌 道指跌超600点 布油创4月以来新高 市场抛售范围扩大 10月24日热门中概股涨跌不一，台积电涨1.49%...",
+      "publishedAt": "2026-10-23T22:55:28.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnya2334385.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnya2334385.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.6929061689814815,
+      "weight": 70
+    },
+    {
+      "id": "N-4187a193fb6836dd",
+      "kind": "event",
+      "label": "报道：美国将部分外交人员及其家属撤离中东驻地",
+      "summary": "据多名知情人士透露，随着地区局势升级的威胁迫近，美国正匆忙从多个中东驻地撤离部分外交官及其家属。 这些撤离被描述为令人沮丧且混乱的“似曾相识”——许多离开的人不久前...",
+      "publishedAt": "2026-10-23T22:53:55.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnxy1602777.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhnxy1602777.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.6939825578703704,
+      "weight": 70
+    },
+    {
+      "id": "N-c61eaaa9120fb8b5",
+      "kind": "event",
+      "label": "Who actually controls Ukraine's access to Starlink?",
+      "summary": "President Zelensky says limits to the technology continue to affect Ukrainian forces, while US officials and Elon Musk offer conflicting accounts of who controls it.",
+      "publishedAt": "2026-10-23T22:24:36.000Z",
+      "knownAt": "2026-10-24T07:38:05.521Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/videos/cqy7lvv0lvzpo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/videos/cqy7lvv0lvzpo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7143413541666668,
+      "weight": 42
+    },
+    {
+      "id": "N-07b1b6c46bf795ba",
+      "kind": "event",
+      "label": "大宗商品综述：油价大涨 铜价收窄周跌幅 金价下跌",
+      "summary": "布伦特原油本周收于4月份以来最高水平，因为沙特阿拉伯遭到的袭击愈演愈烈，加剧了此前已因美伊战争而升温的供应担忧。铜价周五上涨并收窄周跌幅...",
+      "publishedAt": "2026-10-23T22:11:54.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8286322.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8286322.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.723160798611111,
+      "weight": 70
+    },
+    {
+      "id": "N-3d029efb49ce4013",
+      "kind": "event",
+      "label": "CFTC：对冲基金削减日元空头 增持澳元多头",
+      "summary": "美国商品期货交易委员会（CFTC）周五公布的数据显示，截至10月20日当周，对冲基金削减日元空头头寸。日元连续第二周上涨，周五兑美元则小幅走弱。",
+      "publishedAt": "2026-10-23T22:07:24.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2448937.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2448937.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.726285798611111,
+      "weight": 70
+    },
+    {
+      "id": "N-1ebb87bdfe1846b7",
+      "kind": "event",
+      "label": "10月24日外盘头条：俄乌同意奥列什基停火 特朗普拟豁免更多加拿大产品关税 美国将氦列入关键材料清单",
+      "summary": "全球财经媒体昨夜今晨共同关注的头条新闻主要有： 1、俄乌同意奥列什基停火，泽连斯基称11月举行新一轮和平会谈 2、共和党参议员选情告急 特朗普拟豁免更多加拿大产品关税...",
+      "publishedAt": "2026-10-23T21:54:06.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhry5046368.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhry5046368.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7355219097222223,
+      "weight": 70
+    },
+    {
+      "id": "N-c1a7f9f854ce2362",
+      "kind": "event",
+      "label": "俄乌同意奥列什基停火，泽连斯基称11月举行新一轮和平会谈",
+      "summary": "乌克兰和俄罗斯周五表示，双方已同意在俄罗斯占领的乌克兰城镇奥列什基实现停火，该停火由美国第一夫人梅拉尼娅·特朗普斡旋促成。",
+      "publishedAt": "2026-10-23T21:48:56.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2440163.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2440163.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7391098726851852,
+      "weight": 70
+    },
+    {
+      "id": "N-7a069da14101d98f",
+      "kind": "event",
+      "label": "Trump dropping some Canada tariffs but &apos;replacing&apos; them with other products",
+      "summary": "Sen. Susan Collins announced Canada was dropping Canadian tariffs, but the White House later said it was \"replacing\" the ones removed from the list.",
+      "publishedAt": "2026-10-23T21:26:59.000Z",
+      "knownAt": "2026-10-24T02:47:50.858Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/trump-tariffs-canada-susan-collins.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/trump-tariffs-canada-susan-collins.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7543529282407408,
+      "weight": 54
+    },
+    {
+      "id": "N-7b5c36581cdddf84",
+      "kind": "event",
+      "label": "WSJ Dollar Index Falls 0.25% This Week to 96.84",
+      "summary": "The WSJ Dollar Index edged higher, snapping a three-trading-day losing streak.",
+      "publishedAt": "2026-10-23T21:24:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/currencies/dollar-likely-to-remain-in-155-160-yen-range-in-near-term-4e69b51a?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/currencies/dollar-likely-to-remain-in-155-160-yen-range-in-near-term-4e69b51a?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7564246875,
+      "weight": 66
+    },
+    {
+      "id": "N-8c94aba89e73b464",
+      "kind": "event",
+      "label": "观点综述：中期选举前宜押注美债涨、做空美元 避险情绪或延至11月中",
+      "summary": "富国策略师建议，在11月3日中期选举前押注美国久期资产上涨，并做空美元。美国银行策略师Michael Hartnett表示，投资者的避险情绪可能持续至11月晚些时候，进一步显示...",
+      "publishedAt": "2026-10-23T21:21:32.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2422304.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2422304.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.7581376504629629,
+      "weight": 70
+    },
+    {
+      "id": "N-071e11f05b45d536",
+      "kind": "event",
+      "label": "CFTC：对冲基金欧元空头押注升至2020年3月以来最高",
+      "summary": "对冲基金对欧元的看空押注增至2020年3月以来最高水平，法国政治动荡冲击欧洲市场，并给欧元带来压力。 美国商品期货交易委员会（CFTC）周五公布的数据显示...",
+      "publishedAt": "2026-10-23T21:18:33.000Z",
+      "knownAt": "2026-10-24T02:47:50.858Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8241537.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8241537.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.7602094097222223,
+      "weight": 70
+    },
+    {
+      "id": "N-065ac371836d97af",
+      "kind": "event",
+      "label": "共和党参议员选情告急 特朗普拟豁免更多加拿大产品关税",
+      "summary": "特朗普政府准备扩大对加拿大产品的关税豁免范围，而此举可能有助于提升共和党参议员苏珊·柯林斯在缅因州的连任选情。 科林斯周五在一份声明中宣布...",
+      "publishedAt": "2026-10-23T21:03:36.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8226106.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhrw8226106.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.7705913541666667,
+      "weight": 70
+    },
+    {
+      "id": "N-b4a0599433116fb4",
+      "kind": "event",
+      "label": "In hunt for Starlink alternative, Ukraine partners with Nokia and satellite maker ICEYE",
+      "summary": "With SpaceX imposing speed limits on Starlink in Ukraine and hampering military operations, Kyiv is looking for alternatives.",
+      "publishedAt": "2026-10-23T20:52:23.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/ukraine-partners-with-nokia-and-iceye-for-starlink-alternative.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/ukraine-partners-with-nokia-and-iceye-for-starlink-alternative.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7783807060185186,
+      "weight": 42
+    },
+    {
+      "id": "N-b04e63af8bf9a20d",
+      "kind": "event",
+      "label": "原油：中东供应风险推动布伦特原油逼近117美元 创6个月高点",
+      "summary": "布伦特原油本周收于4月份以来最高水平，因为沙特阿拉伯遭到的袭击愈演愈烈，加剧了此前已因美伊战争而升温的供应担忧。",
+      "publishedAt": "2026-10-23T20:35:29.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398290.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398290.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7901168171296296,
+      "weight": 70
+    },
+    {
+      "id": "N-71f7d7b2bb49fb3a",
+      "kind": "event",
+      "label": "美国债市：国债小幅下跌 科技股抛售压力缓解且法债风险溢价收窄",
+      "summary": "随着AI担忧缓解，法国债务相关风险也有所消退，法国国债相对德国国债的风险溢价收窄，近期避险资金流对美国国债的支撑在周五减弱。",
+      "publishedAt": "2026-10-23T20:34:48.000Z",
+      "knownAt": "2026-10-24T02:47:50.858Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398124.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/world/2026-10-24/doc-iniwhhse2398124.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.7905913541666667,
+      "weight": 70
+    },
+    {
+      "id": "N-ae8b0a516ed581fb",
+      "kind": "event",
+      "label": "10-year Treasury yield drops back to 5% this week as investors seek cover from AI worries",
+      "summary": "The 10-year Treasury yield was just below 5% Friday after AI-driven tech selling sent investors into the safety of government bonds.",
+      "publishedAt": "2026-10-23T20:20:58.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/bonds-yields-us-treasurys.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/bonds-yields-us-treasurys.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.800197835648148,
+      "weight": 54
+    },
+    {
+      "id": "N-720210bc75b45d40",
+      "kind": "event",
+      "label": "Musk&apos;s SpaceX is still restricting Starlink in Ukraine and the toll is rising",
+      "summary": "Since last week, Ukraine has reported restrictions on Starshield, a version of SpaceX's Starlink, hampering its military operations against Russia.",
+      "publishedAt": "2026-10-23T19:50:26.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/ukraine-says-starlink-restrictions-remain-despite-trump-assurances.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/ukraine-says-starlink-restrictions-remain-despite-trump-assurances.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.821401539351852,
+      "weight": 42
+    },
+    {
+      "id": "N-afc544a293144a78",
+      "kind": "event",
+      "label": "White House says Melania Trump brokered truce for Ukraine city 'on brink of disaster'",
+      "summary": "Ukraine and Russia confirm the truce in Russian-occupied Oleshky, where residents have had to eat garden weeds to survive.",
+      "publishedAt": "2026-10-23T19:30:19.000Z",
+      "knownAt": "2026-10-24T02:14:08.587Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/c6vgxkvl4w5eo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/c6vgxkvl4w5eo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.8353714467592592,
+      "weight": 42
+    },
+    {
+      "id": "N-dcac0c1c86bfe13c",
+      "kind": "event",
+      "label": "Qatar deal to buy U.S. natural gas shows how Iran war has redrawn global energy markets",
+      "summary": "The Iran war is transforming global energy markets and benefiting U.S. companies, especially liquefied natural gas exporters.",
+      "publishedAt": "2026-10-23T19:19:08.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/cheniere-qatar-energy-lng-natural-gas-iran-war-strait-hormuz.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/cheniere-qatar-energy-lng-natural-gas-iran-war-strait-hormuz.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.843137650462963,
+      "weight": 42
+    },
+    {
+      "id": "N-059e065b684255ff",
+      "kind": "event",
+      "label": "Ukraine says Starlink still restricted after Trump says limits lifted",
+      "summary": "The network is used by the Ukrainian military, sources say, and Trump says \"if there is a problem, I'll get it straightened out\".",
+      "publishedAt": "2026-10-23T18:52:17.000Z",
+      "knownAt": "2026-10-24T02:14:08.587Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/cq74pjpmx0e8o?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cq74pjpmx0e8o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.8617834837962963,
+      "weight": 42
+    },
+    {
+      "id": "N-3238638beb95166b",
+      "kind": "event",
+      "label": "Precious Metals Lose Ground As Oil Prices Press Higher",
+      "summary": "Precious metals extended losses with silver reaching a new low for the year and gold settling below the $4,000 level.",
+      "publishedAt": "2026-10-23T18:41:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/commodities-futures/gold-is-flat-likely-to-consolidate-in-near-term-1fb03f5c?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/commodities-futures/gold-is-flat-likely-to-consolidate-in-near-term-1fb03f5c?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.8696191319444444,
+      "weight": 42
+    },
+    {
+      "id": "N-12f6fd34c1b01c42",
+      "kind": "event",
+      "label": "缅因共和党参议员透露特朗普将降低部分加拿大产品关税",
+      "summary": "特朗普政府准备扩大对部分加拿大产品的关税豁免，而此举可能有助于提升共和党参议员苏珊·柯林斯在缅因州的连任竞选。 科林斯周五在一份声明中宣布...",
+      "publishedAt": "2026-10-23T18:19:01.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwhaiy8239574.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwhaiy8239574.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": true,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 1.884885335648148,
+      "weight": 70
+    },
+    {
+      "id": "N-238b0b8af5d23442",
+      "kind": "event",
+      "label": "Treasury Yields Rise, Eurozone Bond Yields Fall Amid French Concerns",
+      "summary": "U.S. Treasury yields rose as investors sought safety from the turmoil in French government bonds ahead of a closely watched interest-rate decision.",
+      "publishedAt": "2026-10-23T18:11:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/investing/u-s-treasury-yields-edge-up-bond-market-focus-to-stay-on-france-8b28a326?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/investing/u-s-treasury-yields-edge-up-bond-market-focus-to-stay-on-france-8b28a326?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.8904524652777779,
+      "weight": 66
+    },
+    {
+      "id": "N-1ebb536ab9d69592",
+      "kind": "event",
+      "label": "为助力缅因州参议员，特朗普拟取消部分加拿大商品50%关税",
+      "summary": "美国总统特朗普政府据悉准备调整针对加拿大商品征收的50%关税，计划取消部分农业及林业产品的高额关税，以帮助缅因州共和党参议员苏珊·柯林斯（Susan...",
+      "publishedAt": "2026-10-23T17:54:52.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwfwae5126132.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-24/doc-iniwfwae5126132.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.9016561689814815,
+      "weight": 70
+    },
+    {
+      "id": "N-ed6faf1b09668915",
+      "kind": "event",
+      "label": "俄军宣布27日起在赫尔松方向停火并实行“静默状态”",
+      "summary": "总台记者23日获悉，俄罗斯武装力量总参谋长、国防部第一副部长瓦列里·格拉西莫夫大将宣布，俄罗斯武装力量自莫斯科时间2026年10月27日4时起...",
+      "publishedAt": "2026-10-23T15:57:54.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwah1796343.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwah1796343.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.9828830208333332,
+      "weight": 70
+    },
+    {
+      "id": "N-37ea1d48a070d428",
+      "kind": "event",
+      "label": "中东与欧洲八国外长反对扩大地区冲突 呼吁外交对话",
+      "summary": "当地时间10月23日傍晚，土耳其外长费丹在伊斯坦布尔主持土埃巴沙与英法德意八国外长会议后，召开新闻发布会。费丹介绍，当天，中东地区四国外长首先就地区局势...",
+      "publishedAt": "2026-10-23T15:36:01.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwae5026898.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/jjxw/2026-10-23/doc-iniwfwae5026898.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 1.9980797800925927,
+      "weight": 70
+    },
+    {
+      "id": "N-f2249efb4bc5b0b9",
+      "kind": "event",
+      "label": "泽连斯基：星链和Starshield在乌克兰的使用依然受限",
+      "summary": "在与美国特使威特科夫和库什纳讨论后，乌克兰总统泽连斯基表示，乌克兰使用星链和Starshield仍面临限制。 泽连斯基表示，各方已就举行三方会晤达成一致...",
+      "publishedAt": "2026-10-23T14:45:23.000Z",
+      "knownAt": "2026-10-24T02:47:50.858Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-23/doc-iniwfrun2597015.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-23/doc-iniwfrun2597015.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.0332418171296296,
+      "weight": 70
+    },
+    {
+      "id": "N-cfc3fde760461117",
+      "kind": "event",
+      "label": "Higher interest rates have made family offices pickier about investing in real estate",
+      "summary": "Higher interest rates have made family offices more selective about investing in real estate.",
+      "publishedAt": "2026-10-23T12:15:03.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/high-interest-rates-raise-the-bar-for-real-estate-deals.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/high-interest-rates-raise-the-bar-for-real-estate-deals.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.1376399652777778,
+      "weight": 54
+    },
+    {
+      "id": "N-c7a8f117266717cd",
+      "kind": "event",
+      "label": "Russia and Ukraine trade fresh strikes despite renewed push for U.S.-brokered peace talks",
+      "summary": "Both Putin and Zelenskyy said Thursday they were open for peace negotiations, even as they continued strikes overnight.",
+      "publishedAt": "2026-10-23T11:16:30.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/10/23/russia-ukraine-strikes-peace-talks.html",
+      "sources": [
+        {
+          "source": "CNBC Top News",
+          "url": "https://www.cnbc.com/2026/10/23/russia-ukraine-strikes-peace-talks.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.1782996875,
+      "weight": 42
+    },
+    {
+      "id": "N-7230e5cb2b01fca3",
+      "kind": "event",
+      "label": "ECB Consumer Expectations Survey results – September 2026",
+      "summary": "ECB Consumer Expectations Survey results – September 2026",
+      "publishedAt": "2026-10-23T08:00:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr261023~a3d201c97c.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr261023~a3d201c97c.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.314758020833333,
+      "weight": 42
+    },
+    {
+      "id": "N-6aaa637b88c9fd09",
+      "kind": "event",
+      "label": "Surveillance and 'constant paranoia': Western diplomats tell BBC of life in war-time Moscow",
+      "summary": "Officials compare working in Russia since its full-scale invasion of Ukraine to the Cold War era.",
+      "publishedAt": "2026-10-22T23:16:20.000Z",
+      "knownAt": "2026-10-24T02:14:08.587Z",
+      "source": "BBC World",
+      "url": "https://www.bbc.co.uk/news/articles/cj75p1xr7p7vo?at_medium=RSS&at_campaign=rss",
+      "sources": [
+        {
+          "source": "BBC World",
+          "url": "https://www.bbc.co.uk/news/articles/cj75p1xr7p7vo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.678415428240741,
+      "weight": 42
+    },
+    {
+      "id": "N-e1dd7e57952623df",
+      "kind": "event",
+      "label": "WSJ Dollar Index Falls 0.12% to 96.80",
+      "summary": "The WSJ Dollar Index edged 0.1% lower, down for three consecutive trading days.",
+      "publishedAt": "2026-10-22T21:27:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-focus-on-mideast-developments-716c953b?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-focus-on-mideast-developments-716c953b?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 2.754341354166667,
+      "weight": 54
+    },
+    {
+      "id": "N-7c12f364e7575958",
+      "kind": "event",
+      "label": "WSJ Dollar Index Falls 0.04% to 96.92",
+      "summary": "The WSJ Dollar Index edged lower, down for two consecutive trading days.",
+      "publishedAt": "2026-10-21T22:31:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-but-may-be-supported-by-mild-risk-appetite-1384b72e?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-but-may-be-supported-by-mild-risk-appetite-1384b72e?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 3.709896909722222,
+      "weight": 54
+    },
+    {
+      "id": "N-a68fbaa43c640f38",
+      "kind": "event",
+      "label": "Housing is flashing warning signs just as the Fed weighs more interest rate hikes",
+      "summary": "Housing data deteriorated further in September, according to separate reports Tuesday.",
+      "publishedAt": "2026-10-21T11:20:58.000Z",
+      "knownAt": "2026-10-24T01:55:49.934Z",
+      "source": "CNBC Economy",
+      "url": "https://www.cnbc.com/2026/10/20/housing-mortgage-rates-real-estate-federal-reserve.html",
+      "sources": [
+        {
+          "source": "CNBC Economy",
+          "url": "https://www.cnbc.com/2026/10/20/housing-mortgage-rates-real-estate-federal-reserve.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.175197835648148,
+      "weight": 54
+    },
+    {
+      "id": "N-c2c5a79dd4a57d43",
+      "kind": "event",
+      "label": "Piero Cipollone: Pontes and Appia: unlocking opportunities for banks",
+      "summary": "Piero Cipollone: Pontes and Appia: unlocking opportunities for banks",
+      "publishedAt": "2026-10-21T08:00:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261021_1~d190f2c349.en.pdf",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261021_1~d190f2c349.en.pdf"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.314758020833334,
+      "weight": 54
+    },
+    {
+      "id": "N-5af07a29d6c05f1d",
+      "kind": "event",
+      "label": "UK inflation jumps to 3.5% — cementing rate hike expectations",
+      "summary": "U.K. inflation rose by a hotter-than-expected 3.5% in the 12 months to September, driven by the surging cost of motor fuels.",
+      "publishedAt": "2026-10-21T07:50:10.000Z",
+      "knownAt": "2026-10-24T01:55:49.934Z",
+      "source": "CNBC Economy",
+      "url": "https://www.cnbc.com/2026/10/21/inflation-uk-cpi-interest-rates.html",
+      "sources": [
+        {
+          "source": "CNBC Economy",
+          "url": "https://www.cnbc.com/2026/10/21/inflation-uk-cpi-interest-rates.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.321586724537037,
+      "weight": 66
+    },
+    {
+      "id": "N-92fbda37b5976601",
+      "kind": "event",
+      "label": "Philip R. Lane: Euro liquidity lines and the international monetary system",
+      "summary": "Philip R. Lane: Euro liquidity lines and the international monetary system",
+      "publishedAt": "2026-10-21T04:15:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261021~401d6c4b70.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261021~401d6c4b70.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.471008020833334,
+      "weight": 42
+    },
+    {
+      "id": "N-b31d023ee3f95576",
+      "kind": "event",
+      "label": "WSJ Dollar Index Falls 0.25% to 96.96",
+      "summary": "The WSJ Dollar Index fell 0.3% &#x2014; down three of the past four trading days.",
+      "publishedAt": "2026-10-20T21:29:00.000Z",
+      "knownAt": "2026-10-24T02:34:22.077Z",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-mixed-signals-6b3593e6?mod=rss_markets_main",
+      "sources": [
+        {
+          "source": "WSJ Markets",
+          "url": "https://www.wsj.com/finance/currencies/asian-currencies-consolidate-amid-mixed-signals-6b3593e6?mod=rss_markets_main"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 4.752952465277778,
+      "weight": 54
+    },
+    {
+      "id": "N-d5585973bcfc34d7",
+      "kind": "event",
+      "label": "Frank Elderson: Interview with Die Presse",
+      "summary": "Frank Elderson: Interview with Die Presse",
+      "publishedAt": "2026-10-20T07:00:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261020~97e2e4bc38.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in261020~97e2e4bc38.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 5.3564246875,
+      "weight": 42
+    },
+    {
+      "id": "N-5c3f6b77b8fa5291",
+      "kind": "event",
+      "label": "Frank Elderson: From climate and nature risks to economic resilience and competitiveness",
+      "summary": "Frank Elderson: From climate and nature risks to economic resilience and competitiveness",
+      "publishedAt": "2026-10-19T06:00:00.000Z",
+      "knownAt": "2026-10-24T01:52:08.903Z",
+      "source": "European Central Bank",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261019~f0a3e053de.en.html",
+      "sources": [
+        {
+          "source": "European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp261019~f0a3e053de.en.html"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "未识别明确事件方向",
+      "ageDays": 6.398091354166667,
+      "weight": 42
+    }
+  ],
+  "levels": [
+    {
+      "id": "upper",
+      "label": "观察上沿突破",
+      "direction": "up",
+      "threshold": 951.5,
+      "invalidation": 904.912,
+      "reason": "未来收盘站上本次冻结的20日最高价；随后若回落至冻结20日均线，观察条件失效。"
+    },
+    {
+      "id": "lower",
+      "label": "观察下沿失守",
+      "direction": "down",
+      "threshold": 856.01,
+      "invalidation": 904.912,
+      "reason": "未来收盘跌破本次冻结的20日最低价；随后若重新站上冻结20日均线，观察条件失效。"
+    }
+  ],
+  "reference": {
+    "gold": 3997.79,
+    "fx": 6.670240328776915,
+    "goldDate": "2026-10-23",
+    "fxDate": "2026-10-23",
+    "reference": 857.3388838633326,
+    "basis": 6.661116136667374,
+    "note": "现货、汇率为日期级滞后参照；基差包含错时、规格和来源差异。压力测试是算术假设，不是涨跌预测。"
+  },
+  "gaps": [
+    "尚无可连续核对的ETF净流量与央行购金数值序列；相关新闻不能代替统计。"
+  ],
+  "reading": {
+    "position": "20日区间下部",
+    "structure": "收盘低于20日均线，短均线低于60日均线",
+    "tension": "输入存在相反线索",
+    "supportive": [
+      "F-realRates",
+      "F-risk"
+    ],
+    "opposing": [
+      "F-cny",
+      "F-usd"
+    ],
+    "unclear": [
+      "N-f00c8895e753b41d",
+      "N-d6649a9a173a92ea",
+      "N-377d76083d83b890",
+      "N-04fdee93b1599697",
+      "N-a3e77558d513caea",
+      "N-fddfc9162a9cd8d2",
+      "N-82d554a31f1cfc3d",
+      "N-8ecfc6f57072f4ff",
+      "N-5f2022b0d5a78b3c",
+      "N-a488b1e95a2f8669",
+      "N-07af4f89ba46b4e3",
+      "N-c8d998acce4cefec",
+      "N-878c7907a6dcd25f",
+      "N-94efa546a366e304",
+      "N-8c3f729e14cdf4be",
+      "N-ca827896f907b158",
+      "N-65f8fe5f8f7a53ef",
+      "N-839e5fe657d3c842",
+      "N-4187a193fb6836dd",
+      "N-c61eaaa9120fb8b5",
+      "N-07b1b6c46bf795ba",
+      "N-3d029efb49ce4013",
+      "N-1ebb87bdfe1846b7",
+      "N-c1a7f9f854ce2362",
+      "N-7a069da14101d98f",
+      "N-7b5c36581cdddf84",
+      "N-8c94aba89e73b464",
+      "N-071e11f05b45d536",
+      "N-065ac371836d97af",
+      "N-b4a0599433116fb4",
+      "N-b04e63af8bf9a20d",
+      "N-71f7d7b2bb49fb3a",
+      "N-ae8b0a516ed581fb",
+      "N-720210bc75b45d40",
+      "N-afc544a293144a78",
+      "N-dcac0c1c86bfe13c",
+      "N-059e065b684255ff",
+      "N-3238638beb95166b",
+      "N-12f6fd34c1b01c42",
+      "N-238b0b8af5d23442",
+      "N-1ebb536ab9d69592",
+      "N-ed6faf1b09668915",
+      "N-37ea1d48a070d428",
+      "N-f2249efb4bc5b0b9",
+      "N-cfc3fde760461117",
+      "N-c7a8f117266717cd",
+      "N-7230e5cb2b01fca3",
+      "N-6aaa637b88c9fd09",
+      "N-e1dd7e57952623df",
+      "N-7c12f364e7575958",
+      "N-a68fbaa43c640f38",
+      "N-c2c5a79dd4a57d43",
+      "N-5af07a29d6c05f1d",
+      "N-92fbda37b5976601",
+      "N-b31d023ee3f95576",
+      "N-d5585973bcfc34d7",
+      "N-5c3f6b77b8fa5291"
+    ],
+    "note": "偏支持与偏压制是证据方向标签，不是概率；相关因子不按条数累加成买卖分数。"
+  },
+  "checklist": [
+    {
+      "title": "核对下一次已闭市价格",
+      "detail": "用下一条真实收盘检验上沿、下沿与均线条件；盘中触及不算收盘确认。",
+      "evidenceIds": [
+        "P-CLOSE"
+      ]
+    },
+    {
+      "title": "先看传导，再看价格反应",
+      "detail": "把汇率、利率与新闻原文放在一起核对；同时出现不证明因果，也不意味着消息尚未被价格消化。",
+      "evidenceIds": [
+        "F-cny",
+        "F-realRates"
+      ]
+    },
+    {
+      "title": "跟踪相反证据",
+      "detail": "支持与压制线索同时存在，先比较各自时点与来源，保存条件后再观察后续结果。",
+      "evidenceIds": [
+        "F-realRates",
+        "F-risk",
+        "F-cny",
+        "F-usd"
+      ]
+    }
+  ],
+  "narration": {
+    "status": "structured",
+    "inputKey": "5264b5d72eda2c53",
+    "reason": "模型服务未配置，结构化研究正常运行"
+  },
+  "aiPolicy": {
+    "toolsRegistered": 0,
+    "maxCallsPerDay": 12,
+    "minimumIntervalMinutes": 60,
+    "usedToday": 3,
+    "mode": "只解读证据，不生成目标价或交易指令"
+  }
+}

@@ -4,7 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.0.2";
+  var RELEASE_VERSION = "5.1.0";
   var FORECAST_METHOD = "752c60e6f32864c02cc096856c18b25bbb1f1bc6e5bd174982aaf7d397fbe2e5";
   var portfolioSignature = null;
   var storageNotice = "";
@@ -90,6 +90,7 @@
     ledger: DATA.ledger || {entries:[]},
     publication: window.AurumPublication.valid(DATA.publication,FORECAST_METHOD)?DATA.publication:null,
     pipelineHealth: DATA.health || null,
+    analysisDesk: DATA.analysisDesk || null,
     factors: DEFAULT_FACTORS.map(function (item) { return Object.assign({}, item); }),
     forecasts: [],
     forecastHorizon: 1,
@@ -272,6 +273,7 @@
     }
     if(Core.ageHours(bundle.ledger.generatedAt)!==Infinity&&Date.parse(bundle.ledger.generatedAt)>(Date.parse(state.ledger.generatedAt)||0)){state.ledger=bundle.ledger;changed=true;}
     if(window.AurumPublication.valid(bundle.publication,FORECAST_METHOD)&&Date.parse(bundle.publication.generatedAt)>(Date.parse(state.publication?.generatedAt)||0)){state.publication=bundle.publication;changed=true;}
+    if(bundle.analysisDesk?.schema===1&&bundle.analysisDesk?.engine===window.AurumAnalysis.version&&Date.parse(bundle.analysisDesk.generatedAt)>(Date.parse(state.analysisDesk?.generatedAt)||0)){state.analysisDesk=bundle.analysisDesk;changed=true;}
     adoptPipelineHealth(bundle.health);return changed;
   }
 
@@ -676,7 +678,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.0.2");
+      var worker=new Worker("assets/prediction-worker.js?v=5.1.0");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -1205,6 +1207,7 @@
 
   function renderIntelligence() {
     renderResearchHealth();
+    window.AurumAnalysisUI?.render({history:state.history,news:state.news,research:state.research,publication:state.publication,analysisDesk:state.analysisDesk,notify:showToast});
     var query = state.newsQuery.trim().toLocaleLowerCase();
     var filtered = state.news.items.filter(function (item) {
       var category = state.newsFilter === "all" || (state.newsFilter === "high" ? item.weight >= 60 : item.category === state.newsFilter);
@@ -1338,6 +1341,7 @@
       ["账户仓位", stats.allocation.toFixed(1) + "%"],
       ["综合风险", riskScore() + "/100"]
     ];
+    if(!state.config.aiApiKey){var analysis=window.AurumAnalysisUI?.getDesk();context=analysis?.ready?[["已闭市锚点",analysis.price.origin+" / "+money(analysis.price.close)],["研究依据",analysis.facts.length+" 项可核对记录"],["价格窗口","最近60条收盘与区间结构"],["模型任务","解释证据、列出待核实事项"],["账户信息","服务端研究不接收账户数据"]]:[["研究状态","等待有效价格与证据"]];}
     $("modelContextList").innerHTML = context.map(function (item) {
       return '<div class="context-line"><span>' + item[0] + "</span><b>" + item[1] + "</b></div>";
     }).join("");
@@ -1345,14 +1349,14 @@
       ["单笔上限", state.config.maxPosition + "%"],
       ["止损阈值", state.config.stopLoss + "%"],
       ["止盈阈值", state.config.takeProfit + "%"],
-      ["模型接口", state.config.aiApiKey ? state.config.aiProvider : "未启用"]
+      ["模型接口", state.config.aiApiKey ? state.config.aiProvider : "服务端证据研究 / 本地整理"]
     ];
     $("ruleList").innerHTML = rules.map(function (item) {
       return '<div class="context-line"><span>' + escapeHtml(item[0]) +
         "</span><b>" + escapeHtml(String(item[1])) + "</b></div>";
     }).join("");
     $("modelStatus").innerHTML = '<i></i><b>' +
-      escapeHtml(state.config.aiApiKey ? state.config.aiProvider + " · " + state.config.aiModel : "本地规则引擎") +
+      escapeHtml(state.config.aiApiKey ? state.config.aiProvider + " · " + state.config.aiModel : state.analysisDesk?.narration?.inputKey===window.AurumAnalysisUI?.getDesk()?.inputKey&&['ready','partial'].includes(state.analysisDesk?.narration?.status)?"DeepSeek · 证据研究":"结构化研究引擎") +
       "</b>";
   }
 
@@ -1377,6 +1381,7 @@
 
   function renderLocalAdvice() {
     state.aiReportMode = "local";
+    if(!state.config.aiApiKey.trim()&&['daily','news','forecast'].includes(state.promptType)){var grounded=window.AurumAnalysisUI?.advice(state.promptType);if(grounded){$("aiHeadline").textContent=grounded.title;$("aiOutput").innerHTML=grounded.html;return;}}
     if (!state.forecasts.length) { $("aiHeadline").textContent="有效输入不足"; $("aiOutput").innerHTML="<h3>先补齐研究依据</h3><p>需要有效报价和至少 30 个日线点，才能生成情景摘要。</p>"; return; }
     var f = state.forecasts[state.forecastHorizon], baseline = state.baselineForecasts[state.forecastHorizon], stats = portfolioStats();
     var priceDelta = f.center-baseline.center, audit=selectedAudit();
@@ -1449,7 +1454,7 @@
       state.aiReportHeadline = inputProvider + " · 输入截至 " + formatDateTime(inputContext.quote.asOf);
       $("aiHeadline").textContent = state.aiReportHeadline;
       syncAdviceContext();
-      showToast("AI 决策报告已生成", "模型只使用当前页面数据进行推理。");
+      showToast("模型研究报告已生成", "已按本次输入生成，仍需核验来源与结论。");
     } catch (error) {
       state.aiReportMode = "local";
       renderLocalAdvice();

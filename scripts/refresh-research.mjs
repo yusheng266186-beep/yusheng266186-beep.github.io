@@ -3,9 +3,9 @@ import {historyDue,buildHealth} from './pipeline-utils.mjs';
 const json=async p=>{try{return JSON.parse(await readFile(p,'utf8'));}catch{return {};}};
 const previous=await json('data/pipeline-health.json'),started=new Date().toISOString();
 const history=await json('data/market-history.json'),force=process.argv.includes('--force-history');
-async function run(key,file,timeoutMs=160000){
+async function run(key,file,timeoutMs=160000,args=[]){
  const begin=Date.now();let output='';
- return new Promise(resolve=>{const child=spawn(process.execPath,[file],{stdio:['ignore','pipe','pipe']});
+ return new Promise(resolve=>{const child=spawn(process.execPath,[file,...args],{stdio:['ignore','pipe','pipe']});
   const record=data=>{const chunk=data.toString();process.stdout.write(`[${key}] ${chunk}`);output=(output+chunk).slice(-1800);};child.stdout.on('data',record);child.stderr.on('data',record);
   const timer=setTimeout(()=>child.kill('SIGTERM'),timeoutMs);
   child.on('error',error=>{clearTimeout(timer);resolve({key,status:'failed',checkedAt:new Date().toISOString(),error:error.message,durationMs:Date.now()-begin});});
@@ -17,6 +17,7 @@ const attempts=await Promise.all([run('news','scripts/fetch-official-news.mjs'),
 attempts.push(await run('archive','scripts/archive-inputs.mjs'));
 attempts.push(await run('publication','scripts/build-forecast-publication.mjs'));
 attempts.push(await run('ledger','scripts/build-prediction-ledger.mjs'));
+attempts.push(await run('analysis','scripts/build-analysis-desk.mjs',125000,process.env.FORCE_ANALYSIS_AI==='true'?['--refresh-ai']:[]));
 const [news,research,latestHistory,market]=await Promise.all(['data/news.json','data/research-factors.json','data/market-history.json','data/market-snapshot.json'].map(json));
 const runUrl=process.env.GITHUB_RUN_ID?`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`:null;
 async function saveHealth(){const health=buildHealth(previous,attempts,new Date().toISOString(),{news,research,history:latestHistory,market,runUrl});await writeFile('data/pipeline-health.json.tmp',JSON.stringify(health,null,2)+'\n');await rename('data/pipeline-health.json.tmp','data/pipeline-health.json');return health;}
