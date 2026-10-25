@@ -11,11 +11,14 @@
     ["risk",-1,/(?:ceasefire agreement|peace agreement|停火协议|和平协议)/i,"避险事件缓和"],
     ["flows",1,/(?:gold.{0,15}(?:ETF|fund)|黄金.{0,6}(?:ETF|基金)).{0,35}(?:net inflows?|资金净流入)/i,"黄金基金净流入"],
     ["flows",-1,/(?:gold.{0,15}(?:ETF|fund)|黄金.{0,6}(?:ETF|基金)).{0,35}(?:net outflows?|资金净流出)/i,"黄金基金净流出"]
+    ,["liquidity",-1,/(?:margin calls|forced liquidation|追加保证金|被迫平仓)/i,"明确的去杠杆冲击"]
+    ,["supply",-1,/(?:gold mine production|黄金矿产量).{0,30}(?:increas|增长|上升)/i,"矿产供应增加"]
+    ,["supply",1,/(?:gold mine production|黄金矿产量).{0,30}(?:decreas|declin|下降|减少)/i,"矿产供应下降"]
   ];
   function classifyNews(item){
     const text=String(item.title||"")+" "+String(item.summary||"");
     // No generic 'inflation', 'risk' or 'cut' scoring. Negated/conditional statements stay unresolved.
-    if(/\b(?:does not|did not|not to|no plans to|may|might|could|expected to|forecast to)\b.{0,45}(?:cut|lower|raise|hike|buy|sell)|不.{0,5}(?:降息|加息|购金)|可能|预计|有望|预期|料将|或将|暗示|考虑|押注|预测|概率/i.test(text))return {score:0,dimension:"unresolved",reason:"条件、预期或否定语句，未作方向判定"};
+    if(/\b(?:does not|did not|not to|no plans to|may|might|could|expected to|forecast to)\b.{0,45}(?:cut|lower|raise|hike|buy|sell)|不.{0,5}(?:降息|加息|购金)|未.{0,5}(?:增持|购金)|(?:停火|和平)协议.{0,6}(?:破裂|失败)|可能|预计|有望|预期|料将|或将|暗示|考虑|押注|预测|概率/i.test(text))return {score:0,dimension:"unresolved",reason:"条件、预期或否定语句，未作方向判定"};
     const hits=rules.filter(r=>r[2].test(text)),sum=hits.reduce((s,r)=>s+r[1],0);
     return {score:sum?Math.sign(sum)*.6:0,dimension:hits[0]?.[0]||"unresolved",reason:hits.length?hits.map(r=>r[3]).join(" / "):"未识别明确事件方向"};
   }
@@ -39,14 +42,20 @@
     events.push(...groups.values());
     const newsValue=events.length?clamp(events.reduce((s,x)=>s+x.value,0)/Math.sqrt(events.length),-1,1):0;
     const snapshots=(data.snapshots||[]).filter(s=>Number.isFinite(Date.parse(s.capturedAt))&&Date.parse(s.capturedAt)<=cutoff).sort((a,b)=>Date.parse(b.capturedAt)-Date.parse(a.capturedAt));
-    const latest=snapshots[0],drivers=[];
+    const latest=snapshots[0],drivers=[],observations=[];
     for(const f of latest?.factors||[]){
       const observation=Date.parse(f.observedAt),age=(cutoff-observation)/864e5,available=Date.parse(f.availableAt||latest.capturedAt);
-      if(!Number.isFinite(age)||age<0||age>7||!Number.isFinite(available)||available>cutoff||!Number.isFinite(f.signal)||!Number.isFinite(f.weight)||!(f.weight>0))continue;
-      drivers.push({...f,rawValue:f.value,value:clamp(f.signal,-1,1)*Math.exp(-Math.LN2*age/5)});
+      const maxAge=Number.isFinite(f.maxAgeDays)?Math.min(45,Math.max(1,f.maxAgeDays)):7;
+      if(!Number.isFinite(age)||age<0||age>maxAge||!Number.isFinite(available)||available>cutoff||!Number.isFinite(f.signal))continue;
+      const item={...f,rawValue:f.value,value:clamp(f.signal,-1,1)*Math.exp(-Math.LN2*age/Math.max(5,maxAge/2))};
+      observations.push(item);
+      if(Number.isFinite(f.weight)&&f.weight>0)drivers.push(item);
     }
-    const marketValue=drivers.length?clamp(drivers.reduce((s,f)=>s+f.value*f.weight,0)/Math.max(1,drivers.reduce((s,f)=>s+f.weight,0)),-1,1):0;
-    return {asOf:new Date(cutoff).toISOString(),newsValue,marketValue,events,drivers,capturedAt:latest?.capturedAt||null,
+    // Correlated rate channels share one budget instead of multiplying their influence.
+    const driverGroups=new Map();
+    for(const f of drivers){const key=f.group||f.id,old=driverGroups.get(key)||{sum:0,weight:0,cap:0};old.sum+=f.value*f.weight;old.weight+=f.weight;old.cap=Math.max(old.cap,f.weight);driverGroups.set(key,old);}
+    const grouped=[...driverGroups.values()],marketValue=grouped.length?clamp(grouped.reduce((s,g)=>s+g.sum/g.weight*g.cap,0)/Math.max(1,grouped.reduce((s,g)=>s+g.cap,0)),-1,1):0;
+    return {asOf:new Date(cutoff).toISOString(),newsValue,marketValue,events,drivers,observations,capturedAt:latest?.capturedAt||null,
       active:events.length+drivers.length,score:clamp(.35*newsValue+.65*marketValue,-1,1)};
   }
   function movement(ctx,h,sigma){

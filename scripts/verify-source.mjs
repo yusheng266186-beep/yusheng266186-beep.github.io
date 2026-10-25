@@ -1,19 +1,21 @@
 import {readFile,access} from 'node:fs/promises';import {execFileSync} from 'node:child_process';
 import {resolve,dirname} from 'node:path';
 import {createHash} from 'node:crypto';
+import {modelIdentity} from './model-identity.mjs';
 const html=await readFile('index.html','utf8'),app=await readFile('assets/app.js','utf8');
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]),set=new Set(ids);
 if(set.size!==ids.length)throw new Error('Duplicate element IDs');
 for(const source of [app,await readFile('assets/journal-ui.js','utf8')])for(const m of source.matchAll(/\$\("([^"]+)"\)/g))if(!set.has(m[1]))throw new Error('Missing element: '+m[1]);
 const {version}=JSON.parse(await readFile('package.json','utf8'));
+if(!html.includes('data/embedded-data.js?v='+version+'"'))throw Error('Embedded schema cache version mismatch');
 if(!app.includes('var RELEASE_VERSION = '+JSON.stringify(version)))throw Error('App release identity mismatch');
-const methodHash=createHash('sha256').update((await Promise.all(['assets/core.js','assets/quant.js','assets/evidence.js'].map(p=>readFile(p)))).map(b=>b.toString()).join('\n')).digest('hex');
+const methodHash=await modelIdentity();
 if(!app.includes('var FORECAST_METHOD = '+JSON.stringify(methodHash)))throw Error('Forecast algorithm identity mismatch');
 for(const text of [app,await readFile('assets/prediction-worker.js','utf8')])for(const match of text.matchAll(/assets\/prediction-worker\.js\?v=([\d.]+)|(?:core|evidence|quant)\.js\?v=([\d.]+)/g))if((match[1]||match[2])!==version)throw Error('Worker release mismatch');
 for(const path of ['assets/core.js','assets/quant.js','assets/evidence.js','assets/app.js','assets/scene.js','assets/gold-world.js','assets/journal-ui.js','assets/research-journal.js','assets/cinematic.css','assets/layout.css'])if(!html.includes(path+'?v='+version+'"'))throw Error('Release entry version mismatch: '+path);
 for(const match of html.matchAll(/(?:src|href)="(assets\/[^"?]+\.(?:js|css))(?:\?v=([^"&]+))?"/g))if(match[2]!==version)throw Error('Mixed release entries: '+match[1]);
-for(const path of ['assets/app.js','assets/core.js','assets/quant.js','assets/evidence.js','assets/scene.js','assets/gold-world.js','assets/gold-geometry.js','assets/research-journal.js','assets/journal-ui.js','assets/render-policy.js','assets/gold-surface.js','assets/gold-worker.js','assets/prediction-worker.js','scripts/fetch-market-snapshot.mjs','scripts/fetch-market-history.mjs','scripts/fetch-official-news.mjs','scripts/news-utils.mjs','scripts/fetch-utils.mjs','scripts/pipeline-utils.mjs','scripts/refresh-research.mjs','scripts/research-utils.mjs','scripts/build-prediction-ledger.mjs','scripts/ledger-utils.mjs','scripts/fetch-research-factors.mjs','scripts/validate-model.mjs','scripts/validation-utils.mjs','scripts/build-validation-report.mjs','scripts/quote-collector.mjs','scripts/build-embedded-data.mjs'])execFileSync(process.execPath,['--check',path]);
-for(const path of ['data/market-history.json','data/market-snapshot.json','data/news.json','data/pipeline-health.json','data/research-bundle.json','data/research-factors.json','data/forecast-ledger.json','data/model-validation.json'])JSON.parse(await readFile(path,'utf8'));
+for(const path of ['assets/adaptive-model.js','assets/research-engine.js','assets/model-lab-ui.js','scripts/model-identity.mjs','scripts/evaluate-research-model.mjs','scripts/build-model-research-report.mjs','assets/app.js','assets/core.js','assets/quant.js','assets/evidence.js','assets/scene.js','assets/gold-world.js','assets/gold-geometry.js','assets/research-journal.js','assets/journal-ui.js','assets/render-policy.js','assets/gold-surface.js','assets/gold-worker.js','assets/prediction-worker.js','scripts/fetch-market-snapshot.mjs','scripts/fetch-market-history.mjs','scripts/fetch-official-news.mjs','scripts/news-utils.mjs','scripts/fetch-utils.mjs','scripts/pipeline-utils.mjs','scripts/refresh-research.mjs','scripts/research-utils.mjs','scripts/build-prediction-ledger.mjs','scripts/ledger-utils.mjs','scripts/fetch-research-factors.mjs','scripts/validate-model.mjs','scripts/validation-utils.mjs','scripts/build-validation-report.mjs','scripts/quote-collector.mjs','scripts/build-embedded-data.mjs'])execFileSync(process.execPath,['--check',path]);
+for(const path of ['data/market-history.json','data/market-snapshot.json','data/news.json','data/pipeline-health.json','data/research-bundle.json','data/research-factors.json','data/forecast-ledger.json','data/model-validation.json','data/model-research.json'])JSON.parse(await readFile(path,'utf8'));
 const visited=new Set();
 async function checkModule(file){
   file=resolve(file);if(visited.has(file))return;visited.add(file);

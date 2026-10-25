@@ -16,3 +16,11 @@ test('interface releases share algorithm outcomes while a changed algorithm star
  assert.equal(later.entries.length,1);assert.deepEqual(later.entries[0],first.entries[0]);assert.equal(later.methodHash,'hash');assert.equal(later.version,'new-interface');
  const changed=updateLedger(later,{...input,version:'new-interface',methodHash:'changed-algorithm'});assert.equal(changed.entries.length,2);assert.notEqual(changed.entries[0].id,changed.entries[1].id);assert.deepEqual(changed.entries[0],first.entries[0]);
 });
+
+test('shadow forecasts freeze independently and mature without changing original predictions',()=>{
+ const daily=Array.from({length:12},(_,i)=>({time:'2026-10-'+String(i+1).padStart(2,'0'),close:100+i,observedAt:'2026-10-20T00:00:00Z'}));
+ const firstDaily=daily.slice(0,3),forecasts=[{days:7,center:103,low:90,high:120}],shadowForecasts=[{model:'adaptive',days:7,center:104,low:91,high:121}];
+ const first=updateLedger({entries:[]},{daily:firstDaily,forecasts,shadowForecasts,now:'2026-10-03T16:00:00+08:00',version:'v',methodHash:'shadow-test',inputHash:'a',historyAsOf:'2026-10-03T16:00:00+08:00'});
+ const result=updateLedger(first,{daily,forecasts:[],shadowForecasts:[],now:'2026-10-21T00:00:00Z',version:'v',methodHash:'shadow-test',inputHash:'b',historyAsOf:'2026-10-20T00:00:00Z'});
+ assert.equal(first.entries[0].shadowForecasts[0].result,undefined);assert.equal(result.entries[0].shadowForecasts[0].center,104);assert.equal(result.entries[0].shadowForecasts[0].result.actual,107);assert.equal(result.entries[0].forecasts[0].center,103);
+});
