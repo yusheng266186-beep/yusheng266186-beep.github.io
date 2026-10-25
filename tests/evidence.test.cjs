@@ -21,3 +21,12 @@ test('market snapshots cannot backfill future observations or survive stale expi
  assert.equal(E.context(data,'2026-11-01T00:00:00Z').drivers.length,0);
  for(const h of [0,1,5,21,126,756])assert.ok(Math.abs(E.movement({score:100},h,10))<=.04);
 });
+
+test('monitor-only channels remain available to feature training without forcing a directional prior',()=>{
+ const data={snapshots:[{capturedAt:now,factors:[{id:'oil',value:100,signal:1,weight:0,observedAt:'2026-10-23T00:00:00Z',availableAt:now}]}]};
+ const c=E.context(data,now);assert.equal(c.drivers.length,0);assert.equal(c.observations.length,1);assert.equal(c.marketValue,0);
+});
+test('correlated rate indicators share a group budget instead of multiplying exposure',()=>{
+ const f={signal:1,weight:1,observedAt:'2026-10-23T00:00:00Z',availableAt:now,group:'rates'};
+ const a=E.context({snapshots:[{capturedAt:now,factors:[{...f,id:'realRates'}]}]},now),b=E.context({snapshots:[{capturedAt:now,factors:[{...f,id:'realRates'},{...f,id:'nominal2y'}]}]},now);assert.equal(a.marketValue,b.marketValue);
+});

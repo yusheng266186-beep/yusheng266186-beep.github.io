@@ -2,10 +2,10 @@
   "use strict";
 
   var Core = window.AurumCore;
-  var Quant = window.AurumQuant;
+  var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "4.5.3";
-  var FORECAST_METHOD = "3bda3f4cf30262c03074783cb38c1bfa1ddb7b6a5f39385555a38b4632cb0fb4";
+  var RELEASE_VERSION = "4.6.0";
+  var FORECAST_METHOD = "208835dce873a91272793bc1666b244e2c3376b7abcbf5a25ba36e74a6cda3d4";
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
@@ -672,7 +672,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=4.5.3");
+      var worker=new Worker("assets/prediction-worker.js?v=4.6.0");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -977,8 +977,9 @@
     setText("auditWindow", e?.count ? e.records[0].origin+" — "+e.records.at(-1).target+" · "+e.steps+" 个记录交易日/期" : "每年按 252 个交易日近似换算；至少 120 日训练，另需 8 次已结束预测进行初始校准。");
   }
   function renderValidation(){
+    window.AurumModelLab?.render(state.quantProfile,state.quote,state.forecastHorizon,DATA.modelResearch,state.ledger,FORECAST_METHOD);
     var report=DATA.validation,days=state.forecasts[state.forecastHorizon]?.days||30,h=report?.horizons?.find(function(h){return h.days===days;});
-    if(!h||report.methodHash!==FORECAST_METHOD){setText("validationTitle","多时点记录暂不可用");setText("validationDecision","当前实验记录缺失或对应其他算法；当前预测仍可独立使用历史回放检验。");$("exportValidation").disabled=true;return;}
+    if(!h||report.methodHash!=="3bda3f4cf30262c03074783cb38c1bfa1ddb7b6a5f39385555a38b4632cb0fb4"){setText("validationTitle","多时点记录暂不可用");setText("validationDecision","上一代封存实验记录缺失；当前预测可独立使用历史回放检验。");$("exportValidation").disabled=true;return;}
     $("exportValidation").disabled=false;
     if(state.validationDays!==days){state.validationDays=days;state.validationLimit=4;}
     var validationKey=days+"|"+$("validationPhase").value+"|"+(state.validationLimit||4)+"|"+report.generatedAt;if(state.validationRenderKey===validationKey)return;state.validationRenderKey=validationKey;
@@ -1023,14 +1024,14 @@
     var date=$("replayDate").value,days=Number($("replayHorizon").value);
     if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>$("replayDate").max||date<$("replayDate").min){setText("replayStatus","请选择有效历史范围内的日期。");return;}
     var worker=predictionWorker();
-    if(worker){state.replayRequest=(state.replayRequest||0)+1;$("runReplay").disabled=true;setText("replayStatus","正在独立计算所选历史时点…");worker.postMessage({type:"replay",id:state.replayRequest,daily:state.history.daily,date,days,evidence:evidenceData()});}
-    else renderReplayResult(Quant.replay(state.history.daily,date,days,evidenceData()));
+    if(worker){state.replayRequest=(state.replayRequest||0)+1;$("runReplay").disabled=true;setText("replayStatus","正在独立计算所选历史时点…");worker.postMessage({type:"replay",id:state.replayRequest,daily:state.history.daily,date,days,evidence:evidenceData(),model:$("replayModel").value});}
+    else renderReplayResult(Quant.replay(state.history.daily,date,days,evidenceData(),$("replayModel").value));
   }
   function renderReplayResult(r){
     if(!r.ready){setText("replayStatus",r.reason);return;}
     var values=[["训练截至",r.origin],["起点收盘",money(r.start)],["当时预测中枢",money(r.center)],["当时预测区间",toFixedPrice(r.low)+" — "+toFixedPrice(r.high)],["核验日期",r.target||"尚未走完该周期"],["实际收盘",r.actual?money(r.actual):"等待后续日线"],["模型绝对百分比误差",r.error===null?"待核验":r.error.toFixed(2)+"%"],["持平基准误差",r.baselineError===null?"待核验":r.baselineError.toFixed(2)+"%"],["涨跌方向",r.directionHit===null?"待核验":r.directionHit?"命中":"未命中"]];
     $("replayResults").innerHTML=values.map(function(v){return '<div><dt>'+v[0]+'</dt><dd>'+escapeHtml(v[1])+'</dd></div>';}).join("");
-    setText("replayStatus","仅用截至 "+r.origin+" 的 "+r.trainCount+" 条收盘训练，不读取之后的价格作特征；后续收盘只用于核验。"+(r.evidenceCount?"当时有 "+r.evidenceCount+" 项外部存档可用。":"此日期没有当时已见的外部存档，本次仅回放量价模型。")+"休市日回退到此前末次记录；后续目标按记录交易日换算。原始价格为当前历史快照，未具备历史修订版本。单次结果不能代表总体准确率。");
+    setText("replayStatus",({legacy:"当前模型",adaptive:"试验在线集成",boosted:"试验浅层提升"}[r.model]||"当前模型")+" · 仅用截至 "+r.origin+" 的 "+r.trainCount+" 条收盘训练，不读取之后的价格作特征；后续收盘只用于核验。"+(r.evidenceCount?"当时有 "+r.evidenceCount+" 项外部存档可用。":"此日期没有当时已见的外部存档，本次仅回放量价模型。")+"休市日回退到此前末次记录；后续目标按记录交易日换算。原始价格为当前历史快照，未具备历史修订版本。单次结果不能代表总体准确率。");
   }
   function renderRiskLab() {
     var input=orderInput(),size=Quant.riskSize(state.portfolio,state.quote,state.config,input,$("riskBudgetPct").value);
@@ -2678,7 +2679,8 @@
     $("validationPhase").addEventListener("change",function(){state.validationLimit=4;renderValidation();});
     $("moreValidation").addEventListener("click",function(){state.validationLimit=(state.validationLimit||4)+4;renderValidation();});
     $("exportValidation").addEventListener("click",exportValidation);
-    $("validationRecords").addEventListener("click",function(event){var link=event.target.closest("[data-validation-date]");if(!link)return;$("replayDate").value=link.dataset.validationDate;$("replayHorizon").value=link.dataset.validationDays;$("replayLab").open=true;runReplay();});
+    $("modelResearchLab").addEventListener("click",function(event){var link=event.target.closest("[data-research-model]");if(!link)return;$("replayDate").value=link.dataset.validationDate;$("replayHorizon").value=link.dataset.validationDays;$("replayModel").value=link.dataset.researchModel;$("replayLab").open=true;runReplay();});
+    $("validationRecords").addEventListener("click",function(event){var link=event.target.closest("[data-validation-date]");if(!link)return;$("replayDate").value=link.dataset.validationDate;$("replayHorizon").value=link.dataset.validationDays;$("replayModel").value="legacy";$("replayLab").open=true;runReplay();});
     $("runReplay").addEventListener("click",runReplay);
     $("refreshResearchBtn").addEventListener("click",function(){refreshResearchData(true);});
     $("riskBudgetPct").addEventListener("input",renderRiskLab);

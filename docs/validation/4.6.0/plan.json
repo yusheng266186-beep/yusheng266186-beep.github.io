@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "external-methods-2026-10-25",
+  "createdAt": "2026-10-25T06:37:57.263Z",
+  "target": "AU9999 CNY/gram closed daily",
+  "dataHash": "fccbfe1506933db8dde6cfcffa69ab32272a7021b08447d99488c0b645966b13",
+  "kernel": {
+    "assets/core.js": "7e4d0ef0a2dd96e4975a166b8a77038dec701149fb26f1c4ff5f25b2b24b673e",
+    "assets/quant.js": "da4a7294ec44e8e5c34c2502fc2f925e07086de895f29a01f4b701013eddeef9",
+    "assets/evidence.js": "38eab0af9e5a98f6623a2954021ecb7dfa6732914cfbd41454a2a1217869f094",
+    "assets/adaptive-model.js": "02279015a33eb52072b8a2fec8e56ccb624efc9653dd9d62c3c3a889544c66d3"
+  },
+  "candidates": [
+    "legacy",
+    "boosted",
+    "adaptive"
+  ],
+  "horizons": [
+    7,
+    30,
+    180,
+    365,
+    1095
+  ],
+  "splits": {
+    "development": {
+      "start": "2019-01-01",
+      "end": "2022-12-31"
+    },
+    "validation": {
+      "start": "2023-01-01",
+      "end": "2024-12-31"
+    },
+    "holdout": {
+      "start": "2025-01-01",
+      "end": "2026-10-23"
+    }
+  },
+  "origins": "119 + k * round(days*252/365); labels wholly inside each phase; first 8 resolved forecasts calibrate intervals",
+  "gate": {
+    "minNonOverlappingPerPhase": 12,
+    "maxRmseRatio": 1.02,
+    "minDirectionDelta": -3,
+    "minRegimeCount": 8,
+    "maxRegimeMapeRatio": 1.1
+  },
+  "developmentGain": 0.02,
+  "validationGain": 0.02,
+  "holdoutGain": 0.01,
+  "notes": [
+    "This historical cohort has been inspected in previous development; the final phase is a chronological research tail, not pristine never-seen data.",
+    "No archived external news/macro coverage for old origins; this comparison tests price/volume/OHLC only, not hypothetical past real-time news.",
+    "All challengers remain visible if rejected. No hyperparameter retuning after selection or tail results.",
+    "Public methods inspire design; no claim that a third-party accuracy transfers to AU9999."
+  ]
+}

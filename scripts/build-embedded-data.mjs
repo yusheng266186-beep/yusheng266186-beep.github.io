@@ -9,7 +9,8 @@ const files = {
   research: "data/research-factors.json",
   ledger: "data/forecast-ledger.json",
   health: "data/pipeline-health.json",
-  validation: "data/model-validation.json"
+  validation: "data/model-validation.json",
+  modelResearch: "data/model-research.json"
 };
 
 const payload = {};
