@@ -1,5 +1,5 @@
 /* Point-in-time evidence rules, shared by collector and browser. No network or DOM. */
-(function(root,factory){if(typeof module==="object"&&module.exports)module.exports=factory();else root.AurumEvidence=factory();})(typeof globalThis==="object"?globalThis:this,function(){
+(function(root,factory){if(typeof module==="object"&&module.exports)module.exports=factory(require('./news-factors.js'));else root.AurumEvidence=factory(root.AurumNewsFactors);})(typeof globalThis==="object"?globalThis:this,function(NewsFactors){
   "use strict";
   const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
   const rules=[
@@ -40,6 +40,8 @@
       if(!old||Math.abs(value)>Math.abs(old.value))groups.set(group,event);
     }
     events.push(...groups.values());
+    const semanticMode=data.aiNews?.schema===1;
+    if(semanticMode)events.length=0;
     const newsValue=events.length?clamp(events.reduce((s,x)=>s+x.value,0)/Math.sqrt(events.length),-1,1):0;
     const snapshots=(data.snapshots||[]).filter(s=>Number.isFinite(Date.parse(s.capturedAt))&&Date.parse(s.capturedAt)<=cutoff).sort((a,b)=>Date.parse(b.capturedAt)-Date.parse(a.capturedAt));
     const latest=snapshots[0],drivers=[],observations=[];
@@ -55,12 +57,12 @@
     const driverGroups=new Map();
     for(const f of drivers){const key=f.group||f.id,old=driverGroups.get(key)||{sum:0,weight:0,cap:0};old.sum+=f.value*f.weight;old.weight+=f.weight;old.cap=Math.max(old.cap,f.weight);driverGroups.set(key,old);}
     const grouped=[...driverGroups.values()],marketValue=grouped.length?clamp(grouped.reduce((s,g)=>s+g.sum/g.weight*g.cap,0)/Math.max(1,grouped.reduce((s,g)=>s+g.cap,0)),-1,1):0;
-    return {asOf:new Date(cutoff).toISOString(),newsValue,marketValue,events,drivers,observations,capturedAt:latest?.capturedAt||null,
-      active:events.length+drivers.length,score:clamp(.35*newsValue+.65*marketValue,-1,1)};
+    const aiNews=semanticMode?NewsFactors.context(data.aiNews,cutoff,drivers):null;
+    return {semanticMode,aiNews,asOf:new Date(cutoff).toISOString(),newsValue,marketValue,events,drivers,observations,capturedAt:latest?.capturedAt||null,
+      active:events.length+drivers.length+(aiNews?.active||0),score:clamp((semanticMode?0:.35*newsValue)+.65*marketValue,-1,1)};
   }
-  function movement(ctx,h,sigma){
-    // Explicit expert overlay, capped, transient. Not passed off as fitted or historically validated.
-    return ctx?clamp(ctx.score* Math.min(.012,Math.max(.003,sigma))*5*(1-Math.exp(-h/10))*Math.exp(-Math.max(0,h-21)/252),-.04,.04):0;
-  }
-  return {classifyNews,context,movement};
+  function marketMovement(ctx,h,sigma){return ctx?clamp(ctx.score*Math.min(.012,Math.max(.003,sigma))*5*(1-Math.exp(-h/10))*Math.exp(-Math.max(0,h-21)/252),-.04,.04):0;}
+  function newsEffect(ctx,h,sigma){const news=NewsFactors.movement(ctx?.aiNews,h,sigma),base=marketMovement(ctx,h,sigma),move=clamp(base+news.move,-.04,.04)-base,ratio=news.move?move/news.move:0;return {...news,move,components:news.components.map(c=>({...c,move:c.move*ratio}))};}
+  function movement(ctx,h,sigma){return marketMovement(ctx,h,sigma)+newsEffect(ctx,h,sigma).move;}
+  return {classifyNews,context,movement,newsEffect};
 });

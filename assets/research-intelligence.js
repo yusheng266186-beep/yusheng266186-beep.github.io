@@ -1,7 +1,7 @@
 /* Shared, deterministic gates for the fixed-model research workflow. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./analysis-engine.js'));else root.AurumResearchIntelligence=factory(root.AurumAnalysis);})(typeof globalThis==='object'?globalThis:this,function(Analysis){
  'use strict';
- const version='research-agent-2',MODEL='deepseek-v4.1-flash';
+ const version='research-agent-3',MODEL='deepseek-v4.1-flash';
  const fingerprint=f=>Analysis.hash([f.id,f.label,f.summary||'',f.value??null,f.change??null,f.direction,f.publishedAt,f.kind==='price'?null:f.knownAt,f.url]);
  const articleKey=f=>Analysis.hash([f.id,f.label,f.summary,f.publishedAt,f.url]);
  const eventId=item=>'N-'+Analysis.hash(String(item.title||'').slice(0,240).toLowerCase().replace(/[^\p{L}\p{N}]/gu,'')+String(item.publishedAt).slice(0,10));

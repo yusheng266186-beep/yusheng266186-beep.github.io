@@ -4,8 +4,8 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.2.2";
-  var FORECAST_METHOD = "752c60e6f32864c02cc096856c18b25bbb1f1bc6e5bd174982aaf7d397fbe2e5";
+  var RELEASE_VERSION = "5.3.0";
+  var FORECAST_METHOD = "21e6d9c92ae7c06d357e95fbaa385556b8c10dc247f8368f8d62c30af870c0a2";
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
@@ -682,12 +682,12 @@
     state.forecasts = state.scenarioModel.points;
     state.baselineForecasts = Quant.scenarioModel(state.quote.priceCnyGram, {...state.quantProfile,context:null}, 0).points;
   }
-  function evidenceData(){return {news:state.news.items,snapshots:state.research.snapshots||[]};}
+  function evidenceData(){return {news:state.news.items,snapshots:state.research.snapshots||[],aiNews:state.analysisDesk?.intelligence?.factorSnapshot||state.publication?.newsFactors?.snapshot||{schema:1,version:window.AurumNewsFactors.version,generatedAt:new Date().toISOString(),events:[]}};}
   function predictionWorker(){
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.2.2");
+      var worker=new Worker("assets/prediction-worker.js?v=5.3.0");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -924,7 +924,7 @@
       updateText(button.querySelector(".forecast-top>span"), f.label);
       var audit = state.quantProfile.evaluations.find(function(e){return e.days===f.days;});
       var manual = Math.abs(state.scenarioModel.scoreDelta)>.0001;
-      var modelLabel = manual ? "手动假设" : state.quantProfile.context?.active ? "量价 + 多因子" : "量价集成";
+      var modelLabel = manual ? "手动假设" : state.quantProfile.context?.aiNews?.active ? "量价 · AI因子" : state.quantProfile.context?.active ? "量价 + 多因子" : "量价集成";
       updateText(button.querySelector(".forecast-top>b"), modelLabel);
       updateText(button.querySelector('[data-bound="low"]'), toFixedPrice(f.low));
       updateText(button.querySelector('[data-bound="high"]'), toFixedPrice(f.high));
@@ -936,6 +936,7 @@
     var sameCenter=state.forecasts.length>1 && state.forecasts.every(function(f){return Math.abs(f.center-state.forecasts[0].center)<.005;});
     setText("forecastBasisNote", "数据路径由历史量价与可用存档计算；6 个月以上含长期外推。"+(sameCenter?"当前输入接近平稳，未强制制造方向差异。":"")+(Math.abs(state.scenarioModel.scoreDelta)>.0001?"手动假设会平移路径，不沿用历史覆盖率。":""));
     var focus = state.forecasts[state.forecastHorizon];
+    if(focus?.newsEffect){var fx=focus.newsEffect,newsCtx=state.quantProfile.context?.aiNews;setText("forecastNewsEffect",newsCtx?.active?"AI 新闻修正 "+signedPercent(Math.expm1(fx.move)*100)+" · "+newsCtx.active+" 条去重事件 · 含衰减与因子重叠折扣":"AI 新闻参数待补齐或当前无明确有效方向；继续使用量价与已观测因子。");}
     $("captureScenario").disabled = !focus || !state.quote.asOf;
     $("scenarioFocus").innerHTML = focus ? '<div><span>当前观察 · '+focus.label+'</span><strong>'+toFixedPrice(focus.center)+'<small>元 / 克</small></strong></div><p>波动情景带 <b>'+toFixedPrice(focus.low)+' — '+toFixedPrice(focus.high)+'</b><small>历史波动与误差刻度 · 不保证未来覆盖</small></p>' : '';
     var baseline = state.baselineForecasts[state.forecastHorizon];
@@ -1028,14 +1029,17 @@
   }
   function renderPredictionEvidence(){
     var ctx=state.quantProfile.context,e=selectedAudit(),contributions=e?.contributions||[];
-    setText("evidenceSummary",(ctx?.drivers.length||0)+" 项市场输入 · "+(ctx?.events.length||0)+" 条明确事件 · 可追溯时点");
+    setText("evidenceSummary",(ctx?.drivers.length||0)+" 项市场输入 · "+(ctx?.aiNews?.active||ctx?.events.length||0)+" 条有效消息 · 可追溯时点");
     setText("evidenceClock","资讯核对 "+formatDateTime(state.news.checkedAt||state.news.generatedAt)+" · 市场因子核对 "+formatDateTime(state.research.generatedAt)+"。已收录 "+state.news.items.length+" 条原文；本次资讯渠道 "+state.news.sourceStatus.filter(function(s){return s.ok;}).length+" / "+state.news.sourceStatus.length+" 可用。"+(state.news.failedSources.length?"未获取："+state.news.failedSources.join("、")+"。":"")+"后台每轮目标间隔 5 分钟，前台每 1 分钟核对；调度及源站可能延迟，非逐笔实时资讯。没有明确方向的消息不会强行打分。");
     var rows=contributions.map(function(c){return '<div class="evidence-row"><span>'+escapeHtml(c.label)+'</span><b>'+signedPercent(Math.expm1(c.move)*100)+'</b><small>量价模型 · 对数贡献换算</small></div>';});
     rows=rows.concat((ctx?.drivers||[]).map(function(d){return '<a class="evidence-row" href="'+safeUrl(d.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(d.label)+'</span><b>'+signedNumber(Math.round(d.value*100))+'</b><small>'+escapeHtml(d.detail+' · 观测 '+d.observedAt.slice(0,10))+'</small></a>';}));
     rows=rows.concat((ctx?.events||[]).slice(0,8).map(function(event){return '<a class="evidence-row" href="'+safeUrl(event.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(event.label)+'</span><b>'+signedNumber(Math.round(event.value*100))+'</b><small>'+escapeHtml(event.source+' · '+formatDateTime(event.publishedAt))+'</small></a>';}));
+    var ne=window.AurumEvidence.newsEffect(ctx,(e?.steps||state.forecasts[state.forecastHorizon]?.days*252/365),state.quantProfile.fit?.sigma),coverage=ctx?.aiNews?.coverage;
+    if(ctx?.aiNews?.ready){rows.push('<div class="evidence-row"><span>AI 新闻合计修正</span><b>'+signedPercent(Math.expm1(ne.move)*100)+'</b><small>DeepSeek V4.1 Flash · '+(coverage?.parameterized||0)+' 条参数 · 相关因子去重后，有界先验</small></div>');rows=rows.concat(ne.components.filter(c=>c.value).map(c=>'<div class="evidence-row"><span>'+escapeHtml(c.label)+'</span><b>'+signedPercent(Math.expm1(c.move)*100)+'</b><small>方向分 '+signedNumber(Math.round(c.value*100))+(c.overlapDiscount<1?' · 与数值因子重合，贡献减半':'')+'</small></div>'));}
+    var paired=state.publication?.newsFactors?.forwardSummary?.find(x=>x.days===state.forecasts[state.forecastHorizon]?.days);if(paired)rows.push('<div class="evidence-row"><span>AI / 无 AI 前瞻对照</span><b>'+paired.count+' 组</b><small>'+(paired.count?'MAPE '+money(paired.aiMape)+'% / '+money(paired.baseMape)+'%':'尚无到期独立样本，不宣称准确率提高')+'</small></div>');
     var html=rows.join("");if(state.evidenceHTML!==html){$("evidenceRows").innerHTML=html;state.evidenceHTML=html;}
     var failed=(state.research.status||[]).filter(function(s){return !s.ok;}).map(function(s){return s.id;});
-    setText("evidenceLimits","价格贡献单位为收益百分比；预测幅度根据此前已结束的误差收缩，当前保留 "+((e?.shrink||.5)*100).toFixed(0)+"%。外部输入为 −100 至 +100 的方向分，合计修正封顶 ±4%，随时间衰减。外部系数是预设规则，未冒充训练结果。"+(failed.length?"本次市场来源不可用："+failed.join("、")+"；旧观测超过 7 日退出。":"")+"央行储备、ETF 资金流只有明确事件时参与；未取得的数据不补零冒充观测。消息首次见到和发布均须早于计算时点。");
+    setText("evidenceLimits","价格贡献单位为收益百分比；预测幅度根据此前已结束的误差收缩，当前保留 "+((e?.shrink||.5)*100).toFixed(0)+"%。外部输入为 −100 至 +100 的方向分，合计修正封顶 ±4%，随时间衰减。AI 新闻使用弱先验转换为收益修正，按新颖度、持续时间和消息状态衰减；最多贡献约 ±1.2%，价格复述不加方向，分歧仅增加不确定性。与无 AI 版本冻结配对，待真实结果积累后判断提升。"+(failed.length?"本次市场来源不可用："+failed.join("、")+"；旧观测超过 7 日退出。":"")+"央行储备、ETF 资金流只有明确事件时参与；未取得的数据不补零冒充观测。消息首次见到和发布均须早于计算时点。");
     var daily=state.history.daily;
     if(daily.length>=120){$("replayDate").min=daily[119].time;$("replayDate").max=daily.at(-1).time;if(!$("replayDate").value)$("replayDate").value=daily[Math.max(119,daily.length-64)].time;}
     $("runReplay").disabled=daily.length<120;
