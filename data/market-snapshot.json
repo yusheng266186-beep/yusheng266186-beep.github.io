@@ -67,35 +67,37 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-10-26T09:58:17.345Z",
-  "lastSuccessAt": "2026-10-26T09:58:17.345Z",
+  "checkedAt": "2026-10-26T09:58:43.801Z",
+  "lastSuccessAt": "2026-10-26T09:58:43.801Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "checkedAt": "2026-10-26T09:58:12.938Z",
-      "lastSuccessAt": "2026-10-26T09:23:12.534Z",
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "checkedAt": "2026-10-26T09:58:40.638Z",
+      "lastSuccessAt": "2026-10-26T09:58:40.638Z",
+      "kind": "quote",
+      "asOf": "2026-10-26T07:45:00.000Z",
+      "latencyMs": 2407
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-10-26T09:58:12.938Z",
-      "lastSuccessAt": "2026-10-26T09:58:12.938Z",
+      "checkedAt": "2026-10-26T09:58:40.638Z",
+      "lastSuccessAt": "2026-10-26T09:58:40.638Z",
       "kind": "quote",
       "asOf": "2026-10-26T07:29:58.000Z",
-      "latencyMs": 1351
+      "latencyMs": 1157
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-10-26T09:58:12.938Z",
-      "lastSuccessAt": "2026-10-26T09:58:12.938Z",
+      "checkedAt": "2026-10-26T09:58:40.638Z",
+      "lastSuccessAt": "2026-10-26T09:58:40.638Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-10-26",
-      "latencyMs": 4328
+      "latencyMs": 3080
     }
   ],
   "officialReference": {
@@ -127,14 +129,14 @@
       "turnover": false
     }
   },
-  "collectionMs": 4407,
+  "collectionMs": 3163,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 4031.39990234375,
+    "priceUsdOz": 4031.199951171875,
     "previousUsdOz": 4007.89990234375,
     "priceCnyGram": null,
     "asOf": "2026-10-26T04:00:00.000Z",
