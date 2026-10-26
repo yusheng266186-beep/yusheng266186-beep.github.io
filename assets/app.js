@@ -4,7 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.1.5";
+  var RELEASE_VERSION = "5.2.0";
   var FORECAST_METHOD = "752c60e6f32864c02cc096856c18b25bbb1f1bc6e5bd174982aaf7d397fbe2e5";
   var portfolioSignature = null;
   var storageNotice = "";
@@ -23,9 +23,9 @@
     takeProfit: 8,
     alertLower: 0,
     alertUpper: 0,
-    aiEndpoint: "https://api.openai.com/v1/chat/completions",
-    aiModel: "gpt-5",
-    aiProvider: "OpenAI compatible",
+    aiEndpoint: "https://www.codebuddy.cn/v2/chat/completions",
+    aiModel: "deepseek-v4.1-flash",
+    aiProvider: "CodeBuddy",
     aiApiKey: "",
     saveApiKey: false
   };
@@ -687,7 +687,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.1.5");
+      var worker=new Worker("assets/prediction-worker.js?v=5.2.0");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -1221,8 +1221,10 @@
     renderResearchHealth();
     window.AurumAnalysisUI?.render({history:state.history,news:state.news,research:state.research,publication:state.publication,analysisDesk:state.analysisDesk,notify:showToast});
     var query = state.newsQuery.trim().toLocaleLowerCase();
-    var filtered = state.news.items.filter(function (item) {
-      var category = state.newsFilter === "all" || (state.newsFilter === "high" ? item.weight >= 60 : item.category === state.newsFilter);
+    var baseDesk = window.AurumAnalysis?.build({history:state.history,news:state.news,research:state.research,publication:state.publication});
+    var curated = window.AurumResearchIntelligence?.feed(state.news.items,baseDesk,state.analysisDesk?.intelligence,{all:state.newsFilter === "raw"}) || state.news.items;
+    var filtered = curated.filter(function (item) {
+      var category = ["all","raw"].includes(state.newsFilter) || (state.newsFilter === "high" ? item.weight >= 60 : item.category === state.newsFilter);
       return category && (!query || (item.title+" "+item.source).toLocaleLowerCase().includes(query));
     });
     $("newsFreshness").textContent = state.news.items.length ? "原文最新 · "+formatShortDate(new Date(state.news.items[0].publishedAt)) : "暂无有效发布";
@@ -1313,7 +1315,10 @@
     var time = new Date(item.publishedAt), label = item.category === "domestic" ? "国内" : "宏观";
     var source=item.source+(item.publisher&&item.publisher!==item.source?" / "+item.publisher:"");
     var summary=String(item.summary||"").trim();
-    return '<a class="news-item" href="'+safeUrl(item.url)+'" target="_blank" rel="noreferrer"><div class="news-meta-line"><time datetime="'+escapeHtml(item.publishedAt)+'">'+escapeHtml(item.timePrecision==="date-only"?formatShortDate(time).slice(0,10)+" · 仅日期":formatShortDate(time))+'</time><span class="news-publisher">'+escapeHtml(source)+'</span><span class="news-category">'+label+'</span></div><strong>'+escapeHtml(item.title)+'</strong>'+(summary&&summary!==item.title?'<p class="news-summary">'+escapeHtml(summary)+'</p>':'')+'<span class="news-read">'+(index===0?'最新原文':'阅读原文')+' ↗</span></a>';
+    var review=item.aiReview, reviewLabels={direct:"黄金直接相关",context:"关联线索",uncertain:"关联待核实"};
+    var reviewTag=review?'<span class="news-ai-tag">'+escapeHtml(reviewLabels[review.relevance]||"AI 审阅")+'</span>':'<span class="news-ai-tag pending">待语义审阅</span>';
+    var grouped=item.relatedSources?.length?'<span class="news-group-note">同一事件另有 '+item.relatedSources.length+' 条报道 · 已合并阅读</span>':'';
+    return '<a class="news-item" href="'+safeUrl(item.url)+'" target="_blank" rel="noreferrer"><div class="news-meta-line"><time datetime="'+escapeHtml(item.publishedAt)+'">'+escapeHtml(item.timePrecision==="date-only"?formatShortDate(time).slice(0,10)+" · 仅日期":formatShortDate(time))+'</time><span class="news-publisher">'+escapeHtml(source)+'</span><span class="news-category">'+label+'</span></div><strong>'+escapeHtml(item.title)+'</strong>'+reviewTag+grouped+(summary&&summary!==item.title?'<p class="news-summary">'+escapeHtml(summary)+'</p>':'')+'<span class="news-read">'+(index===0?'最新原文':'阅读原文')+' ↗</span></a>';
   }
 
   function getFactor(id) {
@@ -1321,9 +1326,10 @@
     return factor ? factor.value : 0;
   }
 
+  function baseDeskForAdvice(){return window.AurumAnalysis?.build({history:state.history,news:state.news,research:state.research,publication:state.publication});}
   function renderDecisionContext() {
     $("modelStatus").innerHTML = '<i></i><b>' +
-      escapeHtml(state.config.aiApiKey ? state.config.aiProvider + " · " + state.config.aiModel : state.analysisDesk?.narration?.inputKey===window.AurumAnalysisUI?.getDesk()?.inputKey&&['ready','partial'].includes(state.analysisDesk?.narration?.status)?"DeepSeek · 证据研究":"结构化研究引擎") +
+      escapeHtml(window.AurumResearchIntelligence?.compatible(baseDeskForAdvice(),state.analysisDesk?.narration)&&['ready','partial'].includes(state.analysisDesk?.narration?.status)?"DeepSeek · 证据研究":"结构化研究引擎") +
       "</b>";
   }
 
@@ -1348,7 +1354,7 @@
 
   function renderLocalAdvice() {
     state.aiReportMode = "local";
-    if(!state.config.aiApiKey.trim()&&['daily','news','forecast'].includes(state.promptType)){var grounded=window.AurumAnalysisUI?.advice(state.promptType);if(grounded){$("aiHeadline").textContent=grounded.title;$("aiOutput").innerHTML=grounded.html;return;}}
+    if(['daily','news','forecast'].includes(state.promptType)){var grounded=window.AurumAnalysisUI?.advice(state.promptType);if(grounded){$("aiHeadline").textContent=grounded.title;$("aiOutput").innerHTML=grounded.html;return;}}
     if (!state.forecasts.length) { $("aiHeadline").textContent="有效输入不足"; $("aiOutput").innerHTML="<h3>先补齐研究依据</h3><p>需要有效报价和至少 30 个日线点，才能生成情景摘要。</p>"; return; }
     var f = state.forecasts[state.forecastHorizon], baseline = state.baselineForecasts[state.forecastHorizon], stats = portfolioStats();
     var priceDelta = f.center-baseline.center, audit=selectedAudit();
@@ -1377,58 +1383,9 @@
   }
 
   async function generateAdvice() {
-    if (!state.config.aiApiKey.trim()) {
-      state.aiReportMode = "local";
-      renderLocalAdvice();
-      showToast("本地研究笔记已更新", "已按所选主题整理当前页面数据。");
-      return;
-    }
-    state.aiReportMode = "loading";
-    renderTyping(); $("aiHeadline").textContent = "正在生成本次研究笔记";
-    $("generateAdvice").disabled = true;
-    try {
-      var inputContext = aiPayload(), inputKey = reportContextKey(), inputProvider = state.config.aiProvider + " · " + state.config.aiModel;
-      var response = await fetch(state.config.aiEndpoint.trim(), {
-        method: "POST",
-        signal: AbortSignal.timeout(30000),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + state.config.aiApiKey.trim()
-        },
-        body: JSON.stringify({
-          model: state.config.aiModel.trim() || "gpt-5",
-          messages: [
-            {
-              role: "system",
-              content: "你是谨慎的国内黄金市场研究助手。必须优先使用 AU9999 人民币/克、真实历史、国内因素、数据年龄和用户模拟仓位。禁止编造概率、置信度、实时宏观值或买卖指令。区分已知事实与手动假设，引用输入时间，输出待核实事项与复盘条件。"
-            },
-            {
-              role: "user",
-              content: JSON.stringify(inputContext, null, 2)
-            }
-          ]
-        })
-      });
-      if (!response.ok) {
-        throw new Error("模型接口返回 " + response.status + ": " + (await response.text()).slice(0, 160));
-      }
-      var payload = await response.json();
-      var text = payload && payload.choices && payload.choices[0] &&
-        payload.choices[0].message && payload.choices[0].message.content;
-      if (!text) throw new Error("模型返回内容为空");
-      state.aiReportMode = "external"; state.aiReportKey = inputKey;
-      renderExternalAdvice(text);
-      state.aiReportHeadline = inputProvider + " · 输入截至 " + formatDateTime(inputContext.quote.asOf);
-      $("aiHeadline").textContent = state.aiReportHeadline;
-      syncAdviceContext();
-      showToast("模型研究报告已生成", "已按本次输入生成，仍需核验来源与结论。");
-    } catch (error) {
-      state.aiReportMode = "local";
-      renderLocalAdvice();
-      showToast("模型调用失败，已回退本地规则", error.message, "error");
-    } finally {
-      $("generateAdvice").disabled = false;
-    }
+    state.aiReportMode = "local";
+    renderLocalAdvice();
+    showToast("研究笔记已更新", "使用后台 DeepSeek V4.1 Flash 的有效证据分析；最新未审阅消息保留待核实标记。");
   }
 
   function aiPayload() {
