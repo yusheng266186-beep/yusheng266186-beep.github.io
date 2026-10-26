@@ -17,47 +17,49 @@
   "openCnyGram": 864,
   "highCnyGram": 868,
   "lowCnyGram": 858,
-  "changeCnyGram": 2.590000000000032,
-  "changePct": 0.23,
+  "changeCnyGram": 2.59,
+  "changePct": 0.3,
   "volume": 10818,
-  "turnover": 9317630000,
-  "asOf": "2026-10-26T17:39:10.000Z",
-  "source": "新浪财经 SGE_AU9999 国内行情（上金所）",
-  "sourceUrl": "https://finance.sina.com.cn/futures/quotes/SGE_AU9999.shtml",
+  "turnover": 93179348,
+  "asOf": "2026-10-26T17:41:56.000Z",
+  "source": "东方财富 AU9999 国内行情（上金所）",
+  "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "新浪上金所公开行情；与其他来源并发核对，按报价时点选择",
+  "delay": "国内公开行情刷新；非交易终端逐笔行情",
   "dataTier": "domestic-live",
   "contracts": [
     {
       "symbol": "AU9999",
       "name": "黄金9999",
-      "exchangeName": "Au99.99",
       "latest": 864,
       "high": 868,
       "low": 858,
       "open": 864,
       "previousClose": 861.41,
-      "change": 2.590000000000032,
-      "changePct": 0.23,
+      "change": 2.59,
+      "changePct": 0.3,
       "volume": 10818,
-      "turnover": 9317630000,
-      "asOf": "2026-10-26T17:39:10.000Z"
+      "turnover": 93179348,
+      "insideVolume": 3684,
+      "amplitudePct": 0.03,
+      "asOf": "2026-10-26T17:41:56.000Z"
     },
     {
       "symbol": "AUTD",
       "name": "黄金T+D",
-      "exchangeName": "Au(T+D)",
       "latest": 864.22,
       "high": 890,
       "low": 857.44,
       "open": 862.37,
       "previousClose": 860.27,
-      "change": 3.9500000000000455,
-      "changePct": 0.5,
+      "change": 4.05,
+      "changePct": 0.47,
       "volume": 6202,
-      "turnover": 5345620000,
-      "asOf": "2026-10-26T17:41:03.000Z"
+      "turnover": 5342982912,
+      "insideVolume": 2710,
+      "amplitudePct": 0.36,
+      "asOf": "2026-10-26T17:42:01.000Z"
     }
   ],
   "fetchedAt": null,
@@ -65,35 +67,37 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-10-26T17:41:30.450Z",
-  "lastSuccessAt": "2026-10-26T17:41:30.450Z",
+  "checkedAt": "2026-10-26T17:42:06.483Z",
+  "lastSuccessAt": "2026-10-26T17:42:06.483Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "checkedAt": "2026-10-26T17:41:28.930Z",
-      "lastSuccessAt": "2026-10-26T17:06:28.184Z",
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "checkedAt": "2026-10-26T17:42:04.588Z",
+      "lastSuccessAt": "2026-10-26T17:42:04.588Z",
+      "kind": "quote",
+      "asOf": "2026-10-26T17:41:56.000Z",
+      "latencyMs": 1894
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-10-26T17:41:28.930Z",
-      "lastSuccessAt": "2026-10-26T17:41:28.930Z",
+      "checkedAt": "2026-10-26T17:42:04.588Z",
+      "lastSuccessAt": "2026-10-26T17:42:04.588Z",
       "kind": "quote",
       "asOf": "2026-10-26T17:39:10.000Z",
-      "latencyMs": 1089
+      "latencyMs": 1765
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-10-26T17:41:28.930Z",
-      "lastSuccessAt": "2026-10-26T17:41:28.930Z",
+      "checkedAt": "2026-10-26T17:42:04.588Z",
+      "lastSuccessAt": "2026-10-26T17:42:04.588Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-10-27",
-      "latencyMs": 1448
+      "latencyMs": 1312
     }
   ],
   "officialReference": {
@@ -125,14 +129,14 @@
       "turnover": false
     }
   },
-  "collectionMs": 1520,
+  "collectionMs": 1895,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 4036.699951171875,
+    "priceUsdOz": 4036.89990234375,
     "previousUsdOz": 4007.89990234375,
     "priceCnyGram": null,
     "asOf": "2026-10-26T04:00:00.000Z",
