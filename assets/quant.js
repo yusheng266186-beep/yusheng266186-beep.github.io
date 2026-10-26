@@ -96,6 +96,7 @@
     return {ready:!!f,count:rows.length,asOf:rows.at(-1)?.time,fit:f,
       evidence,evaluations:horizons.map(([,days])=>evaluate(rows,days,evidence))};
   }
+  function globalNewsEffect(ctx,h,sigma){return Evidence.newsEffect(ctx,h,sigma);}
   function at(price,days,p,scoreDelta=0){
     if(!(price>0)||!p?.ready)return null;
     if(days===0)return {center:price,low:price,high:price};
@@ -108,8 +109,8 @@
     const shift=clamp(Core.numeric(scoreDelta,0)/100*.12,-.12,.12)*years;
     const ratio=source?Math.min(1,h/source.steps):0,base=(source?.move||0)*ratio;
     const overlay=Evidence.movement(p.context,h,p.fit.sigma);
-    const center=price*Math.exp(base+overlay+shift),spread=width*p.fit.sigma*Math.sqrt(h);
-    return {center,low:center*Math.exp(-spread),high:center*Math.exp(spread)};
+    const newsEffect=globalNewsEffect(p.context,h,p.fit.sigma),center=price*Math.exp(base+overlay+shift),spread=width*p.fit.sigma*Math.sqrt(h)+newsEffect.extraSpread;
+    return {center,low:center*Math.exp(-spread),high:center*Math.exp(spread),newsEffect};
   }
   function path(price,days,p,delta=0){
     const destination=p.evaluations.find(e=>e.days===days)||p.evaluations.find(e=>e.days===30);

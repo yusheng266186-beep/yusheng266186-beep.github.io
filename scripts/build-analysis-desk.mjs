@@ -2,11 +2,12 @@ import {readFile,writeFile,rename} from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import {decision} from './analysis-ai.mjs';
 import {VERSION,generateResearch,updateCases,researchInput} from './research-agent.mjs';
+import {buildSnapshot} from './news-factor-pipeline.mjs';
 import {enrichArticles} from './article-evidence.mjs';
 const require=createRequire(import.meta.url),Analysis=require('../assets/analysis-engine.js'),Intelligence=require('../assets/research-intelligence.js'),json=async file=>{try{return JSON.parse(await readFile(file,'utf8'));}catch{return null;}},save=async(file,data)=>{await writeFile(file+'.tmp',JSON.stringify(data,null,2)+'\n');await rename(file+'.tmp',file);};
 const [history,news,research,publication,previous,oldUsage]=await Promise.all(['data/market-history.json','data/news.json','data/research-factors.json','data/forecast-publication.json','data/analysis-desk.json','data/analysis-ai-usage.json'].map(json)),usage={schema:1,attempts:Array.isArray(oldUsage?.attempts)?oldUsage.attempts.slice(-150):[]};
 let now=Date.now(),desk=Analysis.build({history,news,research,publication},now);
-const old=previous?.intelligence?.version===VERSION?previous.intelligence:{version:VERSION,reviews:{},relations:[],followUps:[],cases:[]};
+const old=previous?.intelligence?.version===VERSION?previous.intelligence:{version:VERSION,reviews:{},relations:[],followUps:[],cases:previous?.intelligence?.cases||[],articles:previous?.intelligence?.articles||[]};
 // Original-page collection is independent of paid inference; failures retain dated RSS evidence.
 const articles=desk.ready?await enrichArticles(desk,old,{now,captureNow:Date.now}):old.articles||[];
 now=Date.now();desk=Analysis.build({history,news,research,publication},now);
@@ -25,6 +26,6 @@ if(selection.call){const attempt={day:selection.day,startedAt:new Date(now).toIS
  await save('data/analysis-ai-usage.json',usage);
 }
 if(desk.ready)intelligence.cases=updateCases(intelligence.cases,desk,null,history,Date.now());
-intelligence.stats=Intelligence.current(desk,intelligence,Date.now()).stats;desk.intelligence=intelligence;
-desk.aiPolicy={model:Intelligence.MODEL,toolsRegistered:0,maxCallsPerDay:12,minimumIntervalMinutes:60,usedToday:usage.attempts.filter(a=>a.day===day).length,mode:'语义筛选、原文补抓、来源对照、条件观察与前瞻复盘；不改写数值预测内核'};
+intelligence.stats=Intelligence.current(desk,intelligence,Date.now()).stats;intelligence.factorSnapshot=buildSnapshot(desk,intelligence,Date.now());desk.intelligence=intelligence;
+desk.aiPolicy={model:Intelligence.MODEL,toolsRegistered:0,maxCallsPerDay:12,minimumIntervalMinutes:60,usedToday:usage.attempts.filter(a=>a.day===day).length,mode:'语义筛选、原文补抓、来源对照、条件观察与前瞻复盘；把经过核对的新闻参数送入有界预测修正'};
 await save('data/analysis-desk.json',desk);console.log(JSON.stringify({ready:desk.ready,origin:desk.price?.origin,evidence:desk.facts.length,inputKey:desk.inputKey,narration:desk.narration.status,callMade:selection.call,usedToday:desk.aiPolicy.usedToday,intelligence:intelligence.stats,articles:articles.filter(a=>a.status==='ok').length,cases:intelligence.cases.length}));

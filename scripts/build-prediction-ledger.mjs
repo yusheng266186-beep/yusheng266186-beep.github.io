@@ -8,7 +8,7 @@ const [history,news,research,packageInfo]=await Promise.all(['data/market-histor
 const now=new Date().toISOString(),daily=Core.closedDaily(history.daily,history.generatedAt).closed;
 let previous={entries:[]};try{previous=await json('data/forecast-ledger.json');}catch{}
 const methodHash=await modelIdentity();
-const publication=await json('data/forecast-publication.json').catch(()=>null),evidence={news:news.items,snapshots:research.snapshots},profile=publication?.methodHash===methodHash&&publication.inputs?.historyAsOf===history.generatedAt?publication.defaultProfile:Quant.profile(daily,evidence);profile.context=Evidence.context(evidence,publication?.generatedAt||now);
+const publication=await json('data/forecast-publication.json').catch(()=>null),evidence={news:news.items,snapshots:research.snapshots,aiNews:publication?.newsFactors?.snapshot},profile=publication?.methodHash===methodHash&&publication.inputs?.historyAsOf===history.generatedAt?publication.defaultProfile:Quant.profile(daily,evidence);profile.context=Evidence.context(evidence,publication?.generatedAt||now);
 const last=daily.at(-1),forecasts=profile.ready?Quant.scenarioModel(last.close,profile).points:[];
 if(profile.research)profile.research.context=profile.context;
 const shadowForecasts=profile.research?.ready?Quant.scenarioModel(last.close,profile.research).points.map(f=>({...f,model:'adaptive'})):[];
