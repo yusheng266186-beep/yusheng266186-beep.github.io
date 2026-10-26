@@ -4,7 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.2.0";
+  var RELEASE_VERSION = "5.2.1";
   var FORECAST_METHOD = "752c60e6f32864c02cc096856c18b25bbb1f1bc6e5bd174982aaf7d397fbe2e5";
   var portfolioSignature = null;
   var storageNotice = "";
@@ -687,7 +687,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.2.0");
+      var worker=new Worker("assets/prediction-worker.js?v=5.2.1");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -1315,8 +1315,8 @@
     var time = new Date(item.publishedAt), label = item.category === "domestic" ? "国内" : "宏观";
     var source=item.source+(item.publisher&&item.publisher!==item.source?" / "+item.publisher:"");
     var summary=String(item.summary||"").trim();
-    var review=item.aiReview, reviewLabels={direct:"黄金直接相关",context:"关联线索",uncertain:"关联待核实"};
-    var reviewTag=review?'<span class="news-ai-tag">'+escapeHtml(reviewLabels[review.relevance]||"AI 审阅")+'</span>':'<span class="news-ai-tag pending">待语义审阅</span>';
+    var review=item.aiReview, statusLabels={reported:"报道已发生",statement:"讲话 / 宣称",proposal:"提议",conditional:"预期 / 条件",background:"背景"}, reviewLabels={direct:"黄金直接相关",context:"关联线索",uncertain:"关联待核实"};
+    var reviewTag=review?'<span class="news-ai-tag">'+escapeHtml((reviewLabels[review.relevance]||"AI 审阅")+" · "+(statusLabels[review.status]||"待核实"))+'</span>':'<span class="news-ai-tag pending">待语义审阅</span>';
     var grouped=item.relatedSources?.length?'<span class="news-group-note">同一事件另有 '+item.relatedSources.length+' 条报道 · 已合并阅读</span>':'';
     return '<a class="news-item" href="'+safeUrl(item.url)+'" target="_blank" rel="noreferrer"><div class="news-meta-line"><time datetime="'+escapeHtml(item.publishedAt)+'">'+escapeHtml(item.timePrecision==="date-only"?formatShortDate(time).slice(0,10)+" · 仅日期":formatShortDate(time))+'</time><span class="news-publisher">'+escapeHtml(source)+'</span><span class="news-category">'+label+'</span></div><strong>'+escapeHtml(item.title)+'</strong>'+reviewTag+grouped+(summary&&summary!==item.title?'<p class="news-summary">'+escapeHtml(summary)+'</p>':'')+'<span class="news-read">'+(index===0?'最新原文':'阅读原文')+' ↗</span></a>';
   }
