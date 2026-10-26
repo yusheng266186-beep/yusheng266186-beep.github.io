@@ -1,6 +1,6 @@
 /* Content boundaries and typography. Keep the full-bleed sculpture separate from reading width. */
 :root { --page-gutter:clamp(20px,5vw,80px); }
-/* A supporting card follows the long reading column without a second scrollbar. */
+/* Either column can become shorter after disclosures or pagination change. */
 .forecast-layout { align-items:start; }
 @media(min-width:1001px) {
   [data-content-rail][data-rail-ready="true"] { position:sticky; align-self:start; top:min(calc(var(--stage-top,94px) + 20px),calc(100svh - var(--content-rail-height) - 24px)); }
