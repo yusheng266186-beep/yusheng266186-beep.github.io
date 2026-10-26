@@ -9,6 +9,11 @@
 #intelligence>.section-heading .section-index{margin-bottom:12px}
 #intelligence>.section-heading p{margin-top:12px}
 .research-home{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:24px;align-items:start;margin:26px 0 32px}
+@media(min-width:1001px){
+ .research-home:not(:has(#newsList>.news-item:nth-child(3))){grid-template-columns:minmax(0,1fr)}
+ .research-home:not(:has(#newsList>.news-item:nth-child(3)))>.research-brief{position:static;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+ .research-home:not(:has(#newsList>.news-item:nth-child(3)))>.research-brief>:is(.research-brief-heading,.analysis-clock){grid-column:1/-1}
+}
 .research-news,.research-brief{min-width:0}
 .research-news .news-terminal{padding:30px;margin:0;background:linear-gradient(145deg,#101910dd,#080f0bd4)}
 .research-news .panel-heading{align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:16px}
