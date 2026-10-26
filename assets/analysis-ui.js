@@ -11,6 +11,7 @@
  function renderAIWork(){
   const intel=published?.intelligence,view=desk.intelligenceView,n=narration(),stats=view?.stats;
   $('analysisAIWork').textContent=stats?.reviewed?'已审阅 '+stats.reviewed+' 条 · 滤去无关 '+stats.excluded+' 条 · 归并重复 '+stats.merged+' 条'+(stats.pending?' · 待审阅 '+stats.pending+' 条':''):'新消息先展示原文，语义审阅完成后补充关联与出处。';
+  $('analysisAIConditions').hidden=!n?.hypotheses?.length;
   $('analysisHypotheses').innerHTML=(n?.hypotheses||[]).map(h=>'<section><h4>'+esc(h.title)+'</h4><p>'+esc(h.mechanism)+'</p><p class="analysis-caption">相反条件：'+esc(h.invalidation)+'</p>'+citations([...h.evidenceIds,...h.counterEvidenceIds])+'<button type="button" class="text-button" data-ai-hypothesis="'+esc(h.id)+'">以此建立观察 ↗</button></section>').join('');
   const checked=Object.values(view?.reviews||{}),relations=view?.relations||[],cases=intel?.cases||[],statuses={waiting:'待未来收盘',tracking:'尚未触发',triggered:'已触发，继续观察',completed:'到期已触发',expired:'到期未触发',invalidated:'触发后失效',revised:'历史修订',unavailable:'数据不足'};
   const sources=checked.slice(0,12).map(r=>'<li><strong>'+esc(desk.facts.find(f=>f.id===r.id)?.label)+'</strong><p>'+esc(r.reason)+'</p><blockquote>'+esc(r.quote)+'</blockquote>'+citations([r.id])+'</li>').join('');

@@ -29,3 +29,6 @@ test('native streaming parses long metadata without a two-megabyte false rejecti
  await assert.rejects(readResearchTransport(new Response(injected)),/TOOL_POLICY/);
  await assert.rejects(readResearchTransport(new Response(stream.replace('data: [DONE]',''))),/INCOMPLETE/);
 });
+
+
+test('research synthesis and frozen cases retain every supplied evidence reference instead of silently truncating citations',()=>{const {desk,request}=setup(),v=reply(request),refs=request.evidence.filter(f=>f.type!=='event').map(f=>f.id);v.interpretations[0].evidenceIds=refs.concat(v.interpretations[0].evidenceIds);const out=validateResearch(v,request,desk,now);assert.deepEqual(new Set(out.interpretations[0].evidenceIds),new Set(v.interpretations[0].evidenceIds));assert.ok(out.interpretations[0].evidenceIds.length>4);});
