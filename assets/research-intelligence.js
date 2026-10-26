@@ -18,7 +18,7 @@
  }
  function overlay(desk,intelligence,now=Date.now()){
   if(!desk.ready)return desk;const view=current(desk,intelligence,now),representatives=new Set(view.groups.map(ids=>ids[0]));
-  const facts=desk.facts.map(f=>{const r=view.reviews[f.id];if(!r)return f;return {...f,aiReview:r,group:r.dimensionLabel||f.group,direction:r.relevance==='unrelated'||r.status!=='reported'?0:r.effect==='support'?1:r.effect==='pressure'?-1:0,conditional:f.conditional||r.status!=='reported'};});
+  const facts=desk.facts.map(f=>{const r=view.reviews[f.id];if(!r)return f.kind==='event'?{...f,direction:0,note:'尚未完成语义审阅，不按标题关键词计入方向线索。'}:f;return {...f,aiReview:r,group:r.dimensionLabel||f.group,direction:r.relevance==='unrelated'||r.status!=='reported'?0:r.effect==='support'?1:r.effect==='pressure'?-1:0,conditional:f.conditional||r.status!=='reported'};});
   const active=facts.filter(f=>f.kind!=='event'||representatives.has(f.id)),supportive=active.filter(f=>f.direction>0).map(f=>f.id),opposing=active.filter(f=>f.direction<0).map(f=>f.id);
   return {...desk,facts,events:facts.filter(f=>f.kind==='event'),intelligenceView:view,reading:{...desk.reading,supportive,opposing,unclear:active.filter(f=>f.kind==='event'&&!f.direction).map(f=>f.id),tension:supportive.length&&opposing.length?'输入存在相反线索':'方向证据仍需补充'}};
  }
@@ -29,7 +29,7 @@
   return Object.entries(narration.basis).every(([id,key])=>facts.has(id)&&fingerprint(facts.get(id))===key);
  }
  function feed(items,desk,intelligence,{all=false,now=Date.now()}={}){
-  if(all||!desk?.ready)return items.map(x=>({...x}));const view=current(desk,intelligence,now),groupById=new Map();for(const ids of view.groups)for(const id of ids)groupById.set(id,ids[0]);const seen=new Map(),output=[];
+  if(!desk?.ready)return items.map(x=>({...x}));const view=current(desk,intelligence,now);if(all)return items.map(x=>({...x,aiReview:view.reviews[eventId(x)]||null}));const groupById=new Map();for(const ids of view.groups)for(const id of ids)groupById.set(id,ids[0]);const seen=new Map(),output=[];
   for(const item of items){const id=eventId(item),review=view.reviews[id];if(review?.relevance==='unrelated')continue;const group=groupById.get(id)||id;if(seen.has(group)){seen.get(group).relatedSources.push({source:item.publisher||item.source,url:item.url});continue;}
    const row={...item,aiReview:review||null,relatedSources:[]};seen.set(group,row);output.push(row);}
   return output;
