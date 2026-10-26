@@ -67,44 +67,42 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-10-26T01:08:19.684Z",
-  "lastSuccessAt": "2026-10-26T01:08:19.684Z",
+  "checkedAt": "2026-10-26T01:13:18.615Z",
+  "lastSuccessAt": "2026-10-26T01:13:18.615Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-10-26T01:08:16.842Z",
+      "ok": false,
+      "checkedAt": "2026-10-26T01:13:16.905Z",
       "lastSuccessAt": "2026-10-26T01:08:16.842Z",
-      "kind": "quote",
-      "asOf": "2026-10-26T01:08:15.000Z",
-      "latencyMs": 2841
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-10-26T01:08:16.842Z",
-      "lastSuccessAt": "2026-10-26T01:08:16.842Z",
+      "checkedAt": "2026-10-26T01:13:16.905Z",
+      "lastSuccessAt": "2026-10-26T01:13:16.905Z",
       "kind": "quote",
       "asOf": "2026-10-26T01:05:33.000Z",
-      "latencyMs": 1544
+      "latencyMs": 916
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-10-26T01:08:16.842Z",
-      "lastSuccessAt": "2026-10-26T01:08:16.842Z",
+      "checkedAt": "2026-10-26T01:13:16.905Z",
+      "lastSuccessAt": "2026-10-26T01:13:16.905Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-10-26",
-      "latencyMs": 1700
+      "latencyMs": 1625
     }
   ],
   "officialReference": {
     "market": "CN-SGE",
     "primaryContract": "AU9999",
     "unit": "CNY/g",
-    "priceCnyGram": 855.6,
+    "priceCnyGram": 858.92,
     "highCnyGram": 872.99,
     "lowCnyGram": 855,
     "openCnyGram": 865,
@@ -129,17 +127,17 @@
       "turnover": false
     }
   },
-  "collectionMs": 2843,
+  "collectionMs": 1710,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 4000.300048828125,
+    "priceUsdOz": 3991.10009765625,
     "previousUsdOz": 4007.89990234375,
     "priceCnyGram": null,
-    "asOf": "2026-10-26T00:58:07.000Z",
+    "asOf": "2026-10-26T01:03:14.000Z",
     "source": "Yahoo Finance GC=F delayed futures reference",
     "delay": "international delayed reference"
   }
