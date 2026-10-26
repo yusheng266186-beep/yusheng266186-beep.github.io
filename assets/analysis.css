@@ -137,3 +137,6 @@
 .analysis-ai-conditions{margin-top:18px;border-top:1px solid rgba(203,177,112,.16);padding-top:15px}.analysis-ai-conditions>summary{font:500 .78rem/1.8 var(--sans);color:var(--gold);cursor:pointer;overflow-wrap:anywhere}.analysis-ai-conditions .analysis-hypotheses section:first-child{border-top:0}
 
 .forecast-news-effect{font:400 11px/1.9 var(--sans);color:var(--gold);margin:12px 0;overflow-wrap:anywhere;max-width:100%}
+
+/* In stacked/sparse layouts the brief itself can contain two columns. Long disclosures use the full row. */
+#intelligence .research-home .research-brief.analysis-desk:has(details[open]){grid-template-columns:minmax(0,1fr)}
