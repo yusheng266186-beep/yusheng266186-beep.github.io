@@ -29,7 +29,7 @@
   return Object.entries(narration.basis).every(([id,key])=>facts.has(id)&&fingerprint(facts.get(id))===key);
  }
  function feed(items,desk,intelligence,{all=false,now=Date.now()}={}){
-  if(all||!desk?.ready)return items.map(x=>({...x}));const view=current(desk,intelligence,now),groupById=new Map();for(const ids of view.groups)for(const id of ids)groupById.set(id,ids[0]);const seen=new Map(),output=[];
+  if(!desk?.ready)return items.map(x=>({...x}));const view=current(desk,intelligence,now);if(all)return items.map(x=>({...x,aiReview:view.reviews[eventId(x)]||null}));const groupById=new Map();for(const ids of view.groups)for(const id of ids)groupById.set(id,ids[0]);const seen=new Map(),output=[];
   for(const item of items){const id=eventId(item),review=view.reviews[id];if(review?.relevance==='unrelated')continue;const group=groupById.get(id)||id;if(seen.has(group)){seen.get(group).relatedSources.push({source:item.publisher||item.source,url:item.url});continue;}
    const row={...item,aiReview:review||null,relatedSources:[]};seen.set(group,row);output.push(row);}
   return output;
