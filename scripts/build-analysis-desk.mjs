@@ -1,6 +1,7 @@
 import {readFile,writeFile,rename} from 'node:fs/promises';
 import {createRequire} from 'node:module';
 import {decision} from './analysis-ai.mjs';
+import {RESEARCH_POLICY} from './research-policy.mjs';
 import {VERSION,generateResearch,updateCases,researchInput} from './research-agent.mjs';
 import {buildSnapshot} from './news-factor-pipeline.mjs';
 import {enrichArticles} from './article-evidence.mjs';
@@ -13,8 +14,7 @@ const articles=desk.ready?await enrichArticles(desk,old,{now,captureNow:Date.now
 now=Date.now();desk=Analysis.build({history,news,research,publication},now);
 const view=Intelligence.current(desk,old,now),work=desk.ready?researchInput(desk,old,articles,now):null;
 const compatible=desk.ready&&Intelligence.compatible(desk,previous?.narration)&&previous?.narration?.protocol===VERSION&&['ready','partial'].includes(previous.narration.status),hasWork=!!(work?.backlog||!compatible);
-const selection=decision({desk,previous:compatible&&!hasWork?{narration:{...previous.narration,inputKey:desk.inputKey}}:null,usage,now,configured:!!process.env.AURUM_CODEBUDDY_API_KEY}),day=new Date(now+8*3600000).toISOString().slice(0,10);
-if(process.argv.includes('--refresh-ai')&&process.env.AURUM_CODEBUDDY_API_KEY&&usage.attempts.filter(a=>a.day===day).length<12){selection.call=true;selection.day=day;}
+const selection=decision({desk,previous:compatible&&!hasWork?{narration:{...previous.narration,inputKey:desk.inputKey}}:null,usage,now,configured:!!process.env.AURUM_CODEBUDDY_API_KEY,backlog:work?.backlog||0,force:process.argv.includes('--refresh-ai')}),day=selection.day;
 desk.narration=compatible?previous.narration:{status:'structured',inputKey:desk.inputKey,reason:selection.reason||'模型正在补齐本轮证据；最新结构化研究继续更新'};
 let intelligence={...old,version:VERSION,model:Intelligence.MODEL,articles,reviews:view.reviews,relations:view.relations};
 if(selection.call){const attempt={day:selection.day,startedAt:new Date(now).toISOString(),inputKey:desk.inputKey,protocol:VERSION,model:Intelligence.MODEL,status:'dispatched'};usage.attempts.push(attempt);await save('data/analysis-ai-usage.json',usage);
@@ -27,5 +27,6 @@ if(selection.call){const attempt={day:selection.day,startedAt:new Date(now).toIS
 }
 if(desk.ready)intelligence.cases=updateCases(intelligence.cases,desk,null,history,Date.now());
 intelligence.stats=Intelligence.current(desk,intelligence,Date.now()).stats;intelligence.factorSnapshot=buildSnapshot(desk,intelligence,Date.now());desk.intelligence=intelligence;
-desk.aiPolicy={model:Intelligence.MODEL,toolsRegistered:0,maxCallsPerDay:12,minimumIntervalMinutes:60,usedToday:usage.attempts.filter(a=>a.day===day).length,mode:'语义筛选、原文补抓、来源对照、条件观察与前瞻复盘；把经过核对的新闻参数送入有界预测修正'};
+const pending=desk.ready?researchInput(desk,intelligence,articles,Date.now()).backlog:0,next=decision({desk,previous:!pending&&Intelligence.compatible(desk,desk.narration)?{narration:{...desk.narration,inputKey:desk.inputKey}}:null,usage,now:Date.now(),configured:!!process.env.AURUM_CODEBUDDY_API_KEY,backlog:pending});
+desk.aiPolicy={...RESEARCH_POLICY,model:Intelligence.MODEL,toolsRegistered:0,usedToday:usage.attempts.filter(a=>a.day===next.day).length,pendingItems:pending,activeIntervalMinutes:next.intervalMinutes,nextEligibleAt:next.nextEligibleAt,schedulingReason:next.reason,mode:'语义筛选、原文补抓、来源对照、条件观察与前瞻复盘；把经过核对的新闻参数送入有界预测修正'};
 await save('data/analysis-desk.json',desk);console.log(JSON.stringify({ready:desk.ready,origin:desk.price?.origin,evidence:desk.facts.length,inputKey:desk.inputKey,narration:desk.narration.status,callMade:selection.call,usedToday:desk.aiPolicy.usedToday,intelligence:intelligence.stats,articles:articles.filter(a=>a.status==='ok').length,cases:intelligence.cases.length}));
