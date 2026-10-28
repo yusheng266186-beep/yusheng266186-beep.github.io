@@ -4,8 +4,8 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.3.4";
-  var FORECAST_METHOD = "cde8661f63fd5b4d49bb06d3dd9afc2b17e3f2e519c12a6ea366cacd67f380b7";
+  var RELEASE_VERSION = "5.3.5";
+  var FORECAST_METHOD = "be86e0264296da99da43b04cb5b5538fb5e39584fa07cf371db10d13e0ed9e06";
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
@@ -687,7 +687,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.3.4");
+      var worker=new Worker("assets/prediction-worker.js?v=5.3.5");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};

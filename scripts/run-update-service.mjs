@@ -45,7 +45,7 @@ const results=await runUpdateWindow({rounds,continueService:process.env.CONTINUE
    await writeFile('data/pipeline-health.json',JSON.stringify(health,null,2)+'\n');await run(process.execPath,['scripts/build-embedded-data.mjs']);
   }
   // The public bundle must describe the same receipt as its companion JSON.
-  const h=await json('data/pipeline-health.json'),bundle=await json('data/research-bundle.json');
+  const h=await json('data/pipeline-health.json'),bundle=await json('data/research-bundle.json'),analysis=await json('data/analysis-desk.json');
   if(!h.generatedAt||bundle.health?.generatedAt!==h.generatedAt)throw Error('Collection receipt and public bundle disagree');
   const changed=await publish(dataPaths(await readdir('data')));
   // GITHUB_TOKEN pushes do not trigger Pages; dispatch explicitly each round.
@@ -54,7 +54,7 @@ const results=await runUpdateWindow({rounds,continueService:process.env.CONTINUE
   if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,`\nRound ${round}: ${h.status}, collected ${h.generatedAt}, news checked ${h.news?.checkedAt}, quote ${h.quote?.asOf}. Pages requested.\n`);
   if(failure)throw failure;
   if(h.status==='failed')throw Error('Critical collector failure; dated recovery receipt published');
-  return {status:h.status,completedAt:h.generatedAt};
+  return {status:h.status,completedAt:h.generatedAt,continueImmediately:analysis.aiPolicy?.continueImmediately===true};
  }
 });
 console.log(JSON.stringify({rounds:results}));
