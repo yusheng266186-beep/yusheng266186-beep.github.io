@@ -2,6 +2,10 @@ import {readFile,writeFile,rename} from 'node:fs/promises';import {spawn} from '
 import {historyDue,buildHealth} from './pipeline-utils.mjs';
 const json=async p=>{try{return JSON.parse(await readFile(p,'utf8'));}catch{return {};}};
 const previous=await json('data/pipeline-health.json'),started=new Date().toISOString();
+// Reserve publication time inside the runner's six-minute window. Remaining
+// successful queue work continues in the next cycle without a five-minute sleep.
+const analysisDeadline=Date.parse(started)+340000;
+process.env.AURUM_ANALYSIS_DEADLINE=new Date(analysisDeadline).toISOString();
 const history=await json('data/market-history.json'),force=process.argv.includes('--force-history');
 async function run(key,file,timeoutMs=160000,args=[]){
  const begin=Date.now();let output='';
@@ -15,12 +19,12 @@ async function run(key,file,timeoutMs=160000,args=[]){
 const historyAttempt=historyDue(history,previous,started,force)?run('history','scripts/fetch-market-history.mjs',210000):Promise.resolve({key:'history',status:'skipped',checkedAt:previous.stages?.history?.checkedAt||null,reason:'Confirmed closes are current; waiting for next capture window'});
 const attempts=await Promise.all([run('news','scripts/fetch-official-news.mjs'),run('factors','scripts/fetch-research-factors.mjs'),run('quote','scripts/fetch-market-snapshot.mjs'),run('components','scripts/fetch-components.mjs'),historyAttempt]);
 attempts.push(await run('archive','scripts/archive-inputs.mjs'));
-attempts.push(await run('analysis','scripts/build-analysis-desk.mjs',125000,process.env.FORCE_ANALYSIS_AI==='true'?['--refresh-ai']:[]));
+attempts.push(await run('analysis','scripts/build-analysis-desk.mjs',Math.max(1000,analysisDeadline-Date.now()+3000),process.env.FORCE_ANALYSIS_AI==='true'?['--refresh-ai']:[]));
 attempts.push(await run('publication','scripts/build-forecast-publication.mjs'));
 attempts.push(await run('ledger','scripts/build-prediction-ledger.mjs'));
-const [news,research,latestHistory,market]=await Promise.all(['data/news.json','data/research-factors.json','data/market-history.json','data/market-snapshot.json'].map(json));
+const [news,research,latestHistory,market,analysis]=await Promise.all(['data/news.json','data/research-factors.json','data/market-history.json','data/market-snapshot.json','data/analysis-desk.json'].map(json));
 const runUrl=process.env.GITHUB_RUN_ID?`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`:null;
-const service=process.env.AURUM_UPDATE_ROUND?{mode:'continuous-window',intervalSeconds:300,round:Number(process.env.AURUM_UPDATE_ROUND),rounds:Number(process.env.AURUM_UPDATE_ROUNDS),startedAt:process.env.AURUM_UPDATE_STARTED_AT,nextAttemptAt:process.env.AURUM_NEXT_ATTEMPT_AT,sourceSha:process.env.AURUM_SOURCE_SHA}:null;
+const continuing=analysis.aiPolicy?.continueImmediately===true,service=process.env.AURUM_UPDATE_ROUND?{mode:'continuous-window',intervalSeconds:continuing?0:300,round:Number(process.env.AURUM_UPDATE_ROUND),rounds:Number(process.env.AURUM_UPDATE_ROUNDS),startedAt:process.env.AURUM_UPDATE_STARTED_AT,nextAttemptAt:continuing?new Date().toISOString():process.env.AURUM_NEXT_ATTEMPT_AT,sourceSha:process.env.AURUM_SOURCE_SHA}:null;
 async function saveHealth(){const health=buildHealth(previous,attempts,new Date().toISOString(),{news,research,history:latestHistory,market,runUrl,service});await writeFile('data/pipeline-health.json.tmp',JSON.stringify(health,null,2)+'\n');await rename('data/pipeline-health.json.tmp','data/pipeline-health.json');return health;}
 await saveHealth();attempts.push(await run('assembly','scripts/build-embedded-data.mjs'));const final=await saveHealth();
 // Rebuild once with the final assembly receipt so embedded and JSON bundle report the same heartbeat.

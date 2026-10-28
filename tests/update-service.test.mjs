@@ -6,6 +6,11 @@ test('finite windows publish immediately, keep five-minute cadence and hand off 
  const result=await runUpdateWindow({rounds:3,now:()=>clock,sleep:async ms=>{clock+=ms;},cycle:async p=>{starts.push(clock);next.push(p.nextAttemptAt);clock+=12000;return {status:'partial'};},handoff:async()=>{handoffs++;}});
  assert.deepEqual(starts,[0,300000,600000]);assert.equal(handoffs,1);assert.equal(result.length,3);assert.equal(next[0],new Date(300000).toISOString());
 });
+test('successful pending work continues without a polling sleep, then returns to normal collection cadence',async()=>{
+ let clock=0,handoffs=0;const starts=[];
+ const result=await runUpdateWindow({rounds:4,now:()=>clock,sleep:async ms=>{clock+=ms;},cycle:async({round})=>{starts.push(clock);clock+=12000;return {continueImmediately:round<3};},handoff:async()=>{handoffs++;}});
+ assert.deepEqual(starts,[0,12000,24000,324000]);assert.equal(result.length,4);assert.equal(handoffs,1);
+});
 test('repeated failures get a finite restart, never a rapid successor loop',async()=>{
  let clock=0,calls=0,handoffs=0;const result=await runUpdateWindow({now:()=>clock,sleep:async ms=>{clock+=ms;},cycle:async()=>{calls++;throw Error('upstream unavailable');},handoff:async()=>{handoffs++;}});
  assert.equal(calls,2);assert.equal(clock,300000);assert.equal(handoffs,1);assert.ok(result.every(x=>!x.ok));
