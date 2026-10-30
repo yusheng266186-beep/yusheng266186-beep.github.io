@@ -9,8 +9,8 @@ function fixture(count){
   onResult:async result=>Object.keys(result.reviews).forEach(id=>remaining.delete(id)),onError:async error=>{throw error;}
  }};
 }
-test('single news dispatches immediately and a large queue drains across consecutive calls without sleeps',async()=>{
- assert.equal(RESEARCH_POLICY.minimumIntervalMinutes,0);assert.equal(RESEARCH_POLICY.maxCallsPerDay,null);
+test('generic queue checkpoints single items and consecutive batches when the caller allows them',async()=>{
+ assert.equal(RESEARCH_POLICY.minimumIntervalMinutes,30);assert.equal(RESEARCH_POLICY.maxCallsPerDay,null);
  const one=fixture(1),single=await drainResearchQueue(one.options);assert.deepEqual(one.starts,[0]);assert.equal(single.completedItems,1);assert.equal(single.stopReason,'queue-empty');
  const many=fixture(25),result=await drainResearchQueue(many.options);assert.deepEqual(many.sizes,[8,8,8,1]);assert.deepEqual(many.starts,[0,1000,2000,3000]);assert.equal(many.remaining.size,0);assert.equal(result.callsMade,4);assert.equal(result.completedItems,25);
 });
@@ -26,4 +26,9 @@ test('checkpointed progress survives finite runner handoff without imposing a ca
  const f=fixture(20),result=await drainResearchQueue({...f.options,deadline:115500});
  assert.equal(result.callsMade,1);assert.equal(result.stopReason,'runtime-budget');assert.equal(f.remaining.size,12);
  const next=await drainResearchQueue(f.options);assert.equal(next.completedItems,12);assert.equal(f.remaining.size,0);
+});
+
+test('half-hour policy makes one paid call and preserves the rest of a large queue',async()=>{
+ const f=fixture(25),result=await drainResearchQueue({...f.options,maxCalls:RESEARCH_POLICY.maxCallsPerCycle});
+ assert.equal(result.callsMade,1);assert.equal(result.completedItems,8);assert.equal(result.stopReason,'batch-limit');assert.equal(f.remaining.size,17);assert.deepEqual(f.starts,[0]);
 });

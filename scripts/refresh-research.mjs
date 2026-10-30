@@ -2,8 +2,8 @@ import {readFile,writeFile,rename} from 'node:fs/promises';import {spawn} from '
 import {historyDue,buildHealth} from './pipeline-utils.mjs';
 const json=async p=>{try{return JSON.parse(await readFile(p,'utf8'));}catch{return {};}};
 const previous=await json('data/pipeline-health.json'),started=new Date().toISOString();
-// Reserve publication time inside the runner's six-minute window. Remaining
-// successful queue work continues in the next cycle without a five-minute sleep.
+// Reserve publication time inside the runner's six-minute window. Pending
+// AI work stays queued until the next eligible review window.
 const analysisDeadline=Date.parse(started)+340000;
 process.env.AURUM_ANALYSIS_DEADLINE=new Date(analysisDeadline).toISOString();
 const history=await json('data/market-history.json'),force=process.argv.includes('--force-history');
