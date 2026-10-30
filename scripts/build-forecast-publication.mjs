@@ -2,6 +2,7 @@ import {readFile,writeFile,rename} from 'node:fs/promises';import {createHash} f
 import Core from '../assets/core.js';import Quant from '../assets/research-engine.js';import Evidence from '../assets/evidence.js';import System from '../assets/forecast-system.js';import Vintage from '../assets/vintage-store.js';import {modelIdentity} from './model-identity.mjs';
 import Factors from '../assets/news-factors.js';
 import {updateForward} from './news-factor-pipeline.mjs';
+import {packArchive,unpackArchive} from './news-factor-archive.mjs';
 import Policy from '../assets/publication-policy.js';
 const json=async p=>JSON.parse(await readFile(p,'utf8'));
 const [history,news,research,archive,events,components,meta]=await Promise.all(['data/market-history.json','data/news.json','data/research-factors.json','data/observation-vintages.json','data/event-archive.json','data/component-history.json','package.json'].map(json));
@@ -10,9 +11,9 @@ const now=new Date().toISOString(),daily=Core.closedDaily(history.daily,history.
 const defaultProfile=Quant.profile(daily,evidence);defaultProfile.context=Evidence.context(evidence,now);delete defaultProfile.evidence;if(defaultProfile.research)delete defaultProfile.research.evidence;
 const system=System.profile(daily,inputs,{asOf:now}),baseline=System.profile(daily,inputs,{asOf:now,variant:'no-components'});
 const compact=p=>({...p,evaluations:p.evaluations.map(f=>({...f,records:undefined,event:f.event?{...f.event,events:f.event.events.slice(0,12)}:undefined}))});
-const oldArchive=await json('data/news-factor-archive.json').catch(()=>({snapshots:[]})),factorArchive={schema:1,version:Factors.version,generatedAt:now,snapshots:[...(oldArchive.snapshots||[])]};
+const oldArchive=unpackArchive(await json('data/news-factor-archive.json').catch(error=>{if(error.code!=='ENOENT')throw error;return {schema:1,snapshots:[]};})),factorArchive={schema:1,version:Factors.version,generatedAt:now,snapshots:[...(oldArchive.snapshots||[])]};
 if(aiNews.events.length&&!factorArchive.snapshots.some(s=>s.inputKey===aiNews.inputKey))factorArchive.snapshots.push(structuredClone(aiNews));factorArchive.snapshots=factorArchive.snapshots.slice(-2000);
-await writeFile('data/news-factor-archive.json.tmp',JSON.stringify(factorArchive)+'\n');await rename('data/news-factor-archive.json.tmp','data/news-factor-archive.json');
+await writeFile('data/news-factor-archive.json.tmp',JSON.stringify(packArchive(factorArchive))+'\n');await rename('data/news-factor-archive.json.tmp','data/news-factor-archive.json');
 const oldForward=await json('data/news-factor-forward.json').catch(()=>null),forward=updateForward(oldForward,{daily,profile:defaultProfile,snapshot:aiNews,now,historyAsOf:history.generatedAt});
 await writeFile('data/news-factor-forward.json.tmp',JSON.stringify(forward)+'\n');await rename('data/news-factor-forward.json.tmp','data/news-factor-forward.json');
 const selection=await json('data/system-validation.json').catch(()=>({decision:'research-only',reason:'Frozen comparison not available'}));
