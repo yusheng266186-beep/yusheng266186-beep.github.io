@@ -67,44 +67,42 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-10-30T16:16:48.288Z",
-  "lastSuccessAt": "2026-10-30T16:16:48.288Z",
+  "checkedAt": "2026-10-30T16:21:49.765Z",
+  "lastSuccessAt": "2026-10-30T16:21:49.765Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-10-30T16:16:45.989Z",
+      "ok": false,
+      "checkedAt": "2026-10-30T16:21:46.111Z",
       "lastSuccessAt": "2026-10-30T16:16:45.989Z",
-      "kind": "quote",
-      "asOf": "2026-10-30T16:16:44.000Z",
-      "latencyMs": 2298
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-10-30T16:16:45.989Z",
-      "lastSuccessAt": "2026-10-30T16:16:45.989Z",
+      "checkedAt": "2026-10-30T16:21:46.111Z",
+      "lastSuccessAt": "2026-10-30T16:21:46.111Z",
       "kind": "quote",
       "asOf": "2026-10-30T15:58:48.000Z",
-      "latencyMs": 905
+      "latencyMs": 1096
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-10-30T16:16:45.989Z",
-      "lastSuccessAt": "2026-10-30T16:16:45.989Z",
+      "checkedAt": "2026-10-30T16:21:46.111Z",
+      "lastSuccessAt": "2026-10-30T16:21:46.111Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-10-31",
-      "latencyMs": 1165
+      "latencyMs": 3593
     }
   ],
   "officialReference": {
     "market": "CN-SGE",
     "primaryContract": "AU9999",
     "unit": "CNY/g",
-    "priceCnyGram": 836.1,
+    "priceCnyGram": 839.41,
     "highCnyGram": 855,
     "lowCnyGram": 835,
     "openCnyGram": 851,
@@ -129,14 +127,14 @@
       "turnover": false
     }
   },
-  "collectionMs": 2299,
+  "collectionMs": 3654,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 3909.300048828125,
+    "priceUsdOz": 3907.39990234375,
     "previousUsdOz": 4031.39990234375,
     "priceCnyGram": null,
     "asOf": "2026-10-30T04:00:00.000Z",
