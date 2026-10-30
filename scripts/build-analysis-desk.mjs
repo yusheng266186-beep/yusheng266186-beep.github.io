@@ -23,13 +23,13 @@ async function checkpoint(queue){
  if(desk.ready)intelligence.cases=updateCases(intelligence.cases,desk,null,history,time);
  intelligence.stats=Intelligence.current(desk,intelligence,time).stats;intelligence.factorSnapshot=buildSnapshot(desk,intelligence,time);desk.intelligence=intelligence;
  const pending=desk.ready?researchInput(desk,intelligence,articles,time).backlog:0,next=decision({desk,previous:Intelligence.compatible(desk,desk.narration)?{narration:{...desk.narration,inputKey:desk.inputKey}}:null,usage,now:time,configured:!!process.env.AURUM_CODEBUDDY_API_KEY,backlog:pending});
- desk.aiPolicy={...RESEARCH_POLICY,model:Intelligence.MODEL,toolsRegistered:0,usedToday:usage.attempts.filter(a=>a.day===next.day).length,pendingItems:pending,activeIntervalMinutes:0,nextEligibleAt:next.nextEligibleAt,schedulingReason:next.reason,queue,continueImmediately:pending>0&&queue.stopReason==='runtime-budget'&&queue.completedItems>0,mode:'新消息到达即研判；连续处理队列，核对新闻参数并送入有界预测修正'};
+ desk.aiPolicy={...RESEARCH_POLICY,model:Intelligence.MODEL,toolsRegistered:0,usedToday:usage.attempts.filter(a=>a.day===next.day).length,pendingItems:pending,activeIntervalMinutes:next.intervalMinutes,nextEligibleAt:next.nextEligibleAt,schedulingReason:next.reason,queue,continueImmediately:false,mode:'每半小时最多研判一次；新增消息留存至下一窗口，复用已核对内容'};
  await save('data/analysis-desk.json',desk);
 }
 await checkpoint({callsMade:0,attemptedItems:0,completedItems:0,stopReason:'not-required'});
 if(selection.call){
  const suppliedDeadline=Date.parse(process.env.AURUM_ANALYSIS_DEADLINE||''),deadline=Number.isFinite(suppliedDeadline)?suppliedDeadline:Date.now()+300000;
- const queue=await drainResearchQueue({deadline,
+ const queue=await drainResearchQueue({deadline,maxCalls:RESEARCH_POLICY.maxCallsPerCycle,
   buildInput:(excludeIds,time)=>researchInput(desk,intelligence,articles,time,{excludeIds}),
   run:async input=>{
    const time=Date.now(),day=new Date(time+8*3600000).toISOString().slice(0,10);
