@@ -21,12 +21,12 @@
   "changePct": -2.55,
   "volume": 27770,
   "turnover": 234857449,
-  "asOf": "2026-10-30T18:03:38.000Z",
+  "asOf": "2026-10-30T18:29:58.000Z",
   "source": "东方财富 AU9999 国内行情（上金所）",
   "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "国内公开行情刷新；副合约 AUTD 暂未返回",
+  "delay": "国内公开行情刷新；非交易终端逐笔行情",
   "dataTier": "domestic-live",
   "contracts": [
     {
@@ -42,8 +42,24 @@
       "volume": 27770,
       "turnover": 234857449,
       "insideVolume": 6894,
-      "amplitudePct": 0.07,
-      "asOf": "2026-10-30T18:03:38.000Z"
+      "amplitudePct": 0.06,
+      "asOf": "2026-10-30T18:29:58.000Z"
+    },
+    {
+      "symbol": "AUTD",
+      "name": "黄金T+D",
+      "latest": 831.1,
+      "high": 851,
+      "low": 830.1,
+      "open": 851,
+      "previousClose": 854.58,
+      "change": -26.72,
+      "changePct": -3.11,
+      "volume": 17118,
+      "turnover": 14418579456,
+      "insideVolume": 7190,
+      "amplitudePct": 1.14,
+      "asOf": "2026-10-30T18:29:58.000Z"
     }
   ],
   "fetchedAt": null,
@@ -51,35 +67,37 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-10-30T18:38:46.396Z",
-  "lastSuccessAt": "2026-10-30T18:38:46.396Z",
+  "checkedAt": "2026-10-30T18:39:21.413Z",
+  "lastSuccessAt": "2026-10-30T18:39:21.413Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "checkedAt": "2026-10-30T18:38:44.326Z",
-      "lastSuccessAt": "2026-10-30T18:03:43.823Z",
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "checkedAt": "2026-10-30T18:39:19.062Z",
+      "lastSuccessAt": "2026-10-30T18:39:19.062Z",
+      "kind": "quote",
+      "asOf": "2026-10-30T18:29:58.000Z",
+      "latencyMs": 2350
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-10-30T18:38:44.326Z",
-      "lastSuccessAt": "2026-10-30T18:38:44.326Z",
+      "checkedAt": "2026-10-30T18:39:19.062Z",
+      "lastSuccessAt": "2026-10-30T18:39:19.062Z",
       "kind": "quote",
       "asOf": "2026-10-30T15:58:48.000Z",
-      "latencyMs": 838
+      "latencyMs": 1906
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-10-30T18:38:44.326Z",
-      "lastSuccessAt": "2026-10-30T18:38:44.326Z",
+      "checkedAt": "2026-10-30T18:39:19.062Z",
+      "lastSuccessAt": "2026-10-30T18:39:19.062Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-10-31",
-      "latencyMs": 1993
+      "latencyMs": 1860
     }
   ],
   "officialReference": {
@@ -111,14 +129,14 @@
       "turnover": false
     }
   },
-  "collectionMs": 2070,
+  "collectionMs": 2352,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 3887,
+    "priceUsdOz": 3886.60009765625,
     "previousUsdOz": 4031.39990234375,
     "priceCnyGram": null,
     "asOf": "2026-10-30T04:00:00.000Z",
