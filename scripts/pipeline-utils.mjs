@@ -15,7 +15,7 @@ export function buildHealth(previous,attempts,now,{news,research,history,market,
  for(const [key,rows] of Object.entries(channels))if(rows.some(s=>s.ok===false)&&!issues.includes(key+'-sources'))issues.push(key+'-sources');
  return {schema:1,generatedAt:now,runUrl:runUrl||null,status:allFailed||assemblyFailed?'failed':issues.length?'partial':'ok',issues,stages,
   service:service||null,
-  news:{checkedAt:news?.checkedAt||news?.generatedAt,lastPublishedAt:news?.items?.[0]?.publishedAt,items:news?.items?.length||0,available:(news?.sourceStatus||[]).filter(s=>s.ok).length,total:news?.sourceStatus?.length||0},
+  news:{checkedAt:news?.checkedAt||news?.generatedAt,lastPublishedAt:news?.items?.[0]?.publishedAt,lastChangeAt:news?.lastChangeAt||null,changes:news?.changes||null,staleSources:(news?.sourceStatus||[]).filter(s=>s.freshness==='stale').map(s=>s.source),items:news?.items?.length||0,available:(news?.sourceStatus||[]).filter(s=>s.ok).length,total:news?.sourceStatus?.length||0},
   factors:{checkedAt:research?.generatedAt,available:(research?.status||[]).filter(s=>s.ok).length,total:research?.status?.length||0},
   history:{latest:history?.daily?.at(-1)?.time,count:history?.daily?.length||0},quote:{asOf:market?.asOf||null,checkedAt:market?.checkedAt||stages.quote?.checkedAt||null,lastSuccessAt:market?.lastSuccessAt||stages.quote?.lastSuccessAt||null,available:channels.quote.filter(s=>s.ok).length,total:channels.quote.length}};
 }

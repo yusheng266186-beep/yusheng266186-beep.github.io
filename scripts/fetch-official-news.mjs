@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { mergeFeedResults,failedFeedSnapshot,goldRelevant } from "./news-utils.mjs";
+import { mergeFeedResults,failedFeedSnapshot,goldRelevant,feedReceipt } from "./news-utils.mjs";
 import {fetchText} from "./fetch-utils.mjs";
 import Evidence from "../assets/evidence.js";
 
@@ -56,15 +56,15 @@ async function fetchSource([id, name, url]) {
       if(sentences.length){item.summary=sentences.slice(0,2).join(" ").slice(0,1000);item.impact=Evidence.classifyNews(item).score>0?"bullish":"bearish";}
     }catch{/* RSS item remains usable when the linked decision is unavailable. */}
   }));
-  return {items,validFeed:true};
+  return feedReceipt(parsed,items,{maxAgeHours:['bbc-world','cnbc-economy','cnbc-top','wsj-markets','marketwatch'].includes(id)?72:null});
 }
 
 async function fetchSinaNews(){
  const url='https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid=2516&num=100&page=1';
  const payload=JSON.parse(await fetchText(url));if(!Array.isArray(payload.result?.data)||!payload.result.data.length)throw Error('Sina news returned no dated feed');
- const items=payload.result.data.map(item=>({id:'sina-'+String(item.oid||item.docid),source:'新浪财经滚动',publisher:String(item.media_name||'新浪财经'),title:clean(item.title||''),summary:clean(item.intro||item.summary||'').slice(0,360),url:item.url,
-  publishedAt:Number(item.ctime)>0?new Date(Number(item.ctime)*1000).toISOString():null,weight:70,category:'domestic'})).filter(item=>item.title&&item.publishedAt&&Date.parse(item.publishedAt)<=Date.now()+300000&&isGoldRelevant(item)).slice(0,24);
- return {items,validFeed:true};
+ const parsed=payload.result.data.map(item=>({id:'sina-'+String(item.oid||item.docid),source:'新浪财经滚动',publisher:String(item.media_name||'新浪财经'),title:clean(item.title||''),summary:clean(item.intro||item.summary||'').slice(0,360),url:item.url,
+  publishedAt:Number(item.ctime)>0?new Date(Number(item.ctime)*1000).toISOString():null,weight:70,category:'domestic'})).filter(item=>item.title&&item.publishedAt&&Date.parse(item.publishedAt)<=Date.now()+300000);
+ return feedReceipt(parsed,parsed.filter(isGoldRelevant).slice(0,24),{maxAgeHours:72});
 }
 
 async function fetchSgeNotices() {

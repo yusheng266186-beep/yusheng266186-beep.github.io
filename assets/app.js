@@ -4,7 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.3.6";
+  var RELEASE_VERSION = "5.3.7";
   var FORECAST_METHOD = "ca3bcb724dd1738ecfe4cdcd8162e0ba00a3acb7be0183165cd9be4e3a298dae";
   var portfolioSignature = null;
   var storageNotice = "";
@@ -197,6 +197,8 @@
     return {
       generatedAt: validDate(raw && raw.generatedAt || new Date(0).toISOString()),
       checkedAt: Core.timestamp(raw && (raw.checkedAt||raw.generatedAt)),
+      lastChangeAt: Core.timestamp(raw && raw.lastChangeAt),
+      changes: raw && raw.changes || null,
       failedSources: raw && Array.isArray(raw.failedSources) ? raw.failedSources.map(String) : [],
       sourceStatus: raw && Array.isArray(raw.sourceStatus) ? raw.sourceStatus : [],
       items: items.filter(function(item){return item && typeof item === "object";}).map(function (item, index) {
@@ -687,7 +689,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.3.6");
+      var worker=new Worker("assets/prediction-worker.js?v=5.3.7");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -1231,8 +1233,10 @@
       var category = ["all","raw"].includes(state.newsFilter) || (state.newsFilter === "high" ? item.weight >= 60 : item.category === state.newsFilter);
       return category && (!query || (item.title+" "+item.source).toLocaleLowerCase().includes(query));
     });
-    $("newsFreshness").textContent = state.news.items.length ? "原文最新 · "+formatShortDate(new Date(state.news.items[0].publishedAt)) : "暂无有效发布";
-    $("newsSourceState").textContent = "资讯核对 "+formatDateTime(state.news.checkedAt||state.news.generatedAt)+" · "+state.news.sourceStatus.filter(function(source){return source.ok;}).length+" / "+state.news.sourceStatus.length+" 渠道可用"+((state.researchFailures||[]).length?" · 本次核对失败，保留原记录":"");
+    $("newsFreshness").textContent = state.news.items.length ? "最新收录原文 · "+formatShortDate(new Date(state.news.items[0].publishedAt)) : "暂无有效发布";
+    var staleNewsSources=state.news.sourceStatus.filter(function(source){return source.freshness==='stale';}).map(function(source){return source.source;});
+    var changeNote=state.news.changes?" · 本轮新增 "+state.news.changes.added+" 条、修订 "+state.news.changes.revised+" 条":"";
+    $("newsSourceState").textContent = "最近采集 "+formatDateTime(state.news.checkedAt||state.news.generatedAt)+" · "+state.news.sourceStatus.filter(function(source){return source.ok;}).length+" / "+state.news.sourceStatus.length+" 渠道可用"+changeNote+(state.news.lastChangeAt?" · 最近入库 "+formatDateTime(state.news.lastChangeAt):"")+(staleNewsSources.length?"。原文停更："+staleNewsSources.join("、"):"")+((state.researchFailures||[]).length?" · 本次核对失败，保留原记录":"");
     var html = filtered.length ? filtered.slice(0,state.newsLimit).map(renderNewsItem).join("") : '<div class="news-empty"><strong>暂时没有匹配的原文。</strong><p>试试其他关键词，或切换资讯类别。</p></div>';
     if (state.newsHTML !== html) { $("newsList").innerHTML = html; state.newsHTML = html; }
     setText("newsResultCount", "已显示 "+Math.min(state.newsLimit,filtered.length)+" / "+filtered.length+" 条");
