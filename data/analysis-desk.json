@@ -2,13 +2,13 @@
   "schema": 1,
   "engine": "analysis-desk-1",
   "ready": true,
-  "generatedAt": "2026-11-02T02:32:36.405Z",
-  "inputKey": "f9526ec8c79cee06",
+  "generatedAt": "2026-11-02T02:37:45.066Z",
+  "inputKey": "8528977188b57299",
   "sourceTimes": {
     "history": "2026-11-01T21:26:24.022Z",
-    "news": "2026-11-02T02:32:33.864Z",
-    "research": "2026-11-02T02:32:31.707Z",
-    "publication": "2026-11-02T02:27:36.599Z"
+    "news": "2026-11-02T02:37:33.274Z",
+    "research": "2026-11-02T02:37:31.717Z",
+    "publication": "2026-11-02T02:32:37.874Z"
   },
   "price": {
     "origin": "2026-10-30",
@@ -72,7 +72,7 @@
       "group": "汇率",
       "direction": -1,
       "note": "20 个参考日变化；人民币走弱对国内克价偏正向",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": false
     },
     {
@@ -92,7 +92,7 @@
       "group": "汇率",
       "direction": -1,
       "note": "双边汇率代理，不是美元指数；美元走强偏负向",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": false
     },
     {
@@ -112,7 +112,7 @@
       "group": "利率",
       "direction": 1,
       "note": "20 个参考日变动；实际收益率上升偏负向",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": false
     },
     {
@@ -132,7 +132,7 @@
       "group": "风险",
       "direction": 1,
       "note": "权益波动代理；流动性冲击下相关关系可能改变",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": false
     },
     {
@@ -152,7 +152,7 @@
       "group": "利率",
       "direction": 0,
       "note": "短端利率监测代理；避免与实际收益率重复施加方向先验",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": true
     },
     {
@@ -172,7 +172,7 @@
       "group": "利率",
       "direction": 0,
       "note": "监测经济周期，不预设固定黄金涨跌方向；档案充足后才可估计系数",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": true
     },
     {
@@ -192,7 +192,7 @@
       "group": "能源",
       "direction": 0,
       "note": "通胀与增长的混合代理，监测输入；不预设固定利好利坏",
-      "ageDays": 6.105976909722222,
+      "ageDays": 6.109549375,
       "monitorOnly": true
     },
     {
@@ -212,7 +212,7 @@
       "group": "资金持仓",
       "direction": 0,
       "note": "COMEX 黄金期货、仅期货；周度头寸可能滞后，不把拥挤方向等同于未来涨跌",
-      "ageDays": 6.105976909722222,
+      "ageDays": 6.109549375,
       "monitorOnly": true
     },
     {
@@ -232,7 +232,7 @@
       "group": "通胀",
       "direction": 0,
       "note": "同日名义减实际收益率，含风险与流动性溢价；监测输入，不作纯通胀预期",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": true
     },
     {
@@ -254,7 +254,29 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.0076782986111111114,
+      "ageDays": 0.011250763888888888,
+      "weight": 70
+    },
+    {
+      "id": "N-ce0f5d0c3bc92dfc",
+      "kind": "event",
+      "label": "美联储加息预期升温叠加流动性挤兑 金价破位下行",
+      "summary": "文章来源：新华财经 新华财经北京11月2日电 受美国经济数据强劲导致加息预期升温以及科技股大跌引发的连锁抛售影响，现货黄金上周一度跌至3870.20美元/盎司。",
+      "publishedAt": "2026-11-02T02:16:16.000Z",
+      "knownAt": "2026-11-02T02:37:33.274Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/money/bond/2026-11-02/doc-inixicie7308678.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/money/bond/2026-11-02/doc-inixicie7308678.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 0.01491974537037037,
       "weight": 70
     },
     {
@@ -276,7 +298,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.026810243055555554,
+      "ageDays": 0.030382708333333334,
       "weight": 70
     },
     {
@@ -298,7 +320,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.0400046875,
+      "ageDays": 0.04357715277777778,
       "weight": 70
     },
     {
@@ -320,7 +342,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.05149774305555556,
+      "ageDays": 0.055070208333333336,
       "weight": 42
     },
     {
@@ -342,7 +364,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.07056024305555555,
+      "ageDays": 0.07413270833333334,
       "weight": 42
     },
     {
@@ -364,7 +386,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.09913663194444444,
+      "ageDays": 0.10270909722222223,
       "weight": 70
     },
     {
@@ -386,7 +408,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.10419450231481482,
+      "ageDays": 0.10776696759259259,
       "weight": 70
     },
     {
@@ -408,7 +430,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.11741209490740741,
+      "ageDays": 0.12098456018518519,
       "weight": 70
     },
     {
@@ -430,7 +452,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.13052552083333332,
+      "ageDays": 0.13409798611111112,
       "weight": 70
     },
     {
@@ -452,7 +474,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.13068755787037037,
+      "ageDays": 0.13426002314814814,
       "weight": 70
     },
     {
@@ -474,7 +496,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.13863894675925925,
+      "ageDays": 0.14221141203703705,
       "weight": 70
     },
     {
@@ -496,7 +518,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.15221533564814815,
+      "ageDays": 0.15578780092592592,
       "weight": 70
     },
     {
@@ -518,7 +540,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.15619681712962963,
+      "ageDays": 0.1597692824074074,
       "weight": 70
     },
     {
@@ -540,7 +562,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.16407876157407408,
+      "ageDays": 0.16765122685185185,
       "weight": 70
     },
     {
@@ -562,7 +584,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.1650046875,
+      "ageDays": 0.16857715277777777,
       "weight": 70
     },
     {
@@ -584,7 +606,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.22961116898148148,
+      "ageDays": 0.23318363425925925,
       "weight": 42
     },
     {
@@ -606,7 +628,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.2670995949074074,
+      "ageDays": 0.2706720601851852,
       "weight": 70
     },
     {
@@ -628,7 +650,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.26784033564814813,
+      "ageDays": 0.2714128009259259,
       "weight": 70
     },
     {
@@ -650,7 +672,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.2699120949074074,
+      "ageDays": 0.2734845601851852,
       "weight": 70
     },
     {
@@ -672,7 +694,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.2706296875,
+      "ageDays": 0.27420215277777776,
       "weight": 70
     },
     {
@@ -694,7 +716,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.32346533564814817,
+      "ageDays": 0.32703780092592594,
       "weight": 70
     },
     {
@@ -716,7 +738,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.3344607060185185,
+      "ageDays": 0.3380331712962963,
       "weight": 70
     },
     {
@@ -738,7 +760,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.33516672453703705,
+      "ageDays": 0.3387391898148148,
       "weight": 70
     },
     {
@@ -760,7 +782,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.3433495949074074,
+      "ageDays": 0.3469220601851852,
       "weight": 70
     },
     {
@@ -782,7 +804,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.4698310763888889,
+      "ageDays": 0.47340354166666665,
       "weight": 70
     },
     {
@@ -804,7 +826,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.5481296875,
+      "ageDays": 0.5517021527777778,
       "weight": 70
     },
     {
@@ -826,7 +848,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.579842650462963,
+      "ageDays": 0.5834151157407408,
       "weight": 70
     },
     {
@@ -848,7 +870,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 0.6577824652777777,
+      "ageDays": 0.6613549305555556,
       "weight": 70
     },
     {
@@ -870,7 +892,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 0.7686505208333333,
+      "ageDays": 0.7722229861111111,
       "weight": 70
     },
     {
@@ -892,7 +914,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.8910347800925926,
+      "ageDays": 0.8946072453703704,
       "weight": 70
     },
     {
@@ -914,7 +936,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.9003866319444445,
+      "ageDays": 0.9039590972222222,
       "weight": 70
     },
     {
@@ -936,7 +958,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 1.0782801504629629,
+      "ageDays": 1.0818526157407407,
       "weight": 70
     },
     {
@@ -958,7 +980,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.0931991319444445,
+      "ageDays": 1.0967715972222223,
       "weight": 70
     },
     {
@@ -980,7 +1002,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.1191250578703704,
+      "ageDays": 1.1226975231481482,
       "weight": 70
     },
     {
@@ -1002,7 +1024,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.138905150462963,
+      "ageDays": 1.1424776157407408,
       "weight": 70
     },
     {
@@ -1024,7 +1046,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.230803298611111,
+      "ageDays": 1.2343757638888888,
       "weight": 70
     },
     {
@@ -1046,7 +1068,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.350027835648148,
+      "ageDays": 1.3536003009259259,
       "weight": 70
     },
     {
@@ -1068,7 +1090,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.3699120949074075,
+      "ageDays": 1.3734845601851853,
       "weight": 70
     },
     {
@@ -1090,7 +1112,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.373430613425926,
+      "ageDays": 1.3770030787037038,
       "weight": 70
     },
     {
@@ -1112,7 +1134,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.3803750578703704,
+      "ageDays": 1.3839475231481482,
       "weight": 70
     },
     {
@@ -1134,7 +1156,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.3983611689814814,
+      "ageDays": 1.4019336342592592,
       "weight": 70
     },
     {
@@ -1156,7 +1178,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.4088125578703703,
+      "ageDays": 1.412385023148148,
       "weight": 70
     },
     {
@@ -1178,7 +1200,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.4953982060185185,
+      "ageDays": 1.4989706712962962,
       "weight": 70
     },
     {
@@ -1200,7 +1222,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.5287894097222223,
+      "ageDays": 1.532361875,
       "weight": 70
     },
     {
@@ -1222,7 +1244,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.555444502314815,
+      "ageDays": 1.5590169675925927,
       "weight": 42
     },
     {
@@ -1244,7 +1266,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.5981991319444444,
+      "ageDays": 1.6017715972222222,
       "weight": 42
     },
     {
@@ -1266,7 +1288,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.8273657986111111,
+      "ageDays": 1.830938263888889,
       "weight": 70
     },
     {
@@ -1288,7 +1310,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.844564872685185,
+      "ageDays": 1.8481373379629629,
       "weight": 70
     },
     {
@@ -1310,7 +1332,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.8839398726851853,
+      "ageDays": 1.887512337962963,
       "weight": 70
     },
     {
@@ -1332,7 +1354,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.9416482060185185,
+      "ageDays": 1.9452206712962963,
       "weight": 70
     },
     {
@@ -1354,7 +1376,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.9952708912037036,
+      "ageDays": 1.9988433564814816,
       "weight": 42
     },
     {
@@ -1376,7 +1398,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 1.997655150462963,
+      "ageDays": 2.0012276157407407,
       "weight": 70
     },
     {
@@ -1398,7 +1420,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.082632002314815,
+      "ageDays": 2.0862044675925926,
       "weight": 70
     },
     {
@@ -1420,7 +1442,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.134252372685185,
+      "ageDays": 2.1378248379629627,
       "weight": 42
     },
     {
@@ -1442,7 +1464,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.147643576388889,
+      "ageDays": 2.151216041666667,
       "weight": 70
     },
     {
@@ -1464,7 +1486,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.156451446759259,
+      "ageDays": 2.1600239120370373,
       "weight": 70
     },
     {
@@ -1486,7 +1508,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.157805613425926,
+      "ageDays": 2.1613780787037036,
       "weight": 70
     },
     {
@@ -1508,7 +1530,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.174819502314815,
+      "ageDays": 2.1783919675925927,
       "weight": 42
     },
     {
@@ -1530,7 +1552,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.1803519097222224,
+      "ageDays": 2.183924375,
       "weight": 70
     },
     {
@@ -1552,7 +1574,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.1838241319444442,
+      "ageDays": 2.187396597222222,
       "weight": 70
     },
     {
@@ -1574,7 +1596,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.1866366319444444,
+      "ageDays": 2.190209097222222,
       "weight": 70
     },
     {
@@ -1596,7 +1618,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.2004213541666666,
+      "ageDays": 2.2039938194444444,
       "weight": 54
     },
     {
@@ -1618,7 +1640,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.2029097800925928,
+      "ageDays": 2.2064822453703705,
       "weight": 70
     },
     {
@@ -1640,7 +1662,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 2.2154213541666667,
+      "ageDays": 2.2189938194444445,
       "weight": 70
     },
     {
@@ -1662,7 +1684,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.222169039351852,
+      "ageDays": 2.22574150462963,
       "weight": 70
     },
     {
@@ -1684,7 +1706,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.2314398726851854,
+      "ageDays": 2.235012337962963,
       "weight": 70
     },
     {
@@ -1706,7 +1728,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 2.232666724537037,
+      "ageDays": 2.236239189814815,
       "weight": 70
     },
     {
@@ -1728,7 +1750,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.2329329282407406,
+      "ageDays": 2.2365053935185184,
       "weight": 70
     },
     {
@@ -1750,7 +1772,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.233928298611111,
+      "ageDays": 2.237500763888889,
       "weight": 70
     },
     {
@@ -1772,7 +1794,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.234518576388889,
+      "ageDays": 2.238091041666667,
       "weight": 70
     },
     {
@@ -1794,7 +1816,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 2.2436505208333335,
+      "ageDays": 2.2472229861111113,
       "weight": 70
     },
     {
@@ -1816,7 +1838,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.265016261574074,
+      "ageDays": 2.268588726851852,
       "weight": 70
     },
     {
@@ -1838,7 +1860,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.2688472800925927,
+      "ageDays": 2.2724197453703705,
       "weight": 70
     },
     {
@@ -1860,7 +1882,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.28744681712963,
+      "ageDays": 2.2910192824074076,
       "weight": 70
     },
     {
@@ -1882,7 +1904,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.3087662615740743,
+      "ageDays": 2.312338726851852,
       "weight": 70
     },
     {
@@ -1904,7 +1926,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.3372269097222222,
+      "ageDays": 2.340799375,
       "weight": 66
     },
     {
@@ -1926,7 +1948,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.3522269097222224,
+      "ageDays": 2.355799375,
       "weight": 70
     },
     {
@@ -1948,7 +1970,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.355976909722222,
+      "ageDays": 2.359549375,
       "weight": 70
     },
     {
@@ -1970,7 +1992,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.3696458912037035,
+      "ageDays": 2.3732183564814813,
       "weight": 54
     },
     {
@@ -1992,7 +2014,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.421127372685185,
+      "ageDays": 2.424699837962963,
       "weight": 42
     },
     {
@@ -2014,7 +2036,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.432365798611111,
+      "ageDays": 2.4359382638888887,
       "weight": 42
     },
     {
@@ -2037,7 +2059,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.43932181712963,
+      "ageDays": 2.4428942824074076,
       "weight": 46
     },
     {
@@ -2059,7 +2081,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4580370949074073,
+      "ageDays": 2.461609560185185,
       "weight": 42
     },
     {
@@ -2081,7 +2103,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.461775520833333,
+      "ageDays": 2.465347986111111,
       "weight": 70
     },
     {
@@ -2103,7 +2125,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.464229224537037,
+      "ageDays": 2.4678016898148147,
       "weight": 70
     },
     {
@@ -2125,7 +2147,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.466416724537037,
+      "ageDays": 2.469989189814815,
       "weight": 70
     },
     {
@@ -2147,7 +2169,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4755602430555554,
+      "ageDays": 2.479132708333333,
       "weight": 42
     },
     {
@@ -2169,7 +2191,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4757570023148148,
+      "ageDays": 2.4793294675925925,
       "weight": 70
     },
     {
@@ -2191,7 +2213,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4781296875,
+      "ageDays": 2.481702152777778,
       "weight": 70
     },
     {
@@ -2213,7 +2235,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4856991319444446,
+      "ageDays": 2.4892715972222224,
       "weight": 66
     },
     {
@@ -2235,7 +2257,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.489217650462963,
+      "ageDays": 2.492790115740741,
       "weight": 70
     },
     {
@@ -2257,7 +2279,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.501115798611111,
+      "ageDays": 2.5046882638888888,
       "weight": 70
     },
     {
@@ -2279,7 +2301,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.522643576388889,
+      "ageDays": 2.526216041666667,
       "weight": 54
     },
     {
@@ -2301,7 +2323,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.580270891203704,
+      "ageDays": 2.5838433564814816,
       "weight": 70
     },
     {
@@ -2323,7 +2345,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.6008843171296294,
+      "ageDays": 2.604456782407407,
       "weight": 70
     },
     {
@@ -2345,7 +2367,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.62775931712963,
+      "ageDays": 2.6313317824074076,
       "weight": 70
     },
     {
@@ -2367,7 +2389,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.6311852430555556,
+      "ageDays": 2.6347577083333333,
       "weight": 70
     },
     {
@@ -2389,7 +2411,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.667782465277778,
+      "ageDays": 2.6713549305555557,
       "weight": 66
     },
     {
@@ -2411,7 +2433,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.730976909722222,
+      "ageDays": 2.734549375,
       "weight": 42
     },
     {
@@ -2433,7 +2455,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.805409780092593,
+      "ageDays": 2.8089822453703706,
       "weight": 54
     },
     {
@@ -2455,7 +2477,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.9256759837962965,
+      "ageDays": 2.9292484490740742,
       "weight": 66
     },
     {
@@ -2477,7 +2499,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.0518102430555554,
+      "ageDays": 3.055382708333333,
       "weight": 42
     },
     {
@@ -2499,7 +2521,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.192666724537037,
+      "ageDays": 3.196239189814815,
       "weight": 70
     },
     {
@@ -2521,7 +2543,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.210838020833333,
+      "ageDays": 3.214410486111111,
       "weight": 54
     },
     {
@@ -2543,7 +2565,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.2343333912037036,
+      "ageDays": 3.2379058564814813,
       "weight": 70
     },
     {
@@ -2565,7 +2587,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.235444502314815,
+      "ageDays": 3.2390169675925926,
       "weight": 70
     },
     {
@@ -2587,7 +2609,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.2390093171296295,
+      "ageDays": 3.2425817824074072,
       "weight": 70
     },
     {
@@ -2609,7 +2631,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.2421690393518516,
+      "ageDays": 3.24574150462963,
       "weight": 70
     },
     {
@@ -2631,7 +2653,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.249032465277778,
+      "ageDays": 3.2526049305555556,
       "weight": 42
     },
     {
@@ -2653,7 +2675,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.2518102430555555,
+      "ageDays": 3.2553827083333333,
       "weight": 42
     },
     {
@@ -2675,7 +2697,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.2620532986111113,
+      "ageDays": 3.265625763888889,
       "weight": 70
     },
     {
@@ -2697,7 +2719,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.2653287615740743,
+      "ageDays": 3.268901226851852,
       "weight": 70
     },
     {
@@ -2719,7 +2741,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.280282465277778,
+      "ageDays": 3.2838549305555556,
       "weight": 78
     },
     {
@@ -2741,7 +2763,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.290039409722222,
+      "ageDays": 3.293611875,
       "weight": 70
     },
     {
@@ -2763,7 +2785,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.3014398726851852,
+      "ageDays": 3.305012337962963,
       "weight": 70
     },
     {
@@ -2785,7 +2807,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.338615798611111,
+      "ageDays": 3.3421882638888887,
       "weight": 54
     },
     {
@@ -2807,7 +2829,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.3511273726851853,
+      "ageDays": 3.354699837962963,
       "weight": 70
     },
     {
@@ -2829,7 +2851,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.3678982060185185,
+      "ageDays": 3.3714706712962963,
       "weight": 70
     },
     {
@@ -2851,7 +2873,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.3869607060185185,
+      "ageDays": 3.3905331712962963,
       "weight": 70
     },
     {
@@ -2873,7 +2895,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4055718171296294,
+      "ageDays": 3.409144282407407,
       "weight": 70
     },
     {
@@ -2895,7 +2917,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.4323195023148148,
+      "ageDays": 3.4358919675925925,
       "weight": 70
     },
     {
@@ -2917,7 +2939,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.445641261574074,
+      "ageDays": 3.449213726851852,
       "weight": 70
     },
     {
@@ -2939,7 +2961,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4462546875,
+      "ageDays": 3.449827152777778,
       "weight": 42
     },
     {
@@ -2961,7 +2983,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4582107060185185,
+      "ageDays": 3.4617831712962963,
       "weight": 70
     },
     {
@@ -2983,7 +3005,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4650046875,
+      "ageDays": 3.468577152777778,
       "weight": 66
     },
     {
@@ -3005,7 +3027,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4797616319444447,
+      "ageDays": 3.4833340972222224,
       "weight": 70
     },
     {
@@ -3027,7 +3049,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4821227430555557,
+      "ageDays": 3.4856952083333335,
       "weight": 70
     },
     {
@@ -3049,7 +3071,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4892986689814816,
+      "ageDays": 3.4928711342592593,
       "weight": 54
     },
     {
@@ -3071,7 +3093,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.490132002314815,
+      "ageDays": 3.493704467592593,
       "weight": 70
     },
     {
@@ -3093,7 +3115,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.517655150462963,
+      "ageDays": 3.5212276157407407,
       "weight": 70
     },
     {
@@ -3115,7 +3137,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.5192986689814814,
+      "ageDays": 3.522871134259259,
       "weight": 70
     },
     {
@@ -3137,7 +3159,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.522643576388889,
+      "ageDays": 3.526216041666667,
       "weight": 42
     },
     {
@@ -3159,7 +3181,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.531972280092593,
+      "ageDays": 3.5355447453703706,
       "weight": 70
     },
     {
@@ -3181,7 +3203,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.53307181712963,
+      "ageDays": 3.5366442824074076,
       "weight": 70
     },
     {
@@ -3203,7 +3225,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.533928298611111,
+      "ageDays": 3.5375007638888887,
       "weight": 70
     },
     {
@@ -3225,7 +3247,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.534715335648148,
+      "ageDays": 3.538287800925926,
       "weight": 70
     },
     {
@@ -3247,7 +3269,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.5477014467592594,
+      "ageDays": 3.551273912037037,
       "weight": 70
     },
     {
@@ -3269,7 +3291,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.553453761574074,
+      "ageDays": 3.557026226851852,
       "weight": 70
     },
     {
@@ -3291,7 +3313,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.553893576388889,
+      "ageDays": 3.557466041666667,
       "weight": 42
     },
     {
@@ -3313,7 +3335,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.5559884837962965,
+      "ageDays": 3.5595609490740743,
       "weight": 70
     },
     {
@@ -3335,7 +3357,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.5802593171296295,
+      "ageDays": 3.5838317824074073,
       "weight": 66
     },
     {
@@ -3357,7 +3379,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.585143576388889,
+      "ageDays": 3.588716041666667,
       "weight": 54
     },
     {
@@ -3379,7 +3401,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.585143576388889,
+      "ageDays": 3.588716041666667,
       "weight": 54
     },
     {
@@ -3401,7 +3423,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.6000741319444445,
+      "ageDays": 3.6036465972222222,
       "weight": 70
     },
     {
@@ -3423,7 +3445,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.640270891203704,
+      "ageDays": 3.6438433564814816,
       "weight": 70
     },
     {
@@ -3445,7 +3467,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.644645891203704,
+      "ageDays": 3.6482183564814816,
       "weight": 70
     },
     {
@@ -3467,7 +3489,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.668175983796296,
+      "ageDays": 3.671748449074074,
       "weight": 70
     },
     {
@@ -3489,7 +3511,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.6835000578703703,
+      "ageDays": 3.687072523148148,
       "weight": 70
     },
     {
@@ -3511,7 +3533,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.686983854166667,
+      "ageDays": 3.6905563194444446,
       "weight": 70
     },
     {
@@ -3533,7 +3555,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.6893102430555555,
+      "ageDays": 3.6928827083333333,
       "weight": 42
     },
     {
@@ -3555,7 +3577,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.6939167245370372,
+      "ageDays": 3.697489189814815,
       "weight": 70
     },
     {
@@ -3577,7 +3599,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.699657465277778,
+      "ageDays": 3.7032299305555556,
       "weight": 70
     },
     {
@@ -3599,7 +3621,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.70943755787037,
+      "ageDays": 3.713010023148148,
       "weight": 70
     },
     {
@@ -3621,7 +3643,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 3.7108611689814817,
+      "ageDays": 3.7144336342592594,
       "weight": 70
     },
     {
@@ -3643,7 +3665,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.7225972800925926,
+      "ageDays": 3.7261697453703704,
       "weight": 70
     },
     {
@@ -3665,7 +3687,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.7230718171296298,
+      "ageDays": 3.7266442824074075,
       "weight": 70
     },
     {
@@ -3687,7 +3709,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.727030150462963,
+      "ageDays": 3.730602615740741,
       "weight": 70
     },
     {
@@ -3709,7 +3731,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.7309653356481483,
+      "ageDays": 3.734537800925926,
       "weight": 54
     },
     {
@@ -3731,7 +3753,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.750814872685185,
+      "ageDays": 3.754387337962963,
       "weight": 70
     },
     {
@@ -3753,7 +3775,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.75631255787037,
+      "ageDays": 3.759885023148148,
       "weight": 42
     },
     {
@@ -3775,7 +3797,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.7688357060185185,
+      "ageDays": 3.7724081712962962,
       "weight": 70
     },
     {
@@ -3797,7 +3819,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 3.772169039351852,
+      "ageDays": 3.7757415046296297,
       "weight": 70
     },
     {
@@ -3819,7 +3841,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.789483854166667,
+      "ageDays": 3.7930563194444447,
       "weight": 54
     },
     {
@@ -3841,7 +3863,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.7929560763888888,
+      "ageDays": 3.7965285416666665,
       "weight": 70
     },
     {
@@ -3863,7 +3885,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.798106539351852,
+      "ageDays": 3.8016790046296296,
       "weight": 70
     },
     {
@@ -3885,7 +3907,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.8058495949074076,
+      "ageDays": 3.8094220601851854,
       "weight": 70
     },
     {
@@ -3907,7 +3929,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.808268576388889,
+      "ageDays": 3.811841041666667,
       "weight": 70
     },
     {
@@ -3929,7 +3951,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.8150046875,
+      "ageDays": 3.818577152777778,
       "weight": 70
     },
     {
@@ -3951,7 +3973,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.8192986689814816,
+      "ageDays": 3.8228711342592594,
       "weight": 70
     },
     {
@@ -3973,7 +3995,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.8260347800925927,
+      "ageDays": 3.8296072453703704,
       "weight": 70
     },
     {
@@ -3995,7 +4017,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.8297500578703705,
+      "ageDays": 3.8333225231481483,
       "weight": 70
     },
     {
@@ -4017,7 +4039,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.83775931712963,
+      "ageDays": 3.8413317824074076,
       "weight": 70
     },
     {
@@ -4039,7 +4061,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.8380486689814814,
+      "ageDays": 3.841621134259259,
       "weight": 70
     },
     {
@@ -4061,7 +4083,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.857527835648148,
+      "ageDays": 3.861100300925926,
       "weight": 70
     },
     {
@@ -4083,7 +4105,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.8933727430555556,
+      "ageDays": 3.8969452083333334,
       "weight": 70
     },
     {
@@ -4105,7 +4127,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.9122847800925924,
+      "ageDays": 3.91585724537037,
       "weight": 70
     },
     {
@@ -4127,7 +4149,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.928893576388889,
+      "ageDays": 3.932466041666667,
       "weight": 70
     },
     {
@@ -4149,7 +4171,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.9514745949074075,
+      "ageDays": 3.9550470601851853,
       "weight": 70
     },
     {
@@ -4171,7 +4193,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.9751898726851853,
+      "ageDays": 3.978762337962963,
       "weight": 70
     },
     {
@@ -4193,7 +4215,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.9893218171296296,
+      "ageDays": 3.9928942824074074,
       "weight": 70
     },
     {
@@ -4215,7 +4237,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.9897847800925925,
+      "ageDays": 3.9933572453703703,
       "weight": 70
     },
     {
@@ -4237,7 +4259,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.9900741319444446,
+      "ageDays": 3.9936465972222224,
       "weight": 70
     },
     {
@@ -4259,7 +4281,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.005976909722222,
+      "ageDays": 4.009549375,
       "weight": 70
     },
     {
@@ -4281,7 +4303,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.045745428240741,
+      "ageDays": 4.049317893518518,
       "weight": 70
     },
     {
@@ -4303,7 +4325,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.055976909722222,
+      "ageDays": 4.059549375,
       "weight": 54
     },
     {
@@ -4325,7 +4347,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.059703761574074,
+      "ageDays": 4.063276226851852,
       "weight": 70
     },
     {
@@ -4347,7 +4369,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.074148206018519,
+      "ageDays": 4.077720671296296,
       "weight": 70
     },
     {
@@ -4369,7 +4391,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.078534780092593,
+      "ageDays": 4.08210724537037,
       "weight": 70
     },
     {
@@ -4391,7 +4413,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.1131991319444445,
+      "ageDays": 4.116771597222222,
       "weight": 70
     },
     {
@@ -4413,7 +4435,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 4.135409780092592,
+      "ageDays": 4.138982245370371,
       "weight": 70
     },
     {
@@ -4435,7 +4457,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.136486168981482,
+      "ageDays": 4.140058634259259,
       "weight": 70
     },
     {
@@ -4457,7 +4479,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.137747743055556,
+      "ageDays": 4.141320208333333,
       "weight": 70
     },
     {
@@ -4479,7 +4501,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.140537094907407,
+      "ageDays": 4.144109560185186,
       "weight": 70
     },
     {
@@ -4501,7 +4523,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.143430613425926,
+      "ageDays": 4.147003078703704,
       "weight": 70
     },
     {
@@ -4523,7 +4545,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 4.1437546875,
+      "ageDays": 4.147327152777778,
       "weight": 70
     },
     {
@@ -4545,7 +4567,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.158800983796296,
+      "ageDays": 4.1623734490740745,
       "weight": 70
     },
     {
@@ -4567,7 +4589,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.175444502314815,
+      "ageDays": 4.179016967592593,
       "weight": 70
     },
     {
@@ -4589,7 +4611,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.181740798611111,
+      "ageDays": 4.185313263888889,
       "weight": 70
     },
     {
@@ -4611,7 +4633,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.199032465277778,
+      "ageDays": 4.202604930555555,
       "weight": 66
     },
     {
@@ -4633,7 +4655,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.208916724537037,
+      "ageDays": 4.212489189814815,
       "weight": 54
     },
     {
@@ -4655,7 +4677,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.209900520833333,
+      "ageDays": 4.213472986111111,
       "weight": 70
     },
     {
@@ -4677,7 +4699,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.211532465277778,
+      "ageDays": 4.2151049305555555,
       "weight": 54
     },
     {
@@ -4699,7 +4721,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.222481539351852,
+      "ageDays": 4.2260540046296295,
       "weight": 70
     },
     {
@@ -4721,7 +4743,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.222643576388889,
+      "ageDays": 4.2262160416666665,
       "weight": 54
     },
     {
@@ -4743,7 +4765,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.22287505787037,
+      "ageDays": 4.226447523148148,
       "weight": 70
     },
     {
@@ -4765,7 +4787,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.254055613425926,
+      "ageDays": 4.2576280787037035,
       "weight": 70
     },
     {
@@ -4787,7 +4809,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.255780150462963,
+      "ageDays": 4.259352615740741,
       "weight": 54
     },
     {
@@ -4809,7 +4831,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.255976909722222,
+      "ageDays": 4.259549375,
       "weight": 54
     },
     {
@@ -4831,7 +4853,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.258060243055556,
+      "ageDays": 4.261632708333333,
       "weight": 78
     },
     {
@@ -4853,7 +4875,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.272643576388889,
+      "ageDays": 4.276216041666666,
       "weight": 66
     },
     {
@@ -4875,7 +4897,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.276925983796296,
+      "ageDays": 4.2804984490740745,
       "weight": 54
     },
     {
@@ -4897,7 +4919,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.2888935763888885,
+      "ageDays": 4.292466041666667,
       "weight": 70
     },
     {
@@ -4919,7 +4941,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.290988483796296,
+      "ageDays": 4.294560949074074,
       "weight": 70
     },
     {
@@ -4941,7 +4963,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.302041724537037,
+      "ageDays": 4.305614189814815,
       "weight": 70
     },
     {
@@ -4963,7 +4985,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.302099594907407,
+      "ageDays": 4.305672060185185,
       "weight": 54
     },
     {
@@ -4985,7 +5007,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 4.30807181712963,
+      "ageDays": 4.311644282407407,
       "weight": 70
     },
     {
@@ -5007,7 +5029,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.315652835648148,
+      "ageDays": 4.319225300925926,
       "weight": 66
     },
     {
@@ -5029,7 +5051,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.323071817129629,
+      "ageDays": 4.326644282407408,
       "weight": 70
     },
     {
@@ -5051,7 +5073,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.334449131944444,
+      "ageDays": 4.338021597222222,
       "weight": 54
     },
     {
@@ -5073,7 +5095,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.339680613425926,
+      "ageDays": 4.343253078703704,
       "weight": 70
     },
     {
@@ -5095,7 +5117,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 4.346983854166667,
+      "ageDays": 4.350556319444444,
       "weight": 70
     },
     {
@@ -5117,7 +5139,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.348777835648148,
+      "ageDays": 4.352350300925926,
       "weight": 70
     },
     {
@@ -5139,7 +5161,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.349634317129629,
+      "ageDays": 4.353206782407407,
       "weight": 66
     },
     {
@@ -5161,7 +5183,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.3512315393518515,
+      "ageDays": 4.35480400462963,
       "weight": 42
     },
     {
@@ -5183,7 +5205,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.3521921875,
+      "ageDays": 4.355764652777777,
       "weight": 70
     },
     {
@@ -5205,7 +5227,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.3522153356481486,
+      "ageDays": 4.355787800925926,
       "weight": 70
     },
     {
@@ -5227,7 +5249,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.355085706018518,
+      "ageDays": 4.358658171296296,
       "weight": 54
     },
     {
@@ -5236,7 +5258,7 @@
       "label": "Federal Reserve issues FOMC statement",
       "summary": "Federal Reserve issues FOMC statement",
       "publishedAt": "2026-10-28T18:00:00.000Z",
-      "knownAt": "2026-11-02T02:32:33.864Z",
+      "knownAt": "2026-11-02T02:37:33.274Z",
       "source": "Fed Monetary Policy",
       "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm",
       "sources": [
@@ -5249,7 +5271,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.355976909722222,
+      "ageDays": 4.359549375,
       "weight": 54
     },
     {
@@ -5271,7 +5293,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.367782465277778,
+      "ageDays": 4.3713549305555555,
       "weight": 54
     },
     {
@@ -5293,7 +5315,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.3709421875,
+      "ageDays": 4.374514652777778,
       "weight": 70
     },
     {
@@ -5315,7 +5337,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.409923668981482,
+      "ageDays": 4.413496134259259,
       "weight": 70
     },
     {
@@ -5337,7 +5359,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.4178171875,
+      "ageDays": 4.421389652777778,
       "weight": 70
     },
     {
@@ -5359,7 +5381,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.434252372685185,
+      "ageDays": 4.437824837962963,
       "weight": 42
     },
     {
@@ -5381,7 +5403,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.453083391203704,
+      "ageDays": 4.456655856481482,
       "weight": 70
     },
     {
@@ -5403,7 +5425,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.502226909722222,
+      "ageDays": 4.505799375,
       "weight": 54
     },
     {
@@ -5425,7 +5447,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.519252372685185,
+      "ageDays": 4.522824837962963,
       "weight": 70
     },
     {
@@ -5447,7 +5469,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.525421354166666,
+      "ageDays": 4.528993819444445,
       "weight": 54
     },
     {
@@ -5469,7 +5491,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.532273206018519,
+      "ageDays": 4.535845671296296,
       "weight": 70
     },
     {
@@ -5491,7 +5513,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.542828761574074,
+      "ageDays": 4.546401226851851,
       "weight": 70
     },
     {
@@ -5513,7 +5535,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.576729224537037,
+      "ageDays": 4.580301689814815,
       "weight": 70
     },
     {
@@ -5535,7 +5557,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.580907465277778,
+      "ageDays": 4.584479930555555,
       "weight": 66
     },
     {
@@ -5557,7 +5579,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.585074131944444,
+      "ageDays": 4.588646597222223,
       "weight": 70
     },
     {
@@ -5579,7 +5601,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.5880486689814814,
+      "ageDays": 4.59162113425926,
       "weight": 42
     },
     {
@@ -5601,7 +5623,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.6304097800925925,
+      "ageDays": 4.633982245370371,
       "weight": 42
     },
     {
@@ -5623,7 +5645,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.688916724537037,
+      "ageDays": 4.692489189814815,
       "weight": 70
     },
     {
@@ -5645,7 +5667,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.696949131944445,
+      "ageDays": 4.700521597222222,
       "weight": 70
     },
     {
@@ -5667,7 +5689,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.705386631944444,
+      "ageDays": 4.708959097222222,
       "weight": 70
     },
     {
@@ -5689,7 +5711,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.706682928240741,
+      "ageDays": 4.710255393518518,
       "weight": 70
     },
     {
@@ -5711,7 +5733,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.707747743055555,
+      "ageDays": 4.711320208333333,
       "weight": 70
     },
     {
@@ -5733,7 +5755,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.711682928240741,
+      "ageDays": 4.715255393518518,
       "weight": 70
     },
     {
@@ -5755,7 +5777,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.718222280092593,
+      "ageDays": 4.721794745370371,
       "weight": 70
     },
     {
@@ -5777,7 +5799,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.756370428240741,
+      "ageDays": 4.759942893518518,
       "weight": 70
     },
     {
@@ -5799,7 +5821,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.760456076388889,
+      "ageDays": 4.764028541666667,
       "weight": 54
     },
     {
@@ -5821,7 +5843,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.769171354166667,
+      "ageDays": 4.772743819444444,
       "weight": 70
     },
     {
@@ -5843,7 +5865,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.778638946759259,
+      "ageDays": 4.782211412037037,
       "weight": 70
     },
     {
@@ -5865,7 +5887,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.784449131944444,
+      "ageDays": 4.788021597222222,
       "weight": 70
     },
     {
@@ -5887,7 +5909,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.790780150462963,
+      "ageDays": 4.794352615740741,
       "weight": 70
     },
     {
@@ -5909,7 +5931,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.7954097800925926,
+      "ageDays": 4.798982245370371,
       "weight": 70
     },
     {
@@ -5931,7 +5953,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.797250057870371,
+      "ageDays": 4.800822523148148,
       "weight": 70
     },
     {
@@ -5953,7 +5975,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.804588020833333,
+      "ageDays": 4.808160486111111,
       "weight": 70
     },
     {
@@ -5975,7 +5997,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.811810243055556,
+      "ageDays": 4.815382708333333,
       "weight": 70
     },
     {
@@ -5997,7 +6019,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.814310243055556,
+      "ageDays": 4.817882708333333,
       "weight": 70
     },
     {
@@ -6019,7 +6041,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.823314872685185,
+      "ageDays": 4.826887337962963,
       "weight": 70
     },
     {
@@ -6041,7 +6063,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.832608854166667,
+      "ageDays": 4.836181319444444,
       "weight": 70
     },
     {
@@ -6063,7 +6085,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.841810243055556,
+      "ageDays": 4.845382708333333,
       "weight": 70
     },
     {
@@ -6085,7 +6107,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.8521921875,
+      "ageDays": 4.855764652777777,
       "weight": 70
     },
     {
@@ -6107,7 +6129,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.8831759837962965,
+      "ageDays": 4.886748449074074,
       "weight": 70
     },
     {
@@ -6129,7 +6151,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.959807928240741,
+      "ageDays": 4.963380393518518,
       "weight": 70
     },
     {
@@ -6151,7 +6173,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.965189872685185,
+      "ageDays": 4.968762337962963,
       "weight": 70
     },
     {
@@ -6173,7 +6195,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.0375046875,
+      "ageDays": 5.041077152777778,
       "weight": 70
     },
     {
@@ -6195,7 +6217,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.0438588541666665,
+      "ageDays": 5.047431319444445,
       "weight": 70
     },
     {
@@ -6217,7 +6239,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.045155150462963,
+      "ageDays": 5.048727615740741,
       "weight": 70
     },
     {
@@ -6239,7 +6261,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.053882002314815,
+      "ageDays": 5.057454467592593,
       "weight": 70
     },
     {
@@ -6261,7 +6283,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.058048668981481,
+      "ageDays": 5.061621134259259,
       "weight": 70
     },
     {
@@ -6283,7 +6305,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.058581076388889,
+      "ageDays": 5.0621535416666665,
       "weight": 70
     },
     {
@@ -6305,7 +6327,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.088743113425926,
+      "ageDays": 5.092315578703704,
       "weight": 70
     },
     {
@@ -6327,7 +6349,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.1056296875,
+      "ageDays": 5.109202152777778,
       "weight": 70
     },
     {
@@ -6349,7 +6371,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.153210706018519,
+      "ageDays": 5.156783171296296,
       "weight": 70
     },
     {
@@ -6371,7 +6393,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.162007002314815,
+      "ageDays": 5.165579467592592,
       "weight": 70
     },
     {
@@ -6393,7 +6415,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.164310243055556,
+      "ageDays": 5.167882708333333,
       "weight": 70
     },
     {
@@ -6415,7 +6437,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.184888946759259,
+      "ageDays": 5.188461412037037,
       "weight": 70
     },
     {
@@ -6437,7 +6459,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.185803298611111,
+      "ageDays": 5.189375763888889,
       "weight": 70
     },
     {
@@ -6459,7 +6481,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.188685243055556,
+      "ageDays": 5.192257708333333,
       "weight": 70
     },
     {
@@ -6481,7 +6503,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.1902245949074075,
+      "ageDays": 5.193797060185185,
       "weight": 70
     },
     {
@@ -6503,7 +6525,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.199726909722222,
+      "ageDays": 5.203299375,
       "weight": 54
     },
     {
@@ -6525,7 +6547,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.222400520833333,
+      "ageDays": 5.2259729861111115,
       "weight": 70
     },
     {
@@ -6547,7 +6569,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.2235463541666665,
+      "ageDays": 5.227118819444445,
       "weight": 70
     },
     {
@@ -6569,7 +6591,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.230189872685185,
+      "ageDays": 5.233762337962963,
       "weight": 42
     },
     {
@@ -6591,7 +6613,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.230976909722222,
+      "ageDays": 5.234549375,
       "weight": 42
     },
     {
@@ -6613,7 +6635,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.243037094907407,
+      "ageDays": 5.246609560185185,
       "weight": 42
     },
     {
@@ -6635,7 +6657,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.247794039351852,
+      "ageDays": 5.25136650462963,
       "weight": 70
     },
     {
@@ -6657,7 +6679,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.255976909722222,
+      "ageDays": 5.259549375,
       "weight": 42
     },
     {
@@ -6679,7 +6701,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.258835706018519,
+      "ageDays": 5.262408171296296,
       "weight": 42
     },
     {
@@ -6701,7 +6723,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.269993113425926,
+      "ageDays": 5.273565578703704,
       "weight": 70
     },
     {
@@ -6723,7 +6745,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.308882002314815,
+      "ageDays": 5.312454467592593,
       "weight": 70
     },
     {
@@ -6745,7 +6767,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.338696817129629,
+      "ageDays": 5.342269282407408,
       "weight": 70
     },
     {
@@ -6767,7 +6789,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.353199131944445,
+      "ageDays": 5.356771597222222,
       "weight": 42
     },
     {
@@ -6789,7 +6811,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.373199131944444,
+      "ageDays": 5.3767715972222225,
       "weight": 42
     },
     {
@@ -6811,7 +6833,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.398384317129629,
+      "ageDays": 5.4019567824074075,
       "weight": 70
     },
     {
@@ -6833,7 +6855,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.404877372685185,
+      "ageDays": 5.408449837962963,
       "weight": 70
     },
     {
@@ -6855,7 +6877,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.415733854166667,
+      "ageDays": 5.419306319444445,
       "weight": 70
     },
     {
@@ -6877,7 +6899,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.426856539351852,
+      "ageDays": 5.430429004629629,
       "weight": 70
     },
     {
@@ -6899,7 +6921,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "避险事件缓和",
-      "ageDays": 5.434553298611111,
+      "ageDays": 5.4381257638888885,
       "weight": 70
     },
     {
@@ -6921,7 +6943,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.4414861689814815,
+      "ageDays": 5.445058634259259,
       "weight": 70
     },
     {
@@ -6943,7 +6965,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.451972280092592,
+      "ageDays": 5.4555447453703705,
       "weight": 42
     },
     {
@@ -6965,7 +6987,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.459078761574074,
+      "ageDays": 5.462651226851852,
       "weight": 70
     },
     {
@@ -6987,7 +7009,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.468476909722222,
+      "ageDays": 5.472049375,
       "weight": 70
     },
     {
@@ -7009,7 +7031,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.471162094907408,
+      "ageDays": 5.474734560185185,
       "weight": 70
     },
     {
@@ -7031,7 +7053,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.472967650462963,
+      "ageDays": 5.4765401157407405,
       "weight": 42
     },
     {
@@ -7057,7 +7079,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.516578761574074,
+      "ageDays": 5.520151226851852,
       "weight": 54
     },
     {
@@ -7079,7 +7101,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.5266482060185185,
+      "ageDays": 5.530220671296297,
       "weight": 70
     },
     {
@@ -7101,7 +7123,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.542932928240741,
+      "ageDays": 5.546505393518519,
       "weight": 70
     },
     {
@@ -7123,7 +7145,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.562342650462963,
+      "ageDays": 5.565915115740741,
       "weight": 70
     },
     {
@@ -7145,7 +7167,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.56994681712963,
+      "ageDays": 5.573519282407408,
       "weight": 70
     },
     {
@@ -7167,7 +7189,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.584935243055556,
+      "ageDays": 5.588507708333333,
       "weight": 70
     },
     {
@@ -7189,7 +7211,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.5849583912037035,
+      "ageDays": 5.588530856481482,
       "weight": 70
     },
     {
@@ -7211,7 +7233,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.6280486689814815,
+      "ageDays": 5.63162113425926,
       "weight": 70
     },
     {
@@ -7233,7 +7255,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.635525520833333,
+      "ageDays": 5.6390979861111115,
       "weight": 42
     },
     {
@@ -7255,7 +7277,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.64068755787037,
+      "ageDays": 5.644260023148148,
       "weight": 54
     },
     {
@@ -7277,7 +7299,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.640861168981481,
+      "ageDays": 5.64443363425926,
       "weight": 70
     },
     {
@@ -7299,7 +7321,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.643222280092592,
+      "ageDays": 5.646794745370371,
       "weight": 54
     },
     {
@@ -7321,7 +7343,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.6633264467592594,
+      "ageDays": 5.666898912037037,
       "weight": 42
     },
     {
@@ -7343,7 +7365,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.671949131944444,
+      "ageDays": 5.675521597222223,
       "weight": 42
     },
     {
@@ -7365,7 +7387,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.677469965277778,
+      "ageDays": 5.681042430555555,
       "weight": 42
     },
     {
@@ -7387,7 +7409,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.690699131944444,
+      "ageDays": 5.694271597222222,
       "weight": 54
     },
     {
@@ -7409,7 +7431,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.700618113425926,
+      "ageDays": 5.704190578703703,
       "weight": 70
     },
     {
@@ -7431,7 +7453,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.7188704282407405,
+      "ageDays": 5.722442893518519,
       "weight": 70
     },
     {
@@ -7453,7 +7475,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.743939872685186,
+      "ageDays": 5.747512337962963,
       "weight": 70
     },
     {
@@ -7475,7 +7497,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.790895891203704,
+      "ageDays": 5.794468356481482,
       "weight": 70
     },
     {
@@ -7497,7 +7519,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.799032465277778,
+      "ageDays": 5.802604930555556,
       "weight": 70
     },
     {
@@ -7519,7 +7541,7 @@
       "direction": 1,
       "conditional": false,
       "rule": "明确的避险事件",
-      "ageDays": 5.816775520833334,
+      "ageDays": 5.820347986111111,
       "weight": 70
     },
     {
@@ -7541,7 +7563,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.831798668981482,
+      "ageDays": 5.835371134259259,
       "weight": 70
     },
     {
@@ -7563,7 +7585,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.858419039351852,
+      "ageDays": 5.861991504629629,
       "weight": 70
     },
     {
@@ -7585,7 +7607,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.888997743055556,
+      "ageDays": 5.892570208333333,
       "weight": 70
     },
     {
@@ -7607,7 +7629,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.991463020833334,
+      "ageDays": 5.995035486111111,
       "weight": 70
     },
     {
@@ -7629,7 +7651,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.993882002314815,
+      "ageDays": 5.9974544675925925,
       "weight": 70
     },
     {
@@ -7651,7 +7673,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.998627372685185,
+      "ageDays": 6.002199837962963,
       "weight": 70
     },
     {
@@ -7673,7 +7695,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.009773206018519,
+      "ageDays": 6.013345671296296,
       "weight": 70
     },
     {
@@ -7695,7 +7717,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.032307928240741,
+      "ageDays": 6.035880393518519,
       "weight": 70
     },
     {
@@ -7717,7 +7739,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.041486168981481,
+      "ageDays": 6.045058634259259,
       "weight": 70
     },
     {
@@ -7739,7 +7761,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.0462546875,
+      "ageDays": 6.049827152777778,
       "weight": 42
     },
     {
@@ -7761,7 +7783,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.0549699652777775,
+      "ageDays": 6.058542430555556,
       "weight": 70
     },
     {
@@ -7783,7 +7805,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.080270891203703,
+      "ageDays": 6.083843356481482,
       "weight": 70
     },
     {
@@ -7805,7 +7827,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.105976909722222,
+      "ageDays": 6.109549375,
       "weight": 42
     },
     {
@@ -7827,7 +7849,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.114020891203704,
+      "ageDays": 6.117593356481481,
       "weight": 70
     },
     {
@@ -7849,7 +7871,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.116787094907408,
+      "ageDays": 6.120359560185185,
       "weight": 70
     },
     {
@@ -7871,7 +7893,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.128789409722223,
+      "ageDays": 6.132361875,
       "weight": 70
     },
     {
@@ -7893,7 +7915,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.128870428240741,
+      "ageDays": 6.132442893518519,
       "weight": 70
     },
     {
@@ -7915,7 +7937,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.164310243055556,
+      "ageDays": 6.167882708333333,
       "weight": 70
     },
     {
@@ -7937,7 +7959,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.190247743055555,
+      "ageDays": 6.193820208333333,
       "weight": 70
     },
     {
@@ -7959,7 +7981,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.213615798611111,
+      "ageDays": 6.217188263888889,
       "weight": 54
     },
     {
@@ -7981,7 +8003,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.2143796875,
+      "ageDays": 6.2179521527777775,
       "weight": 70
     },
     {
@@ -8003,7 +8025,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.2261157986111115,
+      "ageDays": 6.229688263888889,
       "weight": 42
     },
     {
@@ -8025,7 +8047,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.233858854166667,
+      "ageDays": 6.237431319444444,
       "weight": 70
     },
     {
@@ -8047,7 +8069,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.2587546875,
+      "ageDays": 6.262327152777778,
       "weight": 42
     },
     {
@@ -8069,7 +8091,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.265050983796296,
+      "ageDays": 6.268623449074074,
       "weight": 70
     },
     {
@@ -8091,7 +8113,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.267423668981482,
+      "ageDays": 6.270996134259259,
       "weight": 70
     },
     {
@@ -8113,7 +8135,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.278199131944445,
+      "ageDays": 6.281771597222222,
       "weight": 54
     },
     {
@@ -8135,7 +8157,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.290699131944445,
+      "ageDays": 6.294271597222222,
       "weight": 54
     },
     {
@@ -8157,7 +8179,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.330270891203703,
+      "ageDays": 6.333843356481482,
       "weight": 54
     },
     {
@@ -8179,7 +8201,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.338407465277778,
+      "ageDays": 6.3419799305555555,
       "weight": 70
     },
     {
@@ -8201,7 +8223,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.349726909722222,
+      "ageDays": 6.353299375,
       "weight": 54
     },
     {
@@ -8223,7 +8245,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.367203761574074,
+      "ageDays": 6.370776226851852,
       "weight": 70
     },
     {
@@ -8245,7 +8267,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.371081076388889,
+      "ageDays": 6.3746535416666665,
       "weight": 70
     },
     {
@@ -8267,7 +8289,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.372562557870371,
+      "ageDays": 6.376135023148148,
       "weight": 42
     },
     {
@@ -8289,7 +8311,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.413592650462963,
+      "ageDays": 6.41716511574074,
       "weight": 70
     },
     {
@@ -8311,7 +8333,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.414333391203703,
+      "ageDays": 6.4179058564814815,
       "weight": 70
     },
     {
@@ -8333,7 +8355,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.4203287615740745,
+      "ageDays": 6.423901226851852,
       "weight": 70
     },
     {
@@ -8355,7 +8377,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.4365671875,
+      "ageDays": 6.440139652777778,
       "weight": 54
     },
     {
@@ -8378,7 +8400,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.439321817129629,
+      "ageDays": 6.442894282407408,
       "weight": 46
     },
     {
@@ -8400,7 +8422,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.443349594907407,
+      "ageDays": 6.4469220601851855,
       "weight": 70
     },
     {
@@ -8422,7 +8444,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.4438820023148145,
+      "ageDays": 6.447454467592593,
       "weight": 70
     },
     {
@@ -8444,7 +8466,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.459044039351852,
+      "ageDays": 6.462616504629629,
       "weight": 70
     },
     {
@@ -8466,7 +8488,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.505456076388889,
+      "ageDays": 6.509028541666667,
       "weight": 70
     },
     {
@@ -8488,7 +8510,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.522111168981482,
+      "ageDays": 6.525683634259259,
       "weight": 70
     },
     {
@@ -8510,7 +8532,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.592597280092592,
+      "ageDays": 6.5961697453703705,
       "weight": 70
     },
     {
@@ -8532,7 +8554,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.611300983796296,
+      "ageDays": 6.614873449074074,
       "weight": 70
     },
     {
@@ -8554,7 +8576,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.613419039351852,
+      "ageDays": 6.616991504629629,
       "weight": 42
     },
     {
@@ -8576,7 +8598,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.663708391203704,
+      "ageDays": 6.667280856481481,
       "weight": 70
     },
     {
@@ -8598,7 +8620,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.670884317129629,
+      "ageDays": 6.6744567824074075,
       "weight": 70
     },
     {
@@ -8620,7 +8642,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.679298668981481,
+      "ageDays": 6.682871134259259,
       "weight": 70
     },
     {
@@ -8642,7 +8664,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.698349594907407,
+      "ageDays": 6.701922060185185,
       "weight": 42
     },
     {
@@ -8664,7 +8686,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.7284421875,
+      "ageDays": 6.732014652777778,
       "weight": 70
     },
     {
@@ -8686,7 +8708,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.730976909722222,
+      "ageDays": 6.734549375,
       "weight": 42
     },
     {
@@ -8708,7 +8730,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 6.731208391203704,
+      "ageDays": 6.734780856481481,
       "weight": 70
     },
     {
@@ -8730,7 +8752,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.734321817129629,
+      "ageDays": 6.7378942824074075,
       "weight": 70
     },
     {
@@ -8752,7 +8774,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.7441366319444445,
+      "ageDays": 6.747709097222222,
       "weight": 70
     },
     {
@@ -8774,7 +8796,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.744865798611111,
+      "ageDays": 6.748438263888889,
       "weight": 42
     },
     {
@@ -8796,7 +8818,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.7690671875,
+      "ageDays": 6.7726396527777775,
       "weight": 70
     },
     {
@@ -8818,7 +8840,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.77275931712963,
+      "ageDays": 6.776331782407407,
       "weight": 70
     },
     {
@@ -8840,7 +8862,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.8150625578703705,
+      "ageDays": 6.818635023148148,
       "weight": 70
     },
     {
@@ -8862,7 +8884,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.818662094907407,
+      "ageDays": 6.822234560185185,
       "weight": 70
     },
     {
@@ -8884,7 +8906,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.8263704282407405,
+      "ageDays": 6.829942893518519,
       "weight": 70
     },
     {
@@ -8906,7 +8928,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.8274699652777775,
+      "ageDays": 6.831042430555556,
       "weight": 70
     },
     {
@@ -8928,7 +8950,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.831960706018519,
+      "ageDays": 6.835533171296296,
       "weight": 70
     },
     {
@@ -8950,7 +8972,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.841289409722222,
+      "ageDays": 6.844861875,
       "weight": 70
     },
     {
@@ -8972,7 +8994,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.8430949652777775,
+      "ageDays": 6.846667430555556,
       "weight": 70
     },
     {
@@ -8994,7 +9016,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 6.850120428240741,
+      "ageDays": 6.853692893518518,
       "weight": 70
     },
     {
@@ -9016,7 +9038,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.850895891203704,
+      "ageDays": 6.8544683564814815,
       "weight": 70
     },
     {
@@ -9038,7 +9060,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.871474594907407,
+      "ageDays": 6.875047060185185,
       "weight": 70
     },
     {
@@ -9060,7 +9082,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.880919039351852,
+      "ageDays": 6.884491504629629,
       "weight": 70
     },
     {
@@ -9082,7 +9104,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.897643576388889,
+      "ageDays": 6.901216041666666,
       "weight": 42
     },
     {
@@ -9104,7 +9126,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.935838020833334,
+      "ageDays": 6.939410486111111,
       "weight": 70
     },
     {
@@ -9126,7 +9148,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.973338020833333,
+      "ageDays": 6.9769104861111115,
       "weight": 54
     },
     {
@@ -9148,7 +9170,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.976347280092592,
+      "ageDays": 6.9799197453703705,
       "weight": 70
     },
     {
@@ -9170,29 +9192,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.988280150462963,
-      "weight": 70
-    },
-    {
-      "id": "N-12f9b986df078a26",
-      "kind": "event",
-      "label": "伊朗：未关闭对美外交大门，仍通过中间人互通信息",
-      "summary": "伊朗外交部发言人伊斯梅尔・巴加埃周日刊发的采访中表示，伊朗并未关上同美国开展外交的大门，双方仍在通过中介交换信息。",
-      "publishedAt": "2026-10-26T02:34:41.000Z",
-      "knownAt": "2026-10-26T02:39:12.191Z",
-      "source": "新浪财经滚动",
-      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-26/doc-iniwpfmx9344395.shtml",
-      "sources": [
-        {
-          "source": "新浪财经滚动",
-          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-26/doc-iniwpfmx9344395.shtml"
-        }
-      ],
-      "group": "待核实",
-      "direction": 0,
-      "conditional": false,
-      "rule": "未识别明确事件方向",
-      "ageDays": 6.998557928240741,
+      "ageDays": 6.991852615740741,
       "weight": 70
     }
   ],
@@ -9214,7 +9214,7 @@
       "group": "汇率",
       "direction": -1,
       "note": "20 个参考日变化；人民币走弱对国内克价偏正向",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": false
     },
     {
@@ -9234,7 +9234,7 @@
       "group": "汇率",
       "direction": -1,
       "note": "双边汇率代理，不是美元指数；美元走强偏负向",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": false
     },
     {
@@ -9254,7 +9254,7 @@
       "group": "利率",
       "direction": 1,
       "note": "20 个参考日变动；实际收益率上升偏负向",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": false
     },
     {
@@ -9274,7 +9274,7 @@
       "group": "风险",
       "direction": 1,
       "note": "权益波动代理；流动性冲击下相关关系可能改变",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": false
     },
     {
@@ -9294,7 +9294,7 @@
       "group": "利率",
       "direction": 0,
       "note": "短端利率监测代理；避免与实际收益率重复施加方向先验",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": true
     },
     {
@@ -9314,7 +9314,7 @@
       "group": "利率",
       "direction": 0,
       "note": "监测经济周期，不预设固定黄金涨跌方向；档案充足后才可估计系数",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": true
     },
     {
@@ -9334,7 +9334,7 @@
       "group": "能源",
       "direction": 0,
       "note": "通胀与增长的混合代理，监测输入；不预设固定利好利坏",
-      "ageDays": 6.105976909722222,
+      "ageDays": 6.109549375,
       "monitorOnly": true
     },
     {
@@ -9354,7 +9354,7 @@
       "group": "资金持仓",
       "direction": 0,
       "note": "COMEX 黄金期货、仅期货；周度头寸可能滞后，不把拥挤方向等同于未来涨跌",
-      "ageDays": 6.105976909722222,
+      "ageDays": 6.109549375,
       "monitorOnly": true
     },
     {
@@ -9374,7 +9374,7 @@
       "group": "通胀",
       "direction": 0,
       "note": "同日名义减实际收益率，含风险与流动性溢价；监测输入，不作纯通胀预期",
-      "ageDays": 3.105976909722222,
+      "ageDays": 3.109549375,
       "monitorOnly": true
     }
   ],
@@ -9398,7 +9398,29 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.0076782986111111114,
+      "ageDays": 0.011250763888888888,
+      "weight": 70
+    },
+    {
+      "id": "N-ce0f5d0c3bc92dfc",
+      "kind": "event",
+      "label": "美联储加息预期升温叠加流动性挤兑 金价破位下行",
+      "summary": "文章来源：新华财经 新华财经北京11月2日电 受美国经济数据强劲导致加息预期升温以及科技股大跌引发的连锁抛售影响，现货黄金上周一度跌至3870.20美元/盎司。",
+      "publishedAt": "2026-11-02T02:16:16.000Z",
+      "knownAt": "2026-11-02T02:37:33.274Z",
+      "source": "新浪财经滚动",
+      "url": "https://finance.sina.com.cn/money/bond/2026-11-02/doc-inixicie7308678.shtml",
+      "sources": [
+        {
+          "source": "新浪财经滚动",
+          "url": "https://finance.sina.com.cn/money/bond/2026-11-02/doc-inixicie7308678.shtml"
+        }
+      ],
+      "group": "待核实",
+      "direction": 0,
+      "conditional": false,
+      "rule": "条件、预期或否定语句，未作方向判定",
+      "ageDays": 0.01491974537037037,
       "weight": 70
     },
     {
@@ -9420,7 +9442,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.026810243055555554,
+      "ageDays": 0.030382708333333334,
       "weight": 70
     },
     {
@@ -9442,7 +9464,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.0400046875,
+      "ageDays": 0.04357715277777778,
       "weight": 70
     },
     {
@@ -9464,7 +9486,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.05149774305555556,
+      "ageDays": 0.055070208333333336,
       "weight": 42
     },
     {
@@ -9486,7 +9508,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.07056024305555555,
+      "ageDays": 0.07413270833333334,
       "weight": 42
     },
     {
@@ -9508,7 +9530,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.09913663194444444,
+      "ageDays": 0.10270909722222223,
       "weight": 70
     },
     {
@@ -9530,7 +9552,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.10419450231481482,
+      "ageDays": 0.10776696759259259,
       "weight": 70
     },
     {
@@ -9552,7 +9574,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.11741209490740741,
+      "ageDays": 0.12098456018518519,
       "weight": 70
     },
     {
@@ -9574,7 +9596,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.13052552083333332,
+      "ageDays": 0.13409798611111112,
       "weight": 70
     },
     {
@@ -9596,7 +9618,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.13068755787037037,
+      "ageDays": 0.13426002314814814,
       "weight": 70
     },
     {
@@ -9618,7 +9640,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.13863894675925925,
+      "ageDays": 0.14221141203703705,
       "weight": 70
     },
     {
@@ -9640,7 +9662,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.15221533564814815,
+      "ageDays": 0.15578780092592592,
       "weight": 70
     },
     {
@@ -9662,7 +9684,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.15619681712962963,
+      "ageDays": 0.1597692824074074,
       "weight": 70
     },
     {
@@ -9684,7 +9706,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.16407876157407408,
+      "ageDays": 0.16765122685185185,
       "weight": 70
     },
     {
@@ -9706,7 +9728,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.1650046875,
+      "ageDays": 0.16857715277777777,
       "weight": 70
     },
     {
@@ -9728,7 +9750,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.22961116898148148,
+      "ageDays": 0.23318363425925925,
       "weight": 42
     },
     {
@@ -9750,7 +9772,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.2670995949074074,
+      "ageDays": 0.2706720601851852,
       "weight": 70
     },
     {
@@ -9772,7 +9794,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.26784033564814813,
+      "ageDays": 0.2714128009259259,
       "weight": 70
     },
     {
@@ -9794,7 +9816,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.2699120949074074,
+      "ageDays": 0.2734845601851852,
       "weight": 70
     },
     {
@@ -9816,7 +9838,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.2706296875,
+      "ageDays": 0.27420215277777776,
       "weight": 70
     },
     {
@@ -9838,7 +9860,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.32346533564814817,
+      "ageDays": 0.32703780092592594,
       "weight": 70
     },
     {
@@ -9860,7 +9882,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.3344607060185185,
+      "ageDays": 0.3380331712962963,
       "weight": 70
     },
     {
@@ -9882,7 +9904,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.33516672453703705,
+      "ageDays": 0.3387391898148148,
       "weight": 70
     },
     {
@@ -9904,7 +9926,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.3433495949074074,
+      "ageDays": 0.3469220601851852,
       "weight": 70
     },
     {
@@ -9926,7 +9948,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.4698310763888889,
+      "ageDays": 0.47340354166666665,
       "weight": 70
     },
     {
@@ -9948,7 +9970,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.5481296875,
+      "ageDays": 0.5517021527777778,
       "weight": 70
     },
     {
@@ -9970,7 +9992,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.579842650462963,
+      "ageDays": 0.5834151157407408,
       "weight": 70
     },
     {
@@ -9992,7 +10014,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 0.6577824652777777,
+      "ageDays": 0.6613549305555556,
       "weight": 70
     },
     {
@@ -10014,7 +10036,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 0.7686505208333333,
+      "ageDays": 0.7722229861111111,
       "weight": 70
     },
     {
@@ -10036,7 +10058,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 0.8910347800925926,
+      "ageDays": 0.8946072453703704,
       "weight": 70
     },
     {
@@ -10058,7 +10080,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 0.9003866319444445,
+      "ageDays": 0.9039590972222222,
       "weight": 70
     },
     {
@@ -10080,7 +10102,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 1.0782801504629629,
+      "ageDays": 1.0818526157407407,
       "weight": 70
     },
     {
@@ -10102,7 +10124,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.0931991319444445,
+      "ageDays": 1.0967715972222223,
       "weight": 70
     },
     {
@@ -10124,7 +10146,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.1191250578703704,
+      "ageDays": 1.1226975231481482,
       "weight": 70
     },
     {
@@ -10146,7 +10168,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.138905150462963,
+      "ageDays": 1.1424776157407408,
       "weight": 70
     },
     {
@@ -10168,7 +10190,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.230803298611111,
+      "ageDays": 1.2343757638888888,
       "weight": 70
     },
     {
@@ -10190,7 +10212,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.350027835648148,
+      "ageDays": 1.3536003009259259,
       "weight": 70
     },
     {
@@ -10212,7 +10234,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.3699120949074075,
+      "ageDays": 1.3734845601851853,
       "weight": 70
     },
     {
@@ -10234,7 +10256,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.373430613425926,
+      "ageDays": 1.3770030787037038,
       "weight": 70
     },
     {
@@ -10256,7 +10278,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.3803750578703704,
+      "ageDays": 1.3839475231481482,
       "weight": 70
     },
     {
@@ -10278,7 +10300,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.3983611689814814,
+      "ageDays": 1.4019336342592592,
       "weight": 70
     },
     {
@@ -10300,7 +10322,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.4088125578703703,
+      "ageDays": 1.412385023148148,
       "weight": 70
     },
     {
@@ -10322,7 +10344,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.4953982060185185,
+      "ageDays": 1.4989706712962962,
       "weight": 70
     },
     {
@@ -10344,7 +10366,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.5287894097222223,
+      "ageDays": 1.532361875,
       "weight": 70
     },
     {
@@ -10366,7 +10388,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.555444502314815,
+      "ageDays": 1.5590169675925927,
       "weight": 42
     },
     {
@@ -10388,7 +10410,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.5981991319444444,
+      "ageDays": 1.6017715972222222,
       "weight": 42
     },
     {
@@ -10410,7 +10432,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.8273657986111111,
+      "ageDays": 1.830938263888889,
       "weight": 70
     },
     {
@@ -10432,7 +10454,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.844564872685185,
+      "ageDays": 1.8481373379629629,
       "weight": 70
     },
     {
@@ -10454,7 +10476,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.8839398726851853,
+      "ageDays": 1.887512337962963,
       "weight": 70
     },
     {
@@ -10476,7 +10498,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.9416482060185185,
+      "ageDays": 1.9452206712962963,
       "weight": 70
     },
     {
@@ -10498,7 +10520,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 1.9952708912037036,
+      "ageDays": 1.9988433564814816,
       "weight": 42
     },
     {
@@ -10520,7 +10542,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 1.997655150462963,
+      "ageDays": 2.0012276157407407,
       "weight": 70
     },
     {
@@ -10542,7 +10564,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.082632002314815,
+      "ageDays": 2.0862044675925926,
       "weight": 70
     },
     {
@@ -10564,7 +10586,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.134252372685185,
+      "ageDays": 2.1378248379629627,
       "weight": 42
     },
     {
@@ -10586,7 +10608,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.147643576388889,
+      "ageDays": 2.151216041666667,
       "weight": 70
     },
     {
@@ -10608,7 +10630,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.156451446759259,
+      "ageDays": 2.1600239120370373,
       "weight": 70
     },
     {
@@ -10630,7 +10652,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.157805613425926,
+      "ageDays": 2.1613780787037036,
       "weight": 70
     },
     {
@@ -10652,7 +10674,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.174819502314815,
+      "ageDays": 2.1783919675925927,
       "weight": 42
     },
     {
@@ -10674,7 +10696,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.1803519097222224,
+      "ageDays": 2.183924375,
       "weight": 70
     },
     {
@@ -10696,7 +10718,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.1838241319444442,
+      "ageDays": 2.187396597222222,
       "weight": 70
     },
     {
@@ -10718,7 +10740,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.1866366319444444,
+      "ageDays": 2.190209097222222,
       "weight": 70
     },
     {
@@ -10740,7 +10762,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.2004213541666666,
+      "ageDays": 2.2039938194444444,
       "weight": 54
     },
     {
@@ -10762,7 +10784,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.2029097800925928,
+      "ageDays": 2.2064822453703705,
       "weight": 70
     },
     {
@@ -10784,7 +10806,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 2.2154213541666667,
+      "ageDays": 2.2189938194444445,
       "weight": 70
     },
     {
@@ -10806,7 +10828,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.222169039351852,
+      "ageDays": 2.22574150462963,
       "weight": 70
     },
     {
@@ -10828,7 +10850,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.2314398726851854,
+      "ageDays": 2.235012337962963,
       "weight": 70
     },
     {
@@ -10850,7 +10872,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 2.232666724537037,
+      "ageDays": 2.236239189814815,
       "weight": 70
     },
     {
@@ -10872,7 +10894,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.2329329282407406,
+      "ageDays": 2.2365053935185184,
       "weight": 70
     },
     {
@@ -10894,7 +10916,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.233928298611111,
+      "ageDays": 2.237500763888889,
       "weight": 70
     },
     {
@@ -10916,7 +10938,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.234518576388889,
+      "ageDays": 2.238091041666667,
       "weight": 70
     },
     {
@@ -10938,7 +10960,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 2.2436505208333335,
+      "ageDays": 2.2472229861111113,
       "weight": 70
     },
     {
@@ -10960,7 +10982,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.265016261574074,
+      "ageDays": 2.268588726851852,
       "weight": 70
     },
     {
@@ -10982,7 +11004,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.2688472800925927,
+      "ageDays": 2.2724197453703705,
       "weight": 70
     },
     {
@@ -11004,7 +11026,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.28744681712963,
+      "ageDays": 2.2910192824074076,
       "weight": 70
     },
     {
@@ -11026,7 +11048,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.3087662615740743,
+      "ageDays": 2.312338726851852,
       "weight": 70
     },
     {
@@ -11048,7 +11070,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.3372269097222222,
+      "ageDays": 2.340799375,
       "weight": 66
     },
     {
@@ -11070,7 +11092,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.3522269097222224,
+      "ageDays": 2.355799375,
       "weight": 70
     },
     {
@@ -11092,7 +11114,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.355976909722222,
+      "ageDays": 2.359549375,
       "weight": 70
     },
     {
@@ -11114,7 +11136,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.3696458912037035,
+      "ageDays": 2.3732183564814813,
       "weight": 54
     },
     {
@@ -11136,7 +11158,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.421127372685185,
+      "ageDays": 2.424699837962963,
       "weight": 42
     },
     {
@@ -11158,7 +11180,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.432365798611111,
+      "ageDays": 2.4359382638888887,
       "weight": 42
     },
     {
@@ -11181,7 +11203,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.43932181712963,
+      "ageDays": 2.4428942824074076,
       "weight": 46
     },
     {
@@ -11203,7 +11225,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4580370949074073,
+      "ageDays": 2.461609560185185,
       "weight": 42
     },
     {
@@ -11225,7 +11247,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.461775520833333,
+      "ageDays": 2.465347986111111,
       "weight": 70
     },
     {
@@ -11247,7 +11269,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.464229224537037,
+      "ageDays": 2.4678016898148147,
       "weight": 70
     },
     {
@@ -11269,7 +11291,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.466416724537037,
+      "ageDays": 2.469989189814815,
       "weight": 70
     },
     {
@@ -11291,7 +11313,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4755602430555554,
+      "ageDays": 2.479132708333333,
       "weight": 42
     },
     {
@@ -11313,7 +11335,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4757570023148148,
+      "ageDays": 2.4793294675925925,
       "weight": 70
     },
     {
@@ -11335,7 +11357,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4781296875,
+      "ageDays": 2.481702152777778,
       "weight": 70
     },
     {
@@ -11357,7 +11379,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.4856991319444446,
+      "ageDays": 2.4892715972222224,
       "weight": 66
     },
     {
@@ -11379,7 +11401,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.489217650462963,
+      "ageDays": 2.492790115740741,
       "weight": 70
     },
     {
@@ -11401,7 +11423,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.501115798611111,
+      "ageDays": 2.5046882638888888,
       "weight": 70
     },
     {
@@ -11423,7 +11445,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.522643576388889,
+      "ageDays": 2.526216041666667,
       "weight": 54
     },
     {
@@ -11445,7 +11467,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.580270891203704,
+      "ageDays": 2.5838433564814816,
       "weight": 70
     },
     {
@@ -11467,7 +11489,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 2.6008843171296294,
+      "ageDays": 2.604456782407407,
       "weight": 70
     },
     {
@@ -11489,7 +11511,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.62775931712963,
+      "ageDays": 2.6313317824074076,
       "weight": 70
     },
     {
@@ -11511,7 +11533,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.6311852430555556,
+      "ageDays": 2.6347577083333333,
       "weight": 70
     },
     {
@@ -11533,7 +11555,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.667782465277778,
+      "ageDays": 2.6713549305555557,
       "weight": 66
     },
     {
@@ -11555,7 +11577,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.730976909722222,
+      "ageDays": 2.734549375,
       "weight": 42
     },
     {
@@ -11577,7 +11599,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.805409780092593,
+      "ageDays": 2.8089822453703706,
       "weight": 54
     },
     {
@@ -11599,7 +11621,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 2.9256759837962965,
+      "ageDays": 2.9292484490740742,
       "weight": 66
     },
     {
@@ -11621,7 +11643,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.0518102430555554,
+      "ageDays": 3.055382708333333,
       "weight": 42
     },
     {
@@ -11643,7 +11665,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.192666724537037,
+      "ageDays": 3.196239189814815,
       "weight": 70
     },
     {
@@ -11665,7 +11687,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.210838020833333,
+      "ageDays": 3.214410486111111,
       "weight": 54
     },
     {
@@ -11687,7 +11709,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.2343333912037036,
+      "ageDays": 3.2379058564814813,
       "weight": 70
     },
     {
@@ -11709,7 +11731,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.235444502314815,
+      "ageDays": 3.2390169675925926,
       "weight": 70
     },
     {
@@ -11731,7 +11753,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.2390093171296295,
+      "ageDays": 3.2425817824074072,
       "weight": 70
     },
     {
@@ -11753,7 +11775,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.2421690393518516,
+      "ageDays": 3.24574150462963,
       "weight": 70
     },
     {
@@ -11775,7 +11797,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.249032465277778,
+      "ageDays": 3.2526049305555556,
       "weight": 42
     },
     {
@@ -11797,7 +11819,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.2518102430555555,
+      "ageDays": 3.2553827083333333,
       "weight": 42
     },
     {
@@ -11819,7 +11841,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.2620532986111113,
+      "ageDays": 3.265625763888889,
       "weight": 70
     },
     {
@@ -11841,7 +11863,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.2653287615740743,
+      "ageDays": 3.268901226851852,
       "weight": 70
     },
     {
@@ -11863,7 +11885,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.280282465277778,
+      "ageDays": 3.2838549305555556,
       "weight": 78
     },
     {
@@ -11885,7 +11907,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.290039409722222,
+      "ageDays": 3.293611875,
       "weight": 70
     },
     {
@@ -11907,7 +11929,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.3014398726851852,
+      "ageDays": 3.305012337962963,
       "weight": 70
     },
     {
@@ -11929,7 +11951,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.338615798611111,
+      "ageDays": 3.3421882638888887,
       "weight": 54
     },
     {
@@ -11951,7 +11973,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.3511273726851853,
+      "ageDays": 3.354699837962963,
       "weight": 70
     },
     {
@@ -11973,7 +11995,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.3678982060185185,
+      "ageDays": 3.3714706712962963,
       "weight": 70
     },
     {
@@ -11995,7 +12017,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.3869607060185185,
+      "ageDays": 3.3905331712962963,
       "weight": 70
     },
     {
@@ -12017,7 +12039,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4055718171296294,
+      "ageDays": 3.409144282407407,
       "weight": 70
     },
     {
@@ -12039,7 +12061,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.4323195023148148,
+      "ageDays": 3.4358919675925925,
       "weight": 70
     },
     {
@@ -12061,7 +12083,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.445641261574074,
+      "ageDays": 3.449213726851852,
       "weight": 70
     },
     {
@@ -12083,7 +12105,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4462546875,
+      "ageDays": 3.449827152777778,
       "weight": 42
     },
     {
@@ -12105,7 +12127,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4582107060185185,
+      "ageDays": 3.4617831712962963,
       "weight": 70
     },
     {
@@ -12127,7 +12149,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4650046875,
+      "ageDays": 3.468577152777778,
       "weight": 66
     },
     {
@@ -12149,7 +12171,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4797616319444447,
+      "ageDays": 3.4833340972222224,
       "weight": 70
     },
     {
@@ -12171,7 +12193,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4821227430555557,
+      "ageDays": 3.4856952083333335,
       "weight": 70
     },
     {
@@ -12193,7 +12215,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.4892986689814816,
+      "ageDays": 3.4928711342592593,
       "weight": 54
     },
     {
@@ -12215,7 +12237,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.490132002314815,
+      "ageDays": 3.493704467592593,
       "weight": 70
     },
     {
@@ -12237,7 +12259,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.517655150462963,
+      "ageDays": 3.5212276157407407,
       "weight": 70
     },
     {
@@ -12259,7 +12281,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.5192986689814814,
+      "ageDays": 3.522871134259259,
       "weight": 70
     },
     {
@@ -12281,7 +12303,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.522643576388889,
+      "ageDays": 3.526216041666667,
       "weight": 42
     },
     {
@@ -12303,7 +12325,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.531972280092593,
+      "ageDays": 3.5355447453703706,
       "weight": 70
     },
     {
@@ -12325,7 +12347,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.53307181712963,
+      "ageDays": 3.5366442824074076,
       "weight": 70
     },
     {
@@ -12347,7 +12369,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.533928298611111,
+      "ageDays": 3.5375007638888887,
       "weight": 70
     },
     {
@@ -12369,7 +12391,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.534715335648148,
+      "ageDays": 3.538287800925926,
       "weight": 70
     },
     {
@@ -12391,7 +12413,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.5477014467592594,
+      "ageDays": 3.551273912037037,
       "weight": 70
     },
     {
@@ -12413,7 +12435,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.553453761574074,
+      "ageDays": 3.557026226851852,
       "weight": 70
     },
     {
@@ -12435,7 +12457,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.553893576388889,
+      "ageDays": 3.557466041666667,
       "weight": 42
     },
     {
@@ -12457,7 +12479,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.5559884837962965,
+      "ageDays": 3.5595609490740743,
       "weight": 70
     },
     {
@@ -12479,7 +12501,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.5802593171296295,
+      "ageDays": 3.5838317824074073,
       "weight": 66
     },
     {
@@ -12501,7 +12523,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.585143576388889,
+      "ageDays": 3.588716041666667,
       "weight": 54
     },
     {
@@ -12523,7 +12545,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.585143576388889,
+      "ageDays": 3.588716041666667,
       "weight": 54
     },
     {
@@ -12545,7 +12567,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.6000741319444445,
+      "ageDays": 3.6036465972222222,
       "weight": 70
     },
     {
@@ -12567,7 +12589,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.640270891203704,
+      "ageDays": 3.6438433564814816,
       "weight": 70
     },
     {
@@ -12589,7 +12611,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.644645891203704,
+      "ageDays": 3.6482183564814816,
       "weight": 70
     },
     {
@@ -12611,7 +12633,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.668175983796296,
+      "ageDays": 3.671748449074074,
       "weight": 70
     },
     {
@@ -12633,7 +12655,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.6835000578703703,
+      "ageDays": 3.687072523148148,
       "weight": 70
     },
     {
@@ -12655,7 +12677,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.686983854166667,
+      "ageDays": 3.6905563194444446,
       "weight": 70
     },
     {
@@ -12677,7 +12699,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.6893102430555555,
+      "ageDays": 3.6928827083333333,
       "weight": 42
     },
     {
@@ -12699,7 +12721,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.6939167245370372,
+      "ageDays": 3.697489189814815,
       "weight": 70
     },
     {
@@ -12721,7 +12743,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.699657465277778,
+      "ageDays": 3.7032299305555556,
       "weight": 70
     },
     {
@@ -12743,7 +12765,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.70943755787037,
+      "ageDays": 3.713010023148148,
       "weight": 70
     },
     {
@@ -12765,7 +12787,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 3.7108611689814817,
+      "ageDays": 3.7144336342592594,
       "weight": 70
     },
     {
@@ -12787,7 +12809,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.7225972800925926,
+      "ageDays": 3.7261697453703704,
       "weight": 70
     },
     {
@@ -12809,7 +12831,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.7230718171296298,
+      "ageDays": 3.7266442824074075,
       "weight": 70
     },
     {
@@ -12831,7 +12853,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.727030150462963,
+      "ageDays": 3.730602615740741,
       "weight": 70
     },
     {
@@ -12853,7 +12875,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.7309653356481483,
+      "ageDays": 3.734537800925926,
       "weight": 54
     },
     {
@@ -12875,7 +12897,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.750814872685185,
+      "ageDays": 3.754387337962963,
       "weight": 70
     },
     {
@@ -12897,7 +12919,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.75631255787037,
+      "ageDays": 3.759885023148148,
       "weight": 42
     },
     {
@@ -12919,7 +12941,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.7688357060185185,
+      "ageDays": 3.7724081712962962,
       "weight": 70
     },
     {
@@ -12941,7 +12963,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 3.772169039351852,
+      "ageDays": 3.7757415046296297,
       "weight": 70
     },
     {
@@ -12963,7 +12985,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.789483854166667,
+      "ageDays": 3.7930563194444447,
       "weight": 54
     },
     {
@@ -12985,7 +13007,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.7929560763888888,
+      "ageDays": 3.7965285416666665,
       "weight": 70
     },
     {
@@ -13007,7 +13029,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.798106539351852,
+      "ageDays": 3.8016790046296296,
       "weight": 70
     },
     {
@@ -13029,7 +13051,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.8058495949074076,
+      "ageDays": 3.8094220601851854,
       "weight": 70
     },
     {
@@ -13051,7 +13073,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.808268576388889,
+      "ageDays": 3.811841041666667,
       "weight": 70
     },
     {
@@ -13073,7 +13095,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.8150046875,
+      "ageDays": 3.818577152777778,
       "weight": 70
     },
     {
@@ -13095,7 +13117,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.8192986689814816,
+      "ageDays": 3.8228711342592594,
       "weight": 70
     },
     {
@@ -13117,7 +13139,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.8260347800925927,
+      "ageDays": 3.8296072453703704,
       "weight": 70
     },
     {
@@ -13139,7 +13161,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.8297500578703705,
+      "ageDays": 3.8333225231481483,
       "weight": 70
     },
     {
@@ -13161,7 +13183,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.83775931712963,
+      "ageDays": 3.8413317824074076,
       "weight": 70
     },
     {
@@ -13183,7 +13205,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.8380486689814814,
+      "ageDays": 3.841621134259259,
       "weight": 70
     },
     {
@@ -13205,7 +13227,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.857527835648148,
+      "ageDays": 3.861100300925926,
       "weight": 70
     },
     {
@@ -13227,7 +13249,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.8933727430555556,
+      "ageDays": 3.8969452083333334,
       "weight": 70
     },
     {
@@ -13249,7 +13271,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.9122847800925924,
+      "ageDays": 3.91585724537037,
       "weight": 70
     },
     {
@@ -13271,7 +13293,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.928893576388889,
+      "ageDays": 3.932466041666667,
       "weight": 70
     },
     {
@@ -13293,7 +13315,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.9514745949074075,
+      "ageDays": 3.9550470601851853,
       "weight": 70
     },
     {
@@ -13315,7 +13337,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.9751898726851853,
+      "ageDays": 3.978762337962963,
       "weight": 70
     },
     {
@@ -13337,7 +13359,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 3.9893218171296296,
+      "ageDays": 3.9928942824074074,
       "weight": 70
     },
     {
@@ -13359,7 +13381,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.9897847800925925,
+      "ageDays": 3.9933572453703703,
       "weight": 70
     },
     {
@@ -13381,7 +13403,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 3.9900741319444446,
+      "ageDays": 3.9936465972222224,
       "weight": 70
     },
     {
@@ -13403,7 +13425,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.005976909722222,
+      "ageDays": 4.009549375,
       "weight": 70
     },
     {
@@ -13425,7 +13447,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.045745428240741,
+      "ageDays": 4.049317893518518,
       "weight": 70
     },
     {
@@ -13447,7 +13469,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.055976909722222,
+      "ageDays": 4.059549375,
       "weight": 54
     },
     {
@@ -13469,7 +13491,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.059703761574074,
+      "ageDays": 4.063276226851852,
       "weight": 70
     },
     {
@@ -13491,7 +13513,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.074148206018519,
+      "ageDays": 4.077720671296296,
       "weight": 70
     },
     {
@@ -13513,7 +13535,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.078534780092593,
+      "ageDays": 4.08210724537037,
       "weight": 70
     },
     {
@@ -13535,7 +13557,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.1131991319444445,
+      "ageDays": 4.116771597222222,
       "weight": 70
     },
     {
@@ -13557,7 +13579,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 4.135409780092592,
+      "ageDays": 4.138982245370371,
       "weight": 70
     },
     {
@@ -13579,7 +13601,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.136486168981482,
+      "ageDays": 4.140058634259259,
       "weight": 70
     },
     {
@@ -13601,7 +13623,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.137747743055556,
+      "ageDays": 4.141320208333333,
       "weight": 70
     },
     {
@@ -13623,7 +13645,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.140537094907407,
+      "ageDays": 4.144109560185186,
       "weight": 70
     },
     {
@@ -13645,7 +13667,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.143430613425926,
+      "ageDays": 4.147003078703704,
       "weight": 70
     },
     {
@@ -13667,7 +13689,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 4.1437546875,
+      "ageDays": 4.147327152777778,
       "weight": 70
     },
     {
@@ -13689,7 +13711,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.158800983796296,
+      "ageDays": 4.1623734490740745,
       "weight": 70
     },
     {
@@ -13711,7 +13733,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.175444502314815,
+      "ageDays": 4.179016967592593,
       "weight": 70
     },
     {
@@ -13733,7 +13755,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.181740798611111,
+      "ageDays": 4.185313263888889,
       "weight": 70
     },
     {
@@ -13755,7 +13777,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.199032465277778,
+      "ageDays": 4.202604930555555,
       "weight": 66
     },
     {
@@ -13777,7 +13799,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.208916724537037,
+      "ageDays": 4.212489189814815,
       "weight": 54
     },
     {
@@ -13799,7 +13821,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.209900520833333,
+      "ageDays": 4.213472986111111,
       "weight": 70
     },
     {
@@ -13821,7 +13843,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.211532465277778,
+      "ageDays": 4.2151049305555555,
       "weight": 54
     },
     {
@@ -13843,7 +13865,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.222481539351852,
+      "ageDays": 4.2260540046296295,
       "weight": 70
     },
     {
@@ -13865,7 +13887,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.222643576388889,
+      "ageDays": 4.2262160416666665,
       "weight": 54
     },
     {
@@ -13887,7 +13909,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.22287505787037,
+      "ageDays": 4.226447523148148,
       "weight": 70
     },
     {
@@ -13909,7 +13931,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.254055613425926,
+      "ageDays": 4.2576280787037035,
       "weight": 70
     },
     {
@@ -13931,7 +13953,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.255780150462963,
+      "ageDays": 4.259352615740741,
       "weight": 54
     },
     {
@@ -13953,7 +13975,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.255976909722222,
+      "ageDays": 4.259549375,
       "weight": 54
     },
     {
@@ -13975,7 +13997,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.258060243055556,
+      "ageDays": 4.261632708333333,
       "weight": 78
     },
     {
@@ -13997,7 +14019,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.272643576388889,
+      "ageDays": 4.276216041666666,
       "weight": 66
     },
     {
@@ -14019,7 +14041,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.276925983796296,
+      "ageDays": 4.2804984490740745,
       "weight": 54
     },
     {
@@ -14041,7 +14063,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.2888935763888885,
+      "ageDays": 4.292466041666667,
       "weight": 70
     },
     {
@@ -14063,7 +14085,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.290988483796296,
+      "ageDays": 4.294560949074074,
       "weight": 70
     },
     {
@@ -14085,7 +14107,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.302041724537037,
+      "ageDays": 4.305614189814815,
       "weight": 70
     },
     {
@@ -14107,7 +14129,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.302099594907407,
+      "ageDays": 4.305672060185185,
       "weight": 54
     },
     {
@@ -14129,7 +14151,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 4.30807181712963,
+      "ageDays": 4.311644282407407,
       "weight": 70
     },
     {
@@ -14151,7 +14173,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.315652835648148,
+      "ageDays": 4.319225300925926,
       "weight": 66
     },
     {
@@ -14173,7 +14195,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.323071817129629,
+      "ageDays": 4.326644282407408,
       "weight": 70
     },
     {
@@ -14195,7 +14217,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.334449131944444,
+      "ageDays": 4.338021597222222,
       "weight": 54
     },
     {
@@ -14217,7 +14239,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.339680613425926,
+      "ageDays": 4.343253078703704,
       "weight": 70
     },
     {
@@ -14239,7 +14261,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 4.346983854166667,
+      "ageDays": 4.350556319444444,
       "weight": 70
     },
     {
@@ -14261,7 +14283,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.348777835648148,
+      "ageDays": 4.352350300925926,
       "weight": 70
     },
     {
@@ -14283,7 +14305,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.349634317129629,
+      "ageDays": 4.353206782407407,
       "weight": 66
     },
     {
@@ -14305,7 +14327,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.3512315393518515,
+      "ageDays": 4.35480400462963,
       "weight": 42
     },
     {
@@ -14327,7 +14349,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.3521921875,
+      "ageDays": 4.355764652777777,
       "weight": 70
     },
     {
@@ -14349,7 +14371,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.3522153356481486,
+      "ageDays": 4.355787800925926,
       "weight": 70
     },
     {
@@ -14371,7 +14393,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.355085706018518,
+      "ageDays": 4.358658171296296,
       "weight": 54
     },
     {
@@ -14380,7 +14402,7 @@
       "label": "Federal Reserve issues FOMC statement",
       "summary": "Federal Reserve issues FOMC statement",
       "publishedAt": "2026-10-28T18:00:00.000Z",
-      "knownAt": "2026-11-02T02:32:33.864Z",
+      "knownAt": "2026-11-02T02:37:33.274Z",
       "source": "Fed Monetary Policy",
       "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm",
       "sources": [
@@ -14393,7 +14415,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.355976909722222,
+      "ageDays": 4.359549375,
       "weight": 54
     },
     {
@@ -14415,7 +14437,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.367782465277778,
+      "ageDays": 4.3713549305555555,
       "weight": 54
     },
     {
@@ -14437,7 +14459,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.3709421875,
+      "ageDays": 4.374514652777778,
       "weight": 70
     },
     {
@@ -14459,7 +14481,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.409923668981482,
+      "ageDays": 4.413496134259259,
       "weight": 70
     },
     {
@@ -14481,7 +14503,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.4178171875,
+      "ageDays": 4.421389652777778,
       "weight": 70
     },
     {
@@ -14503,7 +14525,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.434252372685185,
+      "ageDays": 4.437824837962963,
       "weight": 42
     },
     {
@@ -14525,7 +14547,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.453083391203704,
+      "ageDays": 4.456655856481482,
       "weight": 70
     },
     {
@@ -14547,7 +14569,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.502226909722222,
+      "ageDays": 4.505799375,
       "weight": 54
     },
     {
@@ -14569,7 +14591,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.519252372685185,
+      "ageDays": 4.522824837962963,
       "weight": 70
     },
     {
@@ -14591,7 +14613,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.525421354166666,
+      "ageDays": 4.528993819444445,
       "weight": 54
     },
     {
@@ -14613,7 +14635,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.532273206018519,
+      "ageDays": 4.535845671296296,
       "weight": 70
     },
     {
@@ -14635,7 +14657,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.542828761574074,
+      "ageDays": 4.546401226851851,
       "weight": 70
     },
     {
@@ -14657,7 +14679,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.576729224537037,
+      "ageDays": 4.580301689814815,
       "weight": 70
     },
     {
@@ -14679,7 +14701,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.580907465277778,
+      "ageDays": 4.584479930555555,
       "weight": 66
     },
     {
@@ -14701,7 +14723,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.585074131944444,
+      "ageDays": 4.588646597222223,
       "weight": 70
     },
     {
@@ -14723,7 +14745,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.5880486689814814,
+      "ageDays": 4.59162113425926,
       "weight": 42
     },
     {
@@ -14745,7 +14767,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.6304097800925925,
+      "ageDays": 4.633982245370371,
       "weight": 42
     },
     {
@@ -14767,7 +14789,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.688916724537037,
+      "ageDays": 4.692489189814815,
       "weight": 70
     },
     {
@@ -14789,7 +14811,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.696949131944445,
+      "ageDays": 4.700521597222222,
       "weight": 70
     },
     {
@@ -14811,7 +14833,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.705386631944444,
+      "ageDays": 4.708959097222222,
       "weight": 70
     },
     {
@@ -14833,7 +14855,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.706682928240741,
+      "ageDays": 4.710255393518518,
       "weight": 70
     },
     {
@@ -14855,7 +14877,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.707747743055555,
+      "ageDays": 4.711320208333333,
       "weight": 70
     },
     {
@@ -14877,7 +14899,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.711682928240741,
+      "ageDays": 4.715255393518518,
       "weight": 70
     },
     {
@@ -14899,7 +14921,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.718222280092593,
+      "ageDays": 4.721794745370371,
       "weight": 70
     },
     {
@@ -14921,7 +14943,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.756370428240741,
+      "ageDays": 4.759942893518518,
       "weight": 70
     },
     {
@@ -14943,7 +14965,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.760456076388889,
+      "ageDays": 4.764028541666667,
       "weight": 54
     },
     {
@@ -14965,7 +14987,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.769171354166667,
+      "ageDays": 4.772743819444444,
       "weight": 70
     },
     {
@@ -14987,7 +15009,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.778638946759259,
+      "ageDays": 4.782211412037037,
       "weight": 70
     },
     {
@@ -15009,7 +15031,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.784449131944444,
+      "ageDays": 4.788021597222222,
       "weight": 70
     },
     {
@@ -15031,7 +15053,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.790780150462963,
+      "ageDays": 4.794352615740741,
       "weight": 70
     },
     {
@@ -15053,7 +15075,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.7954097800925926,
+      "ageDays": 4.798982245370371,
       "weight": 70
     },
     {
@@ -15075,7 +15097,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.797250057870371,
+      "ageDays": 4.800822523148148,
       "weight": 70
     },
     {
@@ -15097,7 +15119,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.804588020833333,
+      "ageDays": 4.808160486111111,
       "weight": 70
     },
     {
@@ -15119,7 +15141,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.811810243055556,
+      "ageDays": 4.815382708333333,
       "weight": 70
     },
     {
@@ -15141,7 +15163,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.814310243055556,
+      "ageDays": 4.817882708333333,
       "weight": 70
     },
     {
@@ -15163,7 +15185,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.823314872685185,
+      "ageDays": 4.826887337962963,
       "weight": 70
     },
     {
@@ -15185,7 +15207,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.832608854166667,
+      "ageDays": 4.836181319444444,
       "weight": 70
     },
     {
@@ -15207,7 +15229,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.841810243055556,
+      "ageDays": 4.845382708333333,
       "weight": 70
     },
     {
@@ -15229,7 +15251,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.8521921875,
+      "ageDays": 4.855764652777777,
       "weight": 70
     },
     {
@@ -15251,7 +15273,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 4.8831759837962965,
+      "ageDays": 4.886748449074074,
       "weight": 70
     },
     {
@@ -15273,7 +15295,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.959807928240741,
+      "ageDays": 4.963380393518518,
       "weight": 70
     },
     {
@@ -15295,7 +15317,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 4.965189872685185,
+      "ageDays": 4.968762337962963,
       "weight": 70
     },
     {
@@ -15317,7 +15339,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.0375046875,
+      "ageDays": 5.041077152777778,
       "weight": 70
     },
     {
@@ -15339,7 +15361,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.0438588541666665,
+      "ageDays": 5.047431319444445,
       "weight": 70
     },
     {
@@ -15361,7 +15383,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.045155150462963,
+      "ageDays": 5.048727615740741,
       "weight": 70
     },
     {
@@ -15383,7 +15405,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.053882002314815,
+      "ageDays": 5.057454467592593,
       "weight": 70
     },
     {
@@ -15405,7 +15427,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.058048668981481,
+      "ageDays": 5.061621134259259,
       "weight": 70
     },
     {
@@ -15427,7 +15449,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.058581076388889,
+      "ageDays": 5.0621535416666665,
       "weight": 70
     },
     {
@@ -15449,7 +15471,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.088743113425926,
+      "ageDays": 5.092315578703704,
       "weight": 70
     },
     {
@@ -15471,7 +15493,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.1056296875,
+      "ageDays": 5.109202152777778,
       "weight": 70
     },
     {
@@ -15493,7 +15515,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.153210706018519,
+      "ageDays": 5.156783171296296,
       "weight": 70
     },
     {
@@ -15515,7 +15537,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.162007002314815,
+      "ageDays": 5.165579467592592,
       "weight": 70
     },
     {
@@ -15537,7 +15559,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.164310243055556,
+      "ageDays": 5.167882708333333,
       "weight": 70
     },
     {
@@ -15559,7 +15581,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.184888946759259,
+      "ageDays": 5.188461412037037,
       "weight": 70
     },
     {
@@ -15581,7 +15603,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.185803298611111,
+      "ageDays": 5.189375763888889,
       "weight": 70
     },
     {
@@ -15603,7 +15625,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.188685243055556,
+      "ageDays": 5.192257708333333,
       "weight": 70
     },
     {
@@ -15625,7 +15647,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.1902245949074075,
+      "ageDays": 5.193797060185185,
       "weight": 70
     },
     {
@@ -15647,7 +15669,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.199726909722222,
+      "ageDays": 5.203299375,
       "weight": 54
     },
     {
@@ -15669,7 +15691,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.222400520833333,
+      "ageDays": 5.2259729861111115,
       "weight": 70
     },
     {
@@ -15691,7 +15713,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.2235463541666665,
+      "ageDays": 5.227118819444445,
       "weight": 70
     },
     {
@@ -15713,7 +15735,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.230189872685185,
+      "ageDays": 5.233762337962963,
       "weight": 42
     },
     {
@@ -15735,7 +15757,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.230976909722222,
+      "ageDays": 5.234549375,
       "weight": 42
     },
     {
@@ -15757,7 +15779,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.243037094907407,
+      "ageDays": 5.246609560185185,
       "weight": 42
     },
     {
@@ -15779,7 +15801,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.247794039351852,
+      "ageDays": 5.25136650462963,
       "weight": 70
     },
     {
@@ -15801,7 +15823,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.255976909722222,
+      "ageDays": 5.259549375,
       "weight": 42
     },
     {
@@ -15823,7 +15845,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.258835706018519,
+      "ageDays": 5.262408171296296,
       "weight": 42
     },
     {
@@ -15845,7 +15867,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.269993113425926,
+      "ageDays": 5.273565578703704,
       "weight": 70
     },
     {
@@ -15867,7 +15889,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.308882002314815,
+      "ageDays": 5.312454467592593,
       "weight": 70
     },
     {
@@ -15889,7 +15911,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.338696817129629,
+      "ageDays": 5.342269282407408,
       "weight": 70
     },
     {
@@ -15911,7 +15933,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.353199131944445,
+      "ageDays": 5.356771597222222,
       "weight": 42
     },
     {
@@ -15933,7 +15955,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.373199131944444,
+      "ageDays": 5.3767715972222225,
       "weight": 42
     },
     {
@@ -15955,7 +15977,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.398384317129629,
+      "ageDays": 5.4019567824074075,
       "weight": 70
     },
     {
@@ -15977,7 +15999,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.404877372685185,
+      "ageDays": 5.408449837962963,
       "weight": 70
     },
     {
@@ -15999,7 +16021,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.415733854166667,
+      "ageDays": 5.419306319444445,
       "weight": 70
     },
     {
@@ -16021,7 +16043,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.426856539351852,
+      "ageDays": 5.430429004629629,
       "weight": 70
     },
     {
@@ -16043,7 +16065,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "避险事件缓和",
-      "ageDays": 5.434553298611111,
+      "ageDays": 5.4381257638888885,
       "weight": 70
     },
     {
@@ -16065,7 +16087,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.4414861689814815,
+      "ageDays": 5.445058634259259,
       "weight": 70
     },
     {
@@ -16087,7 +16109,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.451972280092592,
+      "ageDays": 5.4555447453703705,
       "weight": 42
     },
     {
@@ -16109,7 +16131,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.459078761574074,
+      "ageDays": 5.462651226851852,
       "weight": 70
     },
     {
@@ -16131,7 +16153,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.468476909722222,
+      "ageDays": 5.472049375,
       "weight": 70
     },
     {
@@ -16153,7 +16175,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.471162094907408,
+      "ageDays": 5.474734560185185,
       "weight": 70
     },
     {
@@ -16175,7 +16197,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.472967650462963,
+      "ageDays": 5.4765401157407405,
       "weight": 42
     },
     {
@@ -16201,7 +16223,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.516578761574074,
+      "ageDays": 5.520151226851852,
       "weight": 54
     },
     {
@@ -16223,7 +16245,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.5266482060185185,
+      "ageDays": 5.530220671296297,
       "weight": 70
     },
     {
@@ -16245,7 +16267,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.542932928240741,
+      "ageDays": 5.546505393518519,
       "weight": 70
     },
     {
@@ -16267,7 +16289,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.562342650462963,
+      "ageDays": 5.565915115740741,
       "weight": 70
     },
     {
@@ -16289,7 +16311,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.56994681712963,
+      "ageDays": 5.573519282407408,
       "weight": 70
     },
     {
@@ -16311,7 +16333,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.584935243055556,
+      "ageDays": 5.588507708333333,
       "weight": 70
     },
     {
@@ -16333,7 +16355,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.5849583912037035,
+      "ageDays": 5.588530856481482,
       "weight": 70
     },
     {
@@ -16355,7 +16377,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.6280486689814815,
+      "ageDays": 5.63162113425926,
       "weight": 70
     },
     {
@@ -16377,7 +16399,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.635525520833333,
+      "ageDays": 5.6390979861111115,
       "weight": 42
     },
     {
@@ -16399,7 +16421,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.64068755787037,
+      "ageDays": 5.644260023148148,
       "weight": 54
     },
     {
@@ -16421,7 +16443,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.640861168981481,
+      "ageDays": 5.64443363425926,
       "weight": 70
     },
     {
@@ -16443,7 +16465,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.643222280092592,
+      "ageDays": 5.646794745370371,
       "weight": 54
     },
     {
@@ -16465,7 +16487,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.6633264467592594,
+      "ageDays": 5.666898912037037,
       "weight": 42
     },
     {
@@ -16487,7 +16509,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.671949131944444,
+      "ageDays": 5.675521597222223,
       "weight": 42
     },
     {
@@ -16509,7 +16531,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.677469965277778,
+      "ageDays": 5.681042430555555,
       "weight": 42
     },
     {
@@ -16531,7 +16553,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.690699131944444,
+      "ageDays": 5.694271597222222,
       "weight": 54
     },
     {
@@ -16553,7 +16575,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.700618113425926,
+      "ageDays": 5.704190578703703,
       "weight": 70
     },
     {
@@ -16575,7 +16597,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.7188704282407405,
+      "ageDays": 5.722442893518519,
       "weight": 70
     },
     {
@@ -16597,7 +16619,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.743939872685186,
+      "ageDays": 5.747512337962963,
       "weight": 70
     },
     {
@@ -16619,7 +16641,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.790895891203704,
+      "ageDays": 5.794468356481482,
       "weight": 70
     },
     {
@@ -16641,7 +16663,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.799032465277778,
+      "ageDays": 5.802604930555556,
       "weight": 70
     },
     {
@@ -16663,7 +16685,7 @@
       "direction": 1,
       "conditional": false,
       "rule": "明确的避险事件",
-      "ageDays": 5.816775520833334,
+      "ageDays": 5.820347986111111,
       "weight": 70
     },
     {
@@ -16685,7 +16707,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.831798668981482,
+      "ageDays": 5.835371134259259,
       "weight": 70
     },
     {
@@ -16707,7 +16729,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.858419039351852,
+      "ageDays": 5.861991504629629,
       "weight": 70
     },
     {
@@ -16729,7 +16751,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 5.888997743055556,
+      "ageDays": 5.892570208333333,
       "weight": 70
     },
     {
@@ -16751,7 +16773,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.991463020833334,
+      "ageDays": 5.995035486111111,
       "weight": 70
     },
     {
@@ -16773,7 +16795,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.993882002314815,
+      "ageDays": 5.9974544675925925,
       "weight": 70
     },
     {
@@ -16795,7 +16817,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 5.998627372685185,
+      "ageDays": 6.002199837962963,
       "weight": 70
     },
     {
@@ -16817,7 +16839,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.009773206018519,
+      "ageDays": 6.013345671296296,
       "weight": 70
     },
     {
@@ -16839,7 +16861,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.032307928240741,
+      "ageDays": 6.035880393518519,
       "weight": 70
     },
     {
@@ -16861,7 +16883,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.041486168981481,
+      "ageDays": 6.045058634259259,
       "weight": 70
     },
     {
@@ -16883,7 +16905,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.0462546875,
+      "ageDays": 6.049827152777778,
       "weight": 42
     },
     {
@@ -16905,7 +16927,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.0549699652777775,
+      "ageDays": 6.058542430555556,
       "weight": 70
     },
     {
@@ -16927,7 +16949,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.080270891203703,
+      "ageDays": 6.083843356481482,
       "weight": 70
     },
     {
@@ -16949,7 +16971,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.105976909722222,
+      "ageDays": 6.109549375,
       "weight": 42
     },
     {
@@ -16971,7 +16993,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.114020891203704,
+      "ageDays": 6.117593356481481,
       "weight": 70
     },
     {
@@ -16993,7 +17015,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.116787094907408,
+      "ageDays": 6.120359560185185,
       "weight": 70
     },
     {
@@ -17015,7 +17037,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.128789409722223,
+      "ageDays": 6.132361875,
       "weight": 70
     },
     {
@@ -17037,7 +17059,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.128870428240741,
+      "ageDays": 6.132442893518519,
       "weight": 70
     },
     {
@@ -17059,7 +17081,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.164310243055556,
+      "ageDays": 6.167882708333333,
       "weight": 70
     },
     {
@@ -17081,7 +17103,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.190247743055555,
+      "ageDays": 6.193820208333333,
       "weight": 70
     },
     {
@@ -17103,7 +17125,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.213615798611111,
+      "ageDays": 6.217188263888889,
       "weight": 54
     },
     {
@@ -17125,7 +17147,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.2143796875,
+      "ageDays": 6.2179521527777775,
       "weight": 70
     },
     {
@@ -17147,7 +17169,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.2261157986111115,
+      "ageDays": 6.229688263888889,
       "weight": 42
     },
     {
@@ -17169,7 +17191,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.233858854166667,
+      "ageDays": 6.237431319444444,
       "weight": 70
     },
     {
@@ -17191,7 +17213,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.2587546875,
+      "ageDays": 6.262327152777778,
       "weight": 42
     },
     {
@@ -17213,7 +17235,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.265050983796296,
+      "ageDays": 6.268623449074074,
       "weight": 70
     },
     {
@@ -17235,7 +17257,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.267423668981482,
+      "ageDays": 6.270996134259259,
       "weight": 70
     },
     {
@@ -17257,7 +17279,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.278199131944445,
+      "ageDays": 6.281771597222222,
       "weight": 54
     },
     {
@@ -17279,7 +17301,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.290699131944445,
+      "ageDays": 6.294271597222222,
       "weight": 54
     },
     {
@@ -17301,7 +17323,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.330270891203703,
+      "ageDays": 6.333843356481482,
       "weight": 54
     },
     {
@@ -17323,7 +17345,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.338407465277778,
+      "ageDays": 6.3419799305555555,
       "weight": 70
     },
     {
@@ -17345,7 +17367,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.349726909722222,
+      "ageDays": 6.353299375,
       "weight": 54
     },
     {
@@ -17367,7 +17389,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.367203761574074,
+      "ageDays": 6.370776226851852,
       "weight": 70
     },
     {
@@ -17389,7 +17411,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.371081076388889,
+      "ageDays": 6.3746535416666665,
       "weight": 70
     },
     {
@@ -17411,7 +17433,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.372562557870371,
+      "ageDays": 6.376135023148148,
       "weight": 42
     },
     {
@@ -17433,7 +17455,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.413592650462963,
+      "ageDays": 6.41716511574074,
       "weight": 70
     },
     {
@@ -17455,7 +17477,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.414333391203703,
+      "ageDays": 6.4179058564814815,
       "weight": 70
     },
     {
@@ -17477,7 +17499,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.4203287615740745,
+      "ageDays": 6.423901226851852,
       "weight": 70
     },
     {
@@ -17499,7 +17521,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.4365671875,
+      "ageDays": 6.440139652777778,
       "weight": 54
     },
     {
@@ -17522,7 +17544,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.439321817129629,
+      "ageDays": 6.442894282407408,
       "weight": 46
     },
     {
@@ -17544,7 +17566,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.443349594907407,
+      "ageDays": 6.4469220601851855,
       "weight": 70
     },
     {
@@ -17566,7 +17588,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.4438820023148145,
+      "ageDays": 6.447454467592593,
       "weight": 70
     },
     {
@@ -17588,7 +17610,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.459044039351852,
+      "ageDays": 6.462616504629629,
       "weight": 70
     },
     {
@@ -17610,7 +17632,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.505456076388889,
+      "ageDays": 6.509028541666667,
       "weight": 70
     },
     {
@@ -17632,7 +17654,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.522111168981482,
+      "ageDays": 6.525683634259259,
       "weight": 70
     },
     {
@@ -17654,7 +17676,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.592597280092592,
+      "ageDays": 6.5961697453703705,
       "weight": 70
     },
     {
@@ -17676,7 +17698,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.611300983796296,
+      "ageDays": 6.614873449074074,
       "weight": 70
     },
     {
@@ -17698,7 +17720,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.613419039351852,
+      "ageDays": 6.616991504629629,
       "weight": 42
     },
     {
@@ -17720,7 +17742,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.663708391203704,
+      "ageDays": 6.667280856481481,
       "weight": 70
     },
     {
@@ -17742,7 +17764,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.670884317129629,
+      "ageDays": 6.6744567824074075,
       "weight": 70
     },
     {
@@ -17764,7 +17786,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.679298668981481,
+      "ageDays": 6.682871134259259,
       "weight": 70
     },
     {
@@ -17786,7 +17808,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.698349594907407,
+      "ageDays": 6.701922060185185,
       "weight": 42
     },
     {
@@ -17808,7 +17830,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.7284421875,
+      "ageDays": 6.732014652777778,
       "weight": 70
     },
     {
@@ -17830,7 +17852,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.730976909722222,
+      "ageDays": 6.734549375,
       "weight": 42
     },
     {
@@ -17852,7 +17874,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 6.731208391203704,
+      "ageDays": 6.734780856481481,
       "weight": 70
     },
     {
@@ -17874,7 +17896,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.734321817129629,
+      "ageDays": 6.7378942824074075,
       "weight": 70
     },
     {
@@ -17896,7 +17918,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.7441366319444445,
+      "ageDays": 6.747709097222222,
       "weight": 70
     },
     {
@@ -17918,7 +17940,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.744865798611111,
+      "ageDays": 6.748438263888889,
       "weight": 42
     },
     {
@@ -17940,7 +17962,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.7690671875,
+      "ageDays": 6.7726396527777775,
       "weight": 70
     },
     {
@@ -17962,7 +17984,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.77275931712963,
+      "ageDays": 6.776331782407407,
       "weight": 70
     },
     {
@@ -17984,7 +18006,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.8150625578703705,
+      "ageDays": 6.818635023148148,
       "weight": 70
     },
     {
@@ -18006,7 +18028,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.818662094907407,
+      "ageDays": 6.822234560185185,
       "weight": 70
     },
     {
@@ -18028,7 +18050,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.8263704282407405,
+      "ageDays": 6.829942893518519,
       "weight": 70
     },
     {
@@ -18050,7 +18072,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.8274699652777775,
+      "ageDays": 6.831042430555556,
       "weight": 70
     },
     {
@@ -18072,7 +18094,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.831960706018519,
+      "ageDays": 6.835533171296296,
       "weight": 70
     },
     {
@@ -18094,7 +18116,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.841289409722222,
+      "ageDays": 6.844861875,
       "weight": 70
     },
     {
@@ -18116,7 +18138,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.8430949652777775,
+      "ageDays": 6.846667430555556,
       "weight": 70
     },
     {
@@ -18138,7 +18160,7 @@
       "direction": -1,
       "conditional": false,
       "rule": "政策利率上调",
-      "ageDays": 6.850120428240741,
+      "ageDays": 6.853692893518518,
       "weight": 70
     },
     {
@@ -18160,7 +18182,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.850895891203704,
+      "ageDays": 6.8544683564814815,
       "weight": 70
     },
     {
@@ -18182,7 +18204,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.871474594907407,
+      "ageDays": 6.875047060185185,
       "weight": 70
     },
     {
@@ -18204,7 +18226,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.880919039351852,
+      "ageDays": 6.884491504629629,
       "weight": 70
     },
     {
@@ -18226,7 +18248,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.897643576388889,
+      "ageDays": 6.901216041666666,
       "weight": 42
     },
     {
@@ -18248,7 +18270,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.935838020833334,
+      "ageDays": 6.939410486111111,
       "weight": 70
     },
     {
@@ -18270,7 +18292,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "未识别明确事件方向",
-      "ageDays": 6.973338020833333,
+      "ageDays": 6.9769104861111115,
       "weight": 54
     },
     {
@@ -18292,7 +18314,7 @@
       "direction": 0,
       "conditional": true,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.976347280092592,
+      "ageDays": 6.9799197453703705,
       "weight": 70
     },
     {
@@ -18314,29 +18336,7 @@
       "direction": 0,
       "conditional": false,
       "rule": "条件、预期或否定语句，未作方向判定",
-      "ageDays": 6.988280150462963,
-      "weight": 70
-    },
-    {
-      "id": "N-12f9b986df078a26",
-      "kind": "event",
-      "label": "伊朗：未关闭对美外交大门，仍通过中间人互通信息",
-      "summary": "伊朗外交部发言人伊斯梅尔・巴加埃周日刊发的采访中表示，伊朗并未关上同美国开展外交的大门，双方仍在通过中介交换信息。",
-      "publishedAt": "2026-10-26T02:34:41.000Z",
-      "knownAt": "2026-10-26T02:39:12.191Z",
-      "source": "新浪财经滚动",
-      "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-26/doc-iniwpfmx9344395.shtml",
-      "sources": [
-        {
-          "source": "新浪财经滚动",
-          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-26/doc-iniwpfmx9344395.shtml"
-        }
-      ],
-      "group": "待核实",
-      "direction": 0,
-      "conditional": false,
-      "rule": "未识别明确事件方向",
-      "ageDays": 6.998557928240741,
+      "ageDays": 6.991852615740741,
       "weight": 70
     }
   ],
@@ -18399,6 +18399,7 @@
     ],
     "unclear": [
       "N-9de8ec1e32c8f1aa",
+      "N-ce0f5d0c3bc92dfc",
       "N-d6012a7f405bcabd",
       "N-9a322e836b867b61",
       "N-9f33f3437f61bb65",
@@ -18788,8 +18789,7 @@
       "N-332be6252843c2db",
       "N-c516f10da6f494cd",
       "N-dae499b93f6b5ce7",
-      "N-2b3af7ad75f925c3",
-      "N-12f9b986df078a26"
+      "N-2b3af7ad75f925c3"
     ],
     "note": "偏支持与偏压制是证据方向标签，不是概率；相关因子不按条数累加成买卖分数。"
   },
@@ -18823,7 +18823,7 @@
   ],
   "narration": {
     "status": "structured",
-    "inputKey": "f9526ec8c79cee06",
+    "inputKey": "8528977188b57299",
     "reason": "消息已保留，等待下一次半小时研判窗口"
   },
   "intelligence": {
@@ -28500,30 +28500,6 @@
         "quote": "最低触及3975.10美元/盎司，创下自6月初以来最大单周跌幅",
         "reason": "复盘加息预期与AI交易平仓导致的下跌，属已发生；本周按兵不动概率高，方向取决于声明与通胀数据。",
         "articleHash": "6c2a005ae54ec868"
-      },
-      "N-12f9b986df078a26": {
-        "id": "N-12f9b986df078a26",
-        "version": "research-agent-3",
-        "model": "deepseek-v4.1-flash",
-        "fingerprint": "f73c2bd540b91cd7",
-        "reviewedAt": "2026-10-26T06:16:40.889Z",
-        "factor": {
-          "dimension": "risk",
-          "effect": "pressure",
-          "intensity": "weak",
-          "novelty": "ongoing",
-          "duration": "days",
-          "quote": "双方仍在通过中介交换信息",
-          "mechanism": "外交窗口未关降低极端升级风险，避险溢价边际减弱，但尚未转化为协议"
-        },
-        "relevance": "context",
-        "status": "statement",
-        "dimension": "risk",
-        "dimensionLabel": "风险",
-        "effect": "unclear",
-        "quote": "我们从未离开谈判桌，没有关闭外交窗口。",
-        "reason": "保留外交渠道降低极端升级概率，潜在削弱避险溢价；但为一方表态且核心诉求差距大。",
-        "articleHash": "cc6ed7733fc949a9"
       }
     },
     "relations": [
@@ -56495,6 +56471,46 @@
     ],
     "articles": [
       {
+        "key": "7267d1b16a617375",
+        "id": "N-ce0f5d0c3bc92dfc",
+        "sourceUrl": "https://finance.sina.com.cn/money/bond/2026-11-02/doc-inixicie7308678.shtml",
+        "capturedAt": "2026-11-02T02:37:45.065Z",
+        "requestedByAI": false,
+        "status": "ok",
+        "url": "https://finance.sina.com.cn/money/bond/2026-11-02/doc-inixicie7308678.shtml",
+        "excerpt": "新华财经北京11月2日电 受美国经济数据强劲导致加息预期升温以及科技股大跌引发的连锁抛售影响，现货黄金上周一度跌至3870.20美元/盎司。\n展望本周，非农与中期选举同台登场，美国中期选举可能对伊朗冲突及能源价格前景产生重要影响；而非农就业报告则将为美国劳动力市场健康状况提供关键线索。\n上周初，金价在之前跌破4000美元/盎司后因逢低买盘先行反弹。随后在美债收益率回落、美元走软的推动下，金价重新站上4050美元/盎司，并在周三美联储议息决议前继续上行。\n美联储最终以10比2的投票决定将利率维持在3.75%至4.00%不变，两名官员反对并支持再加息25个基点；美联储在声明中新增一句表述，称“更多信息的积累将有助于委员会确定适当的政策立场，以确保通胀及时回到2%的目标”。市场将本次决议解读为“鹰派暂停”。\n但美联储主席沃什在随后的新闻发布会上称，金融条件已经有所收紧，他在发布会上被问及，既然认为通胀过高，为何本周不选择加息，却没有给出正面回答。他拒绝提供利率指引，也未说明12月会采取何种行动。\n沃什依旧模糊的态度显示鹰派程度未超预期，美元指数在沃什发言后短线急挫，一度向下逼近102关口，现货黄金连续第三个交易日反弹走高，一度触及当周高点4082.50美元/盎司，但随后卖盘重新占据主导。\n美国9月PCE环比上涨0.5%，同比上涨3.6%；核心PCE同比上涨3.1%，环比上涨0.3%。第三季度GDP年化季率初值同比增长3.4%，创一年新高，超出市场预期的3.2%，较二季度的2%显著加速。"
+      },
+      {
+        "key": "20d64e8df482b523",
+        "id": "N-f5912af7708bb847",
+        "sourceUrl": "https://finance.sina.com.cn/jjxw/2026-11-02/doc-inixhwzh7283170.shtml",
+        "capturedAt": "2026-11-02T02:37:45.037Z",
+        "requestedByAI": false,
+        "status": "ok",
+        "url": "https://finance.sina.com.cn/jjxw/2026-11-02/doc-inixhwzh7283170.shtml",
+        "excerpt": "日前，中国人民银行发布公告称，为进一步优化短端利率调控机制，从2026年11月2日起，每个工作日开展隔夜逆回购操作招标，采用固定利率、数量招标，目前操作利率为1.25%。\n业界普遍认为，随着上述调整落地，隔夜逆回购操作成为公开市场的主力操作品种。政策利率由7天期逆回购操作利率切换为隔夜逆回购操作利率，意味着政策利率正式“换锚”。\n“中国人民银行将政策利率从7天期逆回购操作利率切换为隔夜逆回购操作利率，是我国货币政策框架向价格型调控转型的进一步深化。货币政策信号传导更加通畅。” 民生银行 首席经济学家温彬对《证券日报》记者表示，政策利率的切换有助于货币市场利率尤其是D R001 （银行间隔夜回购利率）平稳运行。同时，各市场利率在短期内有一定下行空间，长期更多表现为政策利率的传导通畅性加强。\n招联首席经济学家董希淼认为，每个工作日开展隔夜操作有助于将DR001等稳定在政策利率附近，降低税期、月末对日常政策利率信号的干扰。同时还能缩短政策利率向货币市场、债券收益率和信贷利率的传导链条，提高调控效率。\n除了前述调整外，中国人民银行还宣布7天期逆回购操作调整为固定数量、利率招标、多重价位中标，主要在税期、月末等时点开展。原在7天期逆回购操作利率基础上加减点的其他工具，包括临时正/逆回购、境外央行类机构回购工具等，均调整为在隔夜逆回购操作利率基础上加减点，加减点幅度不变。\n董希淼表示，对7天期逆回购操作的调整，意味着其功能转为季节性流动性调节和价格发现工具。临时正/逆回购等工具统一锚定隔夜逆回购操作利率加减点，进一步强化了隔夜逆回购操作利率的政策利率地位。\n需要注意的是，政策利率从原来的7天期逆回购操作利率1.4%切换为隔夜逆回购操作利率1.25%，并不等同于降息。"
+      },
+      {
+        "key": "086439b8aefce6c8",
+        "id": "N-7ef0053597755817",
+        "sourceUrl": "https://finance.sina.com.cn/china/2026-10-31/doc-inixakvc7712179.shtml",
+        "capturedAt": "2026-11-02T02:37:45.003Z",
+        "requestedByAI": false,
+        "status": "ok",
+        "url": "https://finance.sina.com.cn/china/2026-10-31/doc-inixakvc7712179.shtml",
+        "excerpt": "10月30日，中国人民银行党委书记、行长潘功胜主持召开党委会议，传达学习习近平总书记在党的二十届五中全会上的重要讲话和全会精神，研究部署贯彻落实举措。\n会议强调，继续实施适度宽松的货币政策，加快建设多层次现代化金融市场体系，扩大金融高水平开放。\n会议认为，党的二十届四中全会以来，以习近平同志为核心的党中央坚持稳中求进工作总基调，统筹国内国际两个大局，统筹发展和安全，有效应对各种外部冲击和内部困难挑战，扎实推动经济高质量发展，纵深推进全面从严治党，开展树立和践行正确政绩观学习教育，“十四五”圆满收官，“十五五”开局良好，党和国家事业取得新进展新成效。中国人民银行坚决贯彻落实中央决策部署，实施好适度宽松的货币政策，综合使用多种货币政策工具，保持流动性充裕，优化调整一系列结构性货币政策工具，扎实有力做好金融“五篇大文章”，深化金融供给侧结构性改革，防范化解重点领域风险，推动金融高水平开放，为经济平稳增长、高质量发展和金融市场稳定运行营造了良好的货币金融条件。\n会议指出，党的二十届五中全会回顾党100多年来的奋斗历程，深刻指出中国共产党坚持为中国人民谋幸福、为中华民族谋复兴，在各个历史时期都高度重视管党治党，勇于坚持真理、修正错误，成为党和人民事业的坚强领导核心。党的十八大以来，以习近平同志为核心的党中央把全面从严治党纳入“四个全面”战略布局，以巨大的政治勇气和强烈的责任担当，深入推进新时代党的建设新的伟大工程，从根本上扭转了管党治党宽松软状况，开辟了百年大党自我革命新境界，（下转A02版）\n（上接A01版）推动党和国家事业取得历史性成就、发生历史性变革。在新时代管党治党、兴党强党伟大实践中，以习近平同志为核心的党中央提出一系列新理念新思想新战略，形成习近平党建思想，丰富和发展了马克思主义建党学说，为深入推进新时代党的建设新的伟大工程提供了根本遵循和行动指南。\n会议认为，党的二十届五中全会审议通过的《关于持之以恒推进全面从严治党若干重大问题的决定》，以习近平新时代中国特色社会主义思想为指导，深入贯彻习近平党建思想，系统总结新时代全面从严治党宝贵经验，深入分析党的建设面临的新情况新问题，对持之以恒推进全面从严治党作出系统部署，是持续推进新时代党的建设新的伟大工程的纲领性文件。\n会议强调，中国人民银行将全面准确贯彻落实习近平总书记重要讲话和全会精神，坚持和加强党中央对金融工作的集中统一领导，纵深推进全面从严治党，坚定走好中国特色金融发展之路。"
+      },
+      {
+        "key": "3d3d27d06a9f0c1c",
+        "id": "N-217f15c8463ed16a",
+        "sourceUrl": "https://finance.sina.com.cn/world/2026-10-31/doc-inixazsv7490142.shtml",
+        "capturedAt": "2026-11-02T02:37:45.002Z",
+        "requestedByAI": false,
+        "status": "ok",
+        "url": "https://finance.sina.com.cn/world/2026-10-31/doc-inixazsv7490142.shtml",
+        "excerpt": "网上流传一种担心，沙特卖石油用的是人民币， 但是转头就换成金条运走，中国的黄金储备会不会被一块块搬空？\n央行刚公布的数据指向另一个方向。截至 2026年9月 末， 中国黄金 储备为 7747 万盎司，比 8月 末增加了 74 万盎司，连续第 23 个月增持， 9月 份单月增持量是本轮购金重启以来的最高水平。一边是 “金条被运走” 的画面，一边是储备账本上只增不减的数字。这两件事同时成立，动的根本不是同一本账。\n先看沙特为什么要换。 2026年3月 底，中东地区对华原油出口中以 人民币结算 的比例达到 41% ，人民币首次超过欧元，成为中东石油贸易中仅次于美元的第二大结算货币。沙特阿美走得比整体更快， 2026年2月其对华出口原油中已有45%使用人民币结算。沙特收人民币，不是要做慈善。它的货币里亚尔从1986年起钉在美元上，国家财政和汇率预期都按美元那套算。手里攥着人民币，折回美元会随汇率晃，换成黄金就绕开了这道换算。黄金不挂任何一国的主权信用，冻结不了，也不跟着某一种货币起落。沙特换金，换的是自己那笔油款的安稳。\n那么金条是从哪里来的呢？ 2025年5月8日，上海黄金交易所在沙特正式启用了 交割库 ，境外机构可以以人民币兑换实物黄金，实现双向自由兑换。“交割库” 对接的是上金所 国际板 ，不是央行金库。国际板只对境外投资者开放，里面的黄金是从海外进口的，在上海、深圳等地的保税仓库中存放，海关按照 “ 境内关外 ” 的方式进行监管，独立设置台账、独立核算，从法律上讲是未进关的。打个不精确的比方，机场免税店货架在境内，货物不计入国内零售库存，也不进国家物资储备的账。\n所以沙特在交割库里提走的金条，是国际板保税池里的离岸周转货。 这个池子本身做的就是跨境黄金过手生意，有流出也有新的海外黄金补进来，和央行储备金库在制度上、物理上都是两条线。国际板的规则设计就具有隔离性，境外会员和客户只能在国际板指定的保税仓库里存金取金，和央行储备的账本不交叉。 央行动储备，只能由央行自己买卖，国际板上的跨境交割碰不到那本账。\n再看央行那本账在做什么。 2024年11月 重启购金以来，央行已经连续增持 23 个月， 2026年6月国际金价出现近13年最大季度回撤时，央行单月增持48万盎司，创下本轮购金重启后的单月新高。到2025年底，黄金在我国官方储备中的占比约8.8%，而全球各国央行储备资产中黄金的平均占比是27%，差距本身就是增持的空间。沙特换金的动作是在国际板的离岸池中进行的，央行储备账本在该段时间内只做了下面的事情。\n“掏空” 的说法把两个黄金体系叠成了一张图。产油国用人民币换取金条，动的是保税池里那笔跨境周转的账；国家储备增减只和央行自己购金决定有关。 要让储备被掏空，必须央行打开金库、把战略储备卖给换金的人，但是制度和行动都不支持这个前提。2026年9月7747 万盎司的"
+      },
+      {
         "key": "91f00e0594012b19",
         "id": "N-f55784eb826f59ef",
         "sourceUrl": "https://finance.sina.com.cn/jjxw/2026-10-31/doc-inixcsqp7302314.shtml",
@@ -57252,45 +57268,6 @@
         "status": "ok",
         "url": "https://finance.sina.com.cn/7x24/2026-11-02/doc-inixhnmm0726109.shtml",
         "excerpt": "美国债券持有人刚刚度过一年多以来表现最好的一个月，接下来将面临多重风险：中期选举、财政部最新发债方案，以及一连串美联储官员讲话。投资者将紧盯周二的投票结果，判断民主党能否从共和党手中夺取国会控制权。\n自上世纪90年代中期以来，国会或政府分立的局面往往利好美债。但部分人士对此存疑，认为本次联邦赤字规模巨大，该情景未必能给债券带来同样利好。转天，财政部将发布季度再融资声明。\n不少一级交易商预期指引会出现调整，可能为2027年削减长期国债发行铺路，同时增加短期国库券和短期限票据供给。除此之外，还有多名美联储官员讲话、重磅就业数据陆续出炉，都有可能改变市场对货币政策路径的预期。"
-      },
-      {
-        "key": "b7f2bc5d314b90b5",
-        "id": "N-f11783d585ef20b3",
-        "sourceUrl": "https://finance.sina.com.cn/stock/usstock/c/2026-10-31/doc-inixaepa5104387.shtml",
-        "capturedAt": "2026-11-02T01:06:08.218Z",
-        "requestedByAI": true,
-        "status": "ok",
-        "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-31/doc-inixaepa5104387.shtml",
-        "excerpt": "三位美联储官员重申有必要进一步加息，同时主张采取渐进的紧缩方式，尽量减少对金融市场和经济的冲击。\n“鉴于当前前景，在我看来仍然很明确的是，联邦公开市场委员会需要至少再实施两次25个基点的加息，”达拉斯联储行长洛丽·洛根周五表示。“更加渐进地调整政策可以帮助家庭、企业和市场参与者适应更高的利率，降低经济活动急剧恶化的风险。”\n里士满联储行长汤姆·巴尔金和圣路易斯联储行长阿尔伯托·穆萨莱姆也发表了类似言论。\n今年拥有利率决策投票权的洛根表示，“跳过一次会议并不会改变货币政策的终点。”\n巴尔金周五接受SiriusXM电台采访时表示，“渐进的方式是个好办法”。穆萨莱姆在纽约的一场活动上指出，“较早进行渐进式调整，通常比日后采取幅度更大且突然的行动造成的冲击更小。”\n根据9月会议后公布的预测，大多数美联储官员认为今年可能有必要再加息一次。期货合约显示，投资者目前预计这将在美联储12月8日至9日举行的今年最后一次利率会议上发生。期货合约还显示，美联储可能会在1月再次暂停加息，然后考虑在3月进行第三次加息。\n周五的言论表明，对于以渐进方式进一步收紧政策的必要性，美联储内部的共识可能正在增强。洛根曾在7月对维持利率不变决定投下反对票，但本周她支持多数人的决定，赞成按兵不动。巴尔金将在2027年重新获得FOMC投票权。"
-      },
-      {
-        "key": "f8e2754951efa985",
-        "id": "N-f7bcb20ad6548438",
-        "sourceUrl": "https://finance.sina.com.cn/money/future/fmnews/2026-11-02/doc-inixhwzc2383371.shtml",
-        "capturedAt": "2026-11-02T01:06:08.217Z",
-        "requestedByAI": false,
-        "status": "ok",
-        "url": "https://finance.sina.com.cn/money/future/fmnews/2026-11-02/doc-inixhwzc2383371.shtml",
-        "excerpt": "⚫ 行情回顾：截至10月30日，WTI原油期货主力价格报收104.12美元/桶，月涨幅为15.15%；Brent原油期货主力价格报收117.64美元/桶，月涨幅为13.63%；INE原油期货主力价格报收729.2元/桶，月涨幅为4.81%。\n⚫ 地缘仍是主要变量，油价月度再次冲高： 截至10月底，油价一度因美伊局势升温而再度冲高。地缘层面，随着美国中期选举临近，美方已多次释放中期选举后可能再度袭击伊朗的信号；作为回应，伊朗方面于11月加大了对海峡通航船只的打击力度。综合来看，美伊谈判窗口尚未关闭，但双方在谈判条款、尤其是浓缩铀处理问题上仍存在较大分歧，且彼此缺乏互信。展望11月，地缘因素预计仍将是主导油价的核心变量，油价料将维持宽幅震荡格局。\n⚫ 全球缓冲能力有所下降，中东原油出口韧性再遭挑战： 尽管在阿曼南航线与美军护航的共同支撑下，中东地区（含转运港）原油出口于9月飙升至1875.6万桶/日，一度逼近战前高位，10月仍维持1758.8万桶/日的发运量，但整体供应体系仍十分脆弱。若美伊战事升级，海峡整体供应体系恐再度陷入停滞。同时，美国原油储备（SPR）已于10月底降至2.83亿桶；在其最后一批4000万桶储备投放完成后，继续通过抛储缓冲供应冲击的空间将明显受限。展望11月，随着地缘局势演变，全球原油供应韧性将再度面临挑战。\n⚫ 后市展望： 1．霍尔木兹与曼德海峡通航情况；2．美伊谈判进展；3．胡塞武装的后续袭击情况；4．全球抛储进度\n截至10月31日，受美伊地缘局势反复影响，国际油价当月再度大幅冲高。这主要体现为：在原油缓冲手段趋于减少的背景下，美伊地缘升温使当前中东“暗航+转运”供应体系在美方恢复打击后极易承压。整个10月，油价不仅计入了中东局势升温的地缘溢价，也计入了市场对供应韧性体系的担忧。\n从月差结构看，整体月差有所走强，其中Brent更为明显；但月末随着CFD及CFD Roll走弱，叠加欧洲原油到港增多、下游需求表现一般，整体月差自高位回落。预计11月，美伊地缘仍悬而未决：若美伊升级打击、中东原油出口再度按下“暂停键”，市场对供应持续性的担忧将推动月差正套大幅走强；若双方和谈并最终达成协议，月差将维持偏弱震荡。\n从投资者行为上来看，根据CFTC投机资金净头寸，Brent基金净头寸于10月出现明显反弹。从跨区价差来看，WTI相对于Brent于10月前期出现明显走强，这主要体现在：1．飓风影响，产量与库存出现下滑；2．解除俄罗斯船队对于Brent的利空更为明显；3．空WTI多Brent套利盘逐步止盈平仓所致。但随着月中Brent更为强势主要体现在：1．美原油产量自飓风后出现强势恢复；2．伊朗轰炸油轮数量提升，运费出现小幅反弹同时市场对于供应体系的担忧有所增加。"
-      },
-      {
-        "key": "52efd127a2c8d72d",
-        "id": "N-d4f4c8a1dbf078b7",
-        "sourceUrl": "https://finance.sina.com.cn/7x24/2026-11-02/doc-inixhnmm0726352.shtml",
-        "capturedAt": "2026-11-02T01:06:08.216Z",
-        "requestedByAI": false,
-        "status": "ok",
-        "url": "https://finance.sina.com.cn/7x24/2026-11-02/doc-inixhnmm0726352.shtml",
-        "excerpt": "澳大利亚央行或将在今年第五次加息，以此遏制通胀。该国通胀水平在发达经济体中处于高位。\n多数经济学家预计，澳洲储备银行九人理事会将把现金利率上调25个基点至4.85%，创下18年新高。\n澳洲联储的通胀目标区间为2%‑3%，而通胀长期高于该区间上限，这会损害央行来之不易的公信力。"
-      },
-      {
-        "key": "b49c6f467bda1b64",
-        "id": "N-a55ccac88c3920ca",
-        "sourceUrl": "https://finance.sina.com.cn/7x24/2026-11-02/doc-inixhnmm0727105.shtml",
-        "capturedAt": "2026-11-02T01:06:05.457Z",
-        "requestedByAI": true,
-        "status": "unavailable",
-        "reason": "ARTICLE_BODY_UNAVAILABLE"
       }
     ],
     "model": "deepseek-v4.1-flash",
@@ -57310,18 +57287,18 @@
     },
     "stats": {
       "total": 407,
-      "reviewed": 404,
+      "reviewed": 403,
       "excluded": 24,
       "merged": 48,
-      "pending": 3,
+      "pending": 4,
       "uncertain": 20
     },
     "factorSnapshot": {
       "schema": 1,
       "version": "news-factors-1",
       "model": "deepseek-v4.1-flash",
-      "generatedAt": "2026-11-02T02:32:36.489Z",
-      "inputKey": "f9463fde",
+      "generatedAt": "2026-11-02T02:37:45.152Z",
+      "inputKey": "e8963148",
       "events": [
         {
           "id": "N-9a322e836b867b61",
@@ -57515,9 +57492,9 @@
           "quote": "政策利率从原来的7天期逆回购操作利率1.4%切换为隔夜逆回购操作利率1.25%",
           "cluster": "N-f5912af7708bb847",
           "disputed": false,
-          "sourceWeight": 0.6,
+          "sourceWeight": 0.8,
           "publishedAt": "2026-11-01T22:53:25.000Z",
-          "knownAt": "2026-11-02T00:14:50.127Z",
+          "knownAt": "2026-11-02T02:37:45.037Z",
           "reviewedAt": "2026-11-02T00:14:50.127Z",
           "contentHash": "0fff0ac32ebd51f1"
         },
@@ -57581,9 +57558,9 @@
           "quote": "若美伊战事升级，海峡整体供应体系恐再度陷入停滞",
           "cluster": "N-f7bcb20ad6548438",
           "disputed": false,
-          "sourceWeight": 0.8,
+          "sourceWeight": 0.6,
           "publishedAt": "2026-11-01T22:35:00.000Z",
-          "knownAt": "2026-11-02T01:06:08.217Z",
+          "knownAt": "2026-11-02T00:14:50.127Z",
           "reviewedAt": "2026-11-02T00:14:50.127Z",
           "contentHash": "c5cd73b1c7137f51"
         },
@@ -57669,9 +57646,9 @@
           "quote": "澳大利亚央行或将在今年第五次加息，以此遏制通胀",
           "cluster": "N-d4f4c8a1dbf078b7",
           "disputed": false,
-          "sourceWeight": 0.8,
+          "sourceWeight": 0.6,
           "publishedAt": "2026-11-01T20:03:56.000Z",
-          "knownAt": "2026-11-02T01:06:08.216Z",
+          "knownAt": "2026-11-01T20:35:23.377Z",
           "reviewedAt": "2026-11-01T20:35:23.377Z",
           "contentHash": "914331cc5263f26c"
         },
@@ -58263,9 +58240,9 @@
           "quote": "连续第 23 个月增持",
           "cluster": "N-217f15c8463ed16a",
           "disputed": false,
-          "sourceWeight": 0.6,
+          "sourceWeight": 0.8,
           "publishedAt": "2026-10-31T06:41:12.000Z",
-          "knownAt": "2026-10-31T07:09:33.455Z",
+          "knownAt": "2026-11-02T02:37:45.002Z",
           "reviewedAt": "2026-10-31T07:09:33.455Z",
           "contentHash": "5baebe8fd9444d4b"
         },
@@ -58373,9 +58350,9 @@
           "quote": "继续实施适度宽松的货币政策",
           "cluster": "N-7ef0053597755817",
           "disputed": false,
-          "sourceWeight": 0.6,
+          "sourceWeight": 0.8,
           "publishedAt": "2026-10-31T00:33:37.000Z",
-          "knownAt": "2026-10-31T00:57:28.570Z",
+          "knownAt": "2026-11-02T02:37:45.003Z",
           "reviewedAt": "2026-10-31T00:57:28.570Z",
           "contentHash": "b662312d5b4a3165"
         },
@@ -58615,9 +58592,9 @@
           "quote": "跳过一次会议并不会改变货币政策的终点",
           "cluster": "N-52b80967012934a7",
           "disputed": true,
-          "sourceWeight": 0.8,
+          "sourceWeight": 0.6,
           "publishedAt": "2026-10-30T21:22:24.000Z",
-          "knownAt": "2026-11-02T01:06:08.218Z",
+          "knownAt": "2026-11-01T23:08:43.488Z",
           "reviewedAt": "2026-11-01T23:08:43.488Z",
           "contentHash": "4530317117a900cd"
         },
@@ -64912,35 +64889,13 @@
           "knownAt": "2026-10-26T06:16:40.889Z",
           "reviewedAt": "2026-10-26T06:16:40.889Z",
           "contentHash": "01c3115e21bd7902"
-        },
-        {
-          "id": "N-12f9b986df078a26",
-          "label": "伊朗：未关闭对美外交大门，仍通过中间人互通信息",
-          "url": "https://finance.sina.com.cn/stock/usstock/c/2026-10-26/doc-iniwpfmx9344395.shtml",
-          "source": "新浪财经滚动",
-          "dimension": "risk",
-          "effect": "pressure",
-          "intensity": "weak",
-          "novelty": "ongoing",
-          "duration": "days",
-          "status": "statement",
-          "relevance": "context",
-          "mechanism": "外交窗口未关降低极端升级风险，避险溢价边际减弱，但尚未转化为协议",
-          "quote": "双方仍在通过中介交换信息",
-          "cluster": "N-12f9b986df078a26",
-          "disputed": false,
-          "sourceWeight": 0.6,
-          "publishedAt": "2026-10-26T02:34:41.000Z",
-          "knownAt": "2026-10-26T06:16:40.889Z",
-          "reviewedAt": "2026-10-26T06:16:40.889Z",
-          "contentHash": "f73c2bd540b91cd7"
         }
       ],
       "coverage": {
         "total": 407,
-        "reviewed": 404,
-        "parameterized": 346,
-        "pending": 3
+        "reviewed": 403,
+        "parameterized": 345,
+        "pending": 4
       },
       "calibration": {},
       "notice": "AI 提取事件参数；程序执行衰减、去重、抵消和贡献封顶。未审阅、无方向、价格复述及无法核对的字段不作方向修正。"
@@ -64962,7 +64917,7 @@
     "model": "deepseek-v4.1-flash",
     "toolsRegistered": 0,
     "usedToday": 20,
-    "pendingItems": 3,
+    "pendingItems": 4,
     "activeIntervalMinutes": 30,
     "nextEligibleAt": "2026-11-02T02:47:36.503Z",
     "schedulingReason": "消息已保留，等待下一次半小时研判窗口",
