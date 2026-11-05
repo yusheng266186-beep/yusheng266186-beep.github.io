@@ -67,46 +67,44 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-05T12:37:57.287Z",
-  "lastSuccessAt": "2026-11-05T12:37:57.287Z",
+  "checkedAt": "2026-11-05T12:42:57.151Z",
+  "lastSuccessAt": "2026-11-05T12:42:57.151Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-11-05T12:37:55.152Z",
+      "ok": false,
+      "checkedAt": "2026-11-05T12:42:55.172Z",
       "lastSuccessAt": "2026-11-05T12:37:55.152Z",
-      "kind": "quote",
-      "asOf": "2026-11-05T12:37:53.000Z",
-      "latencyMs": 2134
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-05T12:37:55.152Z",
-      "lastSuccessAt": "2026-11-05T12:37:55.152Z",
+      "checkedAt": "2026-11-05T12:42:55.172Z",
+      "lastSuccessAt": "2026-11-05T12:42:55.172Z",
       "kind": "quote",
       "asOf": "2026-11-05T07:29:56.000Z",
-      "latencyMs": 758
+      "latencyMs": 1923
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-05T12:37:55.152Z",
-      "lastSuccessAt": "2026-11-05T12:37:55.152Z",
+      "checkedAt": "2026-11-05T12:42:55.172Z",
+      "lastSuccessAt": "2026-11-05T12:42:55.172Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-05",
-      "latencyMs": 1612
+      "latencyMs": 1752
     }
   ],
   "officialReference": {
     "market": "CN-SGE",
     "primaryContract": "AU9999",
     "unit": "CNY/g",
-    "priceCnyGram": 884.32,
+    "priceCnyGram": 880.11,
     "highCnyGram": 887,
-    "lowCnyGram": 884.31,
+    "lowCnyGram": 880,
     "openCnyGram": 887,
     "previousCnyGram": null,
     "changeCnyGram": null,
@@ -129,14 +127,14 @@
       "turnover": false
     }
   },
-  "collectionMs": 2135,
+  "collectionMs": 1979,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 4135.5,
+    "priceUsdOz": 4134.39990234375,
     "previousUsdOz": 4073,
     "priceCnyGram": null,
     "asOf": "2026-11-05T05:00:00.000Z",
