@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-05T08:32:15.457Z",
+  "generatedAt": "2026-11-05T08:37:07.556Z",
   "methodHash": "ca3bcb724dd1738ecfe4cdcd8162e0ba00a3acb7be0183165cd9be4e3a298dae",
   "version": "5.3.7",
   "entries": [
@@ -2915,7 +2915,16 @@
           "steps": 5,
           "center": 862.1578283129005,
           "low": 828.6230819065422,
-          "high": 897.0497408917859
+          "high": 897.0497408917859,
+          "result": {
+            "target": "2026-11-05",
+            "actual": 884.09,
+            "verifiedAt": "2026-11-05T08:37:07.556Z",
+            "error": 2.4807623304301085,
+            "baselineError": 2.1298736553970743,
+            "directionHit": false,
+            "hit": true
+          }
         },
         {
           "days": 30,
@@ -2953,7 +2962,16 @@
           "steps": 5,
           "center": 860.6669785459931,
           "low": 825.1968520406965,
-          "high": 897.6617471669138
+          "high": 897.6617471669138,
+          "result": {
+            "target": "2026-11-05",
+            "actual": 884.09,
+            "verifiedAt": "2026-11-05T08:37:07.556Z",
+            "error": 2.6493933257934144,
+            "baselineError": 2.1298736553970743,
+            "directionHit": false,
+            "hit": true
+          }
         },
         {
           "model": "adaptive",
@@ -2998,7 +3016,16 @@
           "quantiles": null,
           "calibrationCount": 310,
           "regime": "趋势",
-          "mode": "strict"
+          "mode": "strict",
+          "result": {
+            "target": "2026-11-05",
+            "actual": 884.09,
+            "verifiedAt": "2026-11-05T08:37:07.556Z",
+            "error": 2.278850887436379,
+            "baselineError": 2.1298736553970743,
+            "directionHit": false,
+            "hit": true
+          }
         },
         {
           "model": "system-full",
@@ -3084,7 +3111,18 @@
           ],
           "calibrationCount": 310,
           "regime": "趋势",
-          "mode": "strict"
+          "mode": "strict",
+          "result": {
+            "target": "2026-11-05",
+            "actual": 884.09,
+            "verifiedAt": "2026-11-05T08:37:07.556Z",
+            "error": 2.299827710085889,
+            "baselineError": 2.1298736553970743,
+            "directionHit": false,
+            "hit": true,
+            "brier": 0.2404770710059172,
+            "pinball": 0.005353179151465549
+          }
         },
         {
           "model": "system-price",
@@ -4193,6 +4231,266 @@
           "center": 860.9345997878496,
           "low": 479.8516291721427,
           "high": 1544.6615996503422,
+          "up": null,
+          "quantiles": null,
+          "calibrationCount": 2,
+          "regime": "震荡",
+          "mode": "strict"
+        }
+      ]
+    },
+    {
+      "id": "ca3bcb724dd1738ecfe4cdcd8162e0ba00a3acb7be0183165cd9be4e3a298dae|2026-11-05",
+      "origin": "2026-11-05",
+      "start": 884.09,
+      "createdAt": "2026-11-05T08:37:07.556Z",
+      "version": "5.3.7",
+      "methodHash": "ca3bcb724dd1738ecfe4cdcd8162e0ba00a3acb7be0183165cd9be4e3a298dae",
+      "inputHash": "1042c3e86a65a47a03f28f232a4b54cfead00a93e9c2cb499d45ea6edad76721",
+      "forecasts": [
+        {
+          "days": 7,
+          "steps": 5,
+          "center": 883.9630548850078,
+          "low": 838.1822856180341,
+          "high": 932.2443289593938
+        },
+        {
+          "days": 30,
+          "steps": 21,
+          "center": 878.1877309680689,
+          "low": 790.5313954646227,
+          "high": 975.5636464881653
+        },
+        {
+          "days": 180,
+          "steps": 124,
+          "center": 865.2244910363157,
+          "low": 622.7486919594774,
+          "high": 1202.1115894014024
+        },
+        {
+          "days": 365,
+          "steps": 252,
+          "center": 872.27801565931,
+          "low": 652.8478919498974,
+          "high": 1165.4612751065388
+        },
+        {
+          "days": 1095,
+          "steps": 756,
+          "center": 867.6096748735987,
+          "low": 529.0994497712084,
+          "high": 1422.6938777951332
+        }
+      ],
+      "shadowForecasts": [
+        {
+          "model": "adaptive",
+          "days": 7,
+          "steps": 5,
+          "center": 886.1332218072097,
+          "low": 837.5788502581621,
+          "high": 937.5022859619697
+        },
+        {
+          "model": "adaptive",
+          "days": 30,
+          "steps": 21,
+          "center": 888.8906700683349,
+          "low": 795.8143934954848,
+          "high": 992.8528935799103
+        },
+        {
+          "model": "adaptive",
+          "days": 180,
+          "steps": 124,
+          "center": 861.9604640983979,
+          "low": 621.8535664002573,
+          "high": 1194.776201042976
+        },
+        {
+          "model": "adaptive",
+          "days": 365,
+          "steps": 252,
+          "center": 820.7032129398565,
+          "low": 614.2472386849206,
+          "high": 1096.5515533644982
+        },
+        {
+          "model": "adaptive",
+          "days": 1095,
+          "steps": 756,
+          "center": 884.336111603057,
+          "low": 539.2998298804766,
+          "high": 1450.1216483946193
+        },
+        {
+          "model": "system-full",
+          "days": 7,
+          "steps": 5,
+          "center": 883.3292011760512,
+          "low": 860.9976184624248,
+          "high": 932.3594144662983,
+          "up": null,
+          "quantiles": null,
+          "calibrationCount": 311,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-full",
+          "days": 30,
+          "steps": 21,
+          "center": 881.6569737205836,
+          "low": 834.9023542398714,
+          "high": 991.3359959855643,
+          "up": null,
+          "quantiles": null,
+          "calibrationCount": 74,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-full",
+          "days": 180,
+          "steps": 124,
+          "center": 880.1845193066187,
+          "low": 694.6074004008616,
+          "high": 1115.3419724292103,
+          "up": null,
+          "quantiles": null,
+          "calibrationCount": 12,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-full",
+          "days": 365,
+          "steps": 252,
+          "center": 880.1845679226918,
+          "low": 628.0235526168636,
+          "high": 1233.5920689297616,
+          "up": null,
+          "quantiles": null,
+          "calibrationCount": 6,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-full",
+          "days": 1095,
+          "steps": 756,
+          "center": 880.1845610852732,
+          "low": 490.5224360454567,
+          "high": 1579.3872097240449,
+          "up": null,
+          "quantiles": null,
+          "calibrationCount": 2,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-price",
+          "days": 7,
+          "steps": 5,
+          "center": 883.7366186702923,
+          "low": 861.3947359717232,
+          "high": 932.7894461417688,
+          "up": 0.5384615384615384,
+          "quantiles": [
+            {
+              "level": 0.1,
+              "value": 861.3947359717232
+            },
+            {
+              "level": 0.25,
+              "value": 876.3600144214388
+            },
+            {
+              "level": 0.5,
+              "value": 886.2309785212187
+            },
+            {
+              "level": 0.75,
+              "value": 904.5031853528308
+            },
+            {
+              "level": 0.9,
+              "value": 932.7894461417688
+            }
+          ],
+          "calibrationCount": 311,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-price",
+          "days": 30,
+          "steps": 21,
+          "center": 883.1551479445809,
+          "low": 836.3210796897462,
+          "high": 993.0205446034228,
+          "up": 0.6025641025641025,
+          "quantiles": [
+            {
+              "level": 0.1,
+              "value": 836.3210796897462
+            },
+            {
+              "level": 0.25,
+              "value": 864.930313572298
+            },
+            {
+              "level": 0.5,
+              "value": 894.8780441251636
+            },
+            {
+              "level": 0.75,
+              "value": 926.677538344122
+            },
+            {
+              "level": 0.9,
+              "value": 993.0205446034228
+            }
+          ],
+          "calibrationCount": 74,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-price",
+          "days": 180,
+          "steps": 124,
+          "center": 883.5350037336301,
+          "low": 697.2514724413053,
+          "high": 1119.5876002804707,
+          "up": null,
+          "quantiles": null,
+          "calibrationCount": 12,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-price",
+          "days": 365,
+          "steps": 252,
+          "center": 883.5337659319165,
+          "low": 630.413250537988,
+          "high": 1238.286020916679,
+          "up": null,
+          "quantiles": null,
+          "calibrationCount": 6,
+          "regime": "震荡",
+          "mode": "strict"
+        },
+        {
+          "model": "system-price",
+          "days": 1095,
+          "steps": 756,
+          "center": 883.5337659319148,
+          "low": 492.38893108845565,
+          "high": 1585.396962145752,
           "up": null,
           "quantiles": null,
           "calibrationCount": 2,
