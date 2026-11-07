@@ -1,9 +1,10 @@
 {
   "schema": 1,
-  "generatedAt": "2026-11-07T05:01:21.280Z",
+  "generatedAt": "2026-11-07T05:06:23.018Z",
   "runUrl": "https://github.com/yusheng266186-beep/yusheng266186-beep.github.io/actions/runs/42340870069",
   "status": "partial",
   "issues": [
+    "quote",
     "news-sources",
     "quote-sources"
   ],
@@ -11,37 +12,37 @@
     "news": {
       "key": "news",
       "status": "ok",
-      "checkedAt": "2026-11-07T05:01:03.460Z",
-      "durationMs": 4886,
+      "checkedAt": "2026-11-07T05:06:05.496Z",
+      "durationMs": 6760,
       "error": null,
-      "lastSuccessAt": "2026-11-07T05:01:03.460Z",
+      "lastSuccessAt": "2026-11-07T05:06:05.496Z",
       "failureStreak": 0
     },
     "factors": {
       "key": "factors",
       "status": "ok",
-      "checkedAt": "2026-11-07T05:00:59.579Z",
-      "durationMs": 1001,
+      "checkedAt": "2026-11-07T05:05:59.638Z",
+      "durationMs": 898,
       "error": null,
-      "lastSuccessAt": "2026-11-07T05:00:59.579Z",
+      "lastSuccessAt": "2026-11-07T05:05:59.638Z",
       "failureStreak": 0
     },
     "quote": {
       "key": "quote",
-      "status": "ok",
-      "checkedAt": "2026-11-07T05:01:00.449Z",
-      "durationMs": 1869,
-      "error": null,
+      "status": "failed",
+      "checkedAt": "2026-11-07T05:06:06.813Z",
+      "durationMs": 8071,
+      "error": "1: 6T18:51:00.693Z',\n      error: 'Invalid or expired quote timestamp'\n    },\n    {\n      source: 'SGE delayed',\n      ok: true,\n      checkedAt: '2026-11-07T05:05:58.802Z',\n      lastSuccessAt: '2026-11-07T05:05:58.802Z',\n      kind: 'reference',\n      asOf: null,\n      referenceDate: '2026-11-07',\n      latencyMs: 6434\n    }\n  ]\n}\n\nNode.js v22.23.4\n",
       "lastSuccessAt": "2026-11-07T05:01:00.449Z",
-      "failureStreak": 0
+      "failureStreak": 1
     },
     "components": {
       "key": "components",
       "status": "ok",
-      "checkedAt": "2026-11-07T05:00:58.692Z",
-      "durationMs": 110,
+      "checkedAt": "2026-11-07T05:05:58.849Z",
+      "durationMs": 104,
       "error": null,
-      "lastSuccessAt": "2026-11-07T05:00:58.692Z",
+      "lastSuccessAt": "2026-11-07T05:05:58.849Z",
       "failureStreak": 0
     },
     "history": {
@@ -55,60 +56,60 @@
     "archive": {
       "key": "archive",
       "status": "ok",
-      "checkedAt": "2026-11-07T05:01:03.647Z",
-      "durationMs": 187,
+      "checkedAt": "2026-11-07T05:06:07.001Z",
+      "durationMs": 188,
       "error": null,
-      "lastSuccessAt": "2026-11-07T05:01:03.647Z",
+      "lastSuccessAt": "2026-11-07T05:06:07.001Z",
       "failureStreak": 0
     },
     "analysis": {
       "key": "analysis",
       "status": "ok",
-      "checkedAt": "2026-11-07T05:01:08.460Z",
-      "durationMs": 4813,
+      "checkedAt": "2026-11-07T05:06:10.231Z",
+      "durationMs": 3230,
       "error": null,
-      "lastSuccessAt": "2026-11-07T05:01:08.460Z",
+      "lastSuccessAt": "2026-11-07T05:06:10.231Z",
       "failureStreak": 0
     },
     "publication": {
       "key": "publication",
       "status": "ok",
-      "checkedAt": "2026-11-07T05:01:20.846Z",
-      "durationMs": 12386,
+      "checkedAt": "2026-11-07T05:06:22.618Z",
+      "durationMs": 12387,
       "error": null,
-      "lastSuccessAt": "2026-11-07T05:01:20.846Z",
+      "lastSuccessAt": "2026-11-07T05:06:22.618Z",
       "failureStreak": 0
     },
     "ledger": {
       "key": "ledger",
       "status": "ok",
-      "checkedAt": "2026-11-07T05:01:20.980Z",
-      "durationMs": 134,
+      "checkedAt": "2026-11-07T05:06:22.751Z",
+      "durationMs": 133,
       "error": null,
-      "lastSuccessAt": "2026-11-07T05:01:20.980Z",
+      "lastSuccessAt": "2026-11-07T05:06:22.751Z",
       "failureStreak": 0
     },
     "assembly": {
       "key": "assembly",
       "status": "ok",
-      "checkedAt": "2026-11-07T05:01:21.280Z",
-      "durationMs": 252,
+      "checkedAt": "2026-11-07T05:06:23.018Z",
+      "durationMs": 219,
       "error": null,
-      "lastSuccessAt": "2026-11-07T05:01:21.280Z",
+      "lastSuccessAt": "2026-11-07T05:06:23.018Z",
       "failureStreak": 0
     }
   },
   "service": {
     "mode": "continuous-window",
     "intervalSeconds": 300,
-    "round": 1,
+    "round": 2,
     "rounds": 8,
     "startedAt": "2026-11-07T05:00:58.198Z",
-    "nextAttemptAt": "2026-11-07T05:05:58.199Z",
-    "sourceSha": "da1c0d497c6c2af08461e6283a8f4a9097d34752"
+    "nextAttemptAt": "2026-11-07T05:10:58.299Z",
+    "sourceSha": "62da4a2cf111ee6796744874907f254db38f4c3e"
   },
   "news": {
-    "checkedAt": "2026-11-07T05:01:03.425Z",
+    "checkedAt": "2026-11-07T05:06:05.462Z",
     "lastPublishedAt": "2026-11-07T02:53:02.000Z",
     "lastChangeAt": "2026-11-07T04:23:45.296Z",
     "changes": {
@@ -123,7 +124,7 @@
     "total": 15
   },
   "factors": {
-    "checkedAt": "2026-11-07T05:00:58.646Z",
+    "checkedAt": "2026-11-07T05:05:58.775Z",
     "available": 6,
     "total": 6
   },
@@ -133,9 +134,9 @@
   },
   "quote": {
     "asOf": "2026-11-06T18:29:54.000Z",
-    "checkedAt": "2026-11-07T05:01:00.441Z",
+    "checkedAt": "2026-11-07T05:06:06.804Z",
     "lastSuccessAt": "2026-11-07T05:01:00.441Z",
-    "available": 2,
+    "available": 1,
     "total": 3
   }
 }
