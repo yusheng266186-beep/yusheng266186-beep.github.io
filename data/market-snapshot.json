@@ -26,7 +26,7 @@
   "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "国内公开行情刷新；副合约 AUTD 暂未返回",
+  "delay": "国内公开行情刷新；非交易终端逐笔行情",
   "dataTier": "domestic-live",
   "contracts": [
     {
@@ -44,6 +44,22 @@
       "insideVolume": 11450,
       "amplitudePct": 0.11,
       "asOf": "2026-11-06T18:29:54.000Z"
+    },
+    {
+      "symbol": "AUTD",
+      "name": "黄金T+D",
+      "latest": 872.5,
+      "high": 873.5,
+      "low": 862.23,
+      "open": 871.2,
+      "previousClose": 868.08,
+      "change": 0.46,
+      "changePct": 0.05,
+      "volume": 8186,
+      "turnover": 7116330752,
+      "insideVolume": 4010,
+      "amplitudePct": 0.34,
+      "asOf": "2026-11-06T18:29:59.000Z"
     }
   ],
   "fetchedAt": null,
@@ -51,36 +67,36 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-08T06:59:25.708Z",
-  "lastSuccessAt": "2026-11-08T06:59:25.708Z",
+  "checkedAt": "2026-11-08T07:04:20.583Z",
+  "lastSuccessAt": "2026-11-08T07:04:20.583Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
       "ok": true,
-      "checkedAt": "2026-11-08T06:59:17.624Z",
-      "lastSuccessAt": "2026-11-08T06:59:17.624Z",
+      "checkedAt": "2026-11-08T07:04:17.728Z",
+      "lastSuccessAt": "2026-11-08T07:04:17.728Z",
       "kind": "quote",
       "asOf": "2026-11-06T18:29:54.000Z",
-      "latencyMs": 8083
+      "latencyMs": 2855
     },
     {
       "source": "Sina AU9999",
       "ok": false,
-      "checkedAt": "2026-11-08T06:59:17.624Z",
+      "checkedAt": "2026-11-08T07:04:17.728Z",
       "lastSuccessAt": "2026-11-06T18:51:00.693Z",
       "error": "Invalid or expired quote timestamp"
     },
     {
       "source": "SGE delayed",
       "ok": false,
-      "checkedAt": "2026-11-08T06:59:17.624Z",
+      "checkedAt": "2026-11-08T07:04:17.728Z",
       "lastSuccessAt": "2026-11-07T10:58:58.260Z",
       "error": "Official page has no valid Au99.99 reference"
     }
   ],
   "officialReference": null,
-  "collectionMs": 8085,
+  "collectionMs": 2856,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
