@@ -26,7 +26,7 @@
   "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "国内公开行情刷新；副合约 AUTD 暂未返回",
+  "delay": "国内公开行情刷新；非交易终端逐笔行情",
   "dataTier": "domestic-live",
   "contracts": [
     {
@@ -44,6 +44,22 @@
       "insideVolume": 421838,
       "amplitudePct": 2.31,
       "asOf": "2026-11-13T07:45:00.000Z"
+    },
+    {
+      "symbol": "AUTD",
+      "name": "黄金T+D",
+      "latest": 837.45,
+      "high": 847.97,
+      "low": 829,
+      "open": 847.2,
+      "previousClose": 850.62,
+      "change": -18.06,
+      "changePct": -2.11,
+      "volume": 59700,
+      "turnover": 50074999040,
+      "insideVolume": 28214,
+      "amplitudePct": 1.66,
+      "asOf": "2026-11-13T07:45:00.000Z"
     }
   ],
   "fetchedAt": null,
@@ -51,35 +67,37 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-13T08:34:06.268Z",
-  "lastSuccessAt": "2026-11-13T08:34:06.268Z",
+  "checkedAt": "2026-11-13T08:39:00.852Z",
+  "lastSuccessAt": "2026-11-13T08:39:00.852Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "checkedAt": "2026-11-13T08:33:58.268Z",
-      "lastSuccessAt": "2026-11-13T08:33:10.227Z",
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "checkedAt": "2026-11-13T08:38:58.344Z",
+      "lastSuccessAt": "2026-11-13T08:38:58.344Z",
+      "kind": "quote",
+      "asOf": "2026-11-13T07:45:00.000Z",
+      "latencyMs": 2408
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-13T08:33:58.268Z",
-      "lastSuccessAt": "2026-11-13T08:33:58.268Z",
+      "checkedAt": "2026-11-13T08:38:58.344Z",
+      "lastSuccessAt": "2026-11-13T08:38:58.344Z",
       "kind": "quote",
       "asOf": "2026-11-13T07:29:54.000Z",
-      "latencyMs": 1362
+      "latencyMs": 2450
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-13T08:33:58.268Z",
-      "lastSuccessAt": "2026-11-13T08:33:58.268Z",
+      "checkedAt": "2026-11-13T08:38:58.344Z",
+      "lastSuccessAt": "2026-11-13T08:38:58.344Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-13",
-      "latencyMs": 1756
+      "latencyMs": 1669
     }
   ],
   "officialReference": {
@@ -111,7 +129,7 @@
       "turnover": false
     }
   },
-  "collectionMs": 8001,
+  "collectionMs": 2508,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
