@@ -67,30 +67,28 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-14T18:18:01.615Z",
+  "checkedAt": "2026-11-14T18:23:07.516Z",
   "lastSuccessAt": "2026-11-14T18:18:01.615Z",
-  "collectionError": null,
+  "collectionError": "All domestic sources failed; previous snapshot and its timestamp retained.",
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-11-14T18:17:59.348Z",
+      "ok": false,
+      "checkedAt": "2026-11-14T18:22:59.432Z",
       "lastSuccessAt": "2026-11-14T18:17:59.348Z",
-      "kind": "quote",
-      "asOf": "2026-11-13T18:29:55.000Z",
-      "latencyMs": 2266
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": false,
-      "checkedAt": "2026-11-14T18:17:59.348Z",
+      "checkedAt": "2026-11-14T18:22:59.432Z",
       "lastSuccessAt": "2026-11-13T12:49:50.249Z",
       "error": "Invalid or expired quote timestamp"
     },
     {
       "source": "SGE delayed",
       "ok": false,
-      "checkedAt": "2026-11-14T18:17:59.348Z",
+      "checkedAt": "2026-11-14T18:22:59.432Z",
       "lastSuccessAt": "2026-11-14T11:01:44.868Z",
       "error": "Official page has no valid Au99.99 reference"
     }
