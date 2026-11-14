@@ -67,67 +67,36 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-14T10:00:17.726Z",
-  "lastSuccessAt": "2026-11-14T10:00:17.726Z",
+  "checkedAt": "2026-11-14T10:05:15.613Z",
+  "lastSuccessAt": "2026-11-14T10:05:15.613Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
       "ok": true,
-      "checkedAt": "2026-11-14T10:00:13.479Z",
-      "lastSuccessAt": "2026-11-14T10:00:13.479Z",
+      "checkedAt": "2026-11-14T10:05:13.554Z",
+      "lastSuccessAt": "2026-11-14T10:05:13.554Z",
       "kind": "quote",
       "asOf": "2026-11-13T18:29:55.000Z",
-      "latencyMs": 4247
+      "latencyMs": 1958
     },
     {
       "source": "Sina AU9999",
       "ok": false,
-      "checkedAt": "2026-11-14T10:00:13.479Z",
+      "checkedAt": "2026-11-14T10:05:13.554Z",
       "lastSuccessAt": "2026-11-13T12:49:50.249Z",
       "error": "Invalid or expired quote timestamp"
     },
     {
       "source": "SGE delayed",
-      "ok": true,
-      "checkedAt": "2026-11-14T10:00:13.479Z",
+      "ok": false,
+      "checkedAt": "2026-11-14T10:05:13.554Z",
       "lastSuccessAt": "2026-11-14T10:00:13.479Z",
-      "kind": "reference",
-      "asOf": null,
-      "referenceDate": "2026-11-14",
-      "latencyMs": 1999
+      "error": "fetch failed"
     }
   ],
-  "officialReference": {
-    "market": "CN-SGE",
-    "primaryContract": "AU9999",
-    "unit": "CNY/g",
-    "priceCnyGram": 837,
-    "highCnyGram": 841,
-    "lowCnyGram": 833,
-    "openCnyGram": 841,
-    "previousCnyGram": null,
-    "changeCnyGram": null,
-    "changePct": null,
-    "volume": null,
-    "turnover": null,
-    "asOf": null,
-    "referenceDate": "2026-11-14",
-    "timePrecision": "date-only",
-    "dataTier": "official-reference",
-    "source": "上海黄金交易所官方日期级参照",
-    "sourceUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-    "observed": {
-      "previous": false,
-      "open": true,
-      "range": true,
-      "change": false,
-      "changeAmount": false,
-      "volume": false,
-      "turnover": false
-    }
-  },
-  "collectionMs": 4247,
+  "officialReference": null,
+  "collectionMs": 2059,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
