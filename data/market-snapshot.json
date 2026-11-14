@@ -67,33 +67,35 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-14T06:35:27.534Z",
-  "lastSuccessAt": "2026-11-14T06:30:21.989Z",
-  "collectionError": "All domestic sources failed; previous snapshot and its timestamp retained.",
+  "checkedAt": "2026-11-14T06:40:22.368Z",
+  "lastSuccessAt": "2026-11-14T06:40:22.368Z",
+  "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "checkedAt": "2026-11-14T06:35:19.467Z",
-      "lastSuccessAt": "2026-11-14T06:30:19.425Z",
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "checkedAt": "2026-11-14T06:40:19.554Z",
+      "lastSuccessAt": "2026-11-14T06:40:19.554Z",
+      "kind": "quote",
+      "asOf": "2026-11-13T18:29:55.000Z",
+      "latencyMs": 2813
     },
     {
       "source": "Sina AU9999",
       "ok": false,
-      "checkedAt": "2026-11-14T06:35:19.467Z",
+      "checkedAt": "2026-11-14T06:40:19.554Z",
       "lastSuccessAt": "2026-11-13T12:49:50.249Z",
       "error": "Invalid or expired quote timestamp"
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-14T06:35:19.467Z",
-      "lastSuccessAt": "2026-11-14T06:35:19.467Z",
+      "checkedAt": "2026-11-14T06:40:19.554Z",
+      "lastSuccessAt": "2026-11-14T06:40:19.554Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-14",
-      "latencyMs": 1795
+      "latencyMs": 2022
     }
   ],
   "officialReference": {
@@ -125,7 +127,7 @@
       "turnover": false
     }
   },
-  "collectionMs": 2565,
+  "collectionMs": 2815,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
