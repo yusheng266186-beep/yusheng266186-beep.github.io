@@ -26,7 +26,7 @@
   "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "国内公开行情刷新；非交易终端逐笔行情",
+  "delay": "国内公开行情刷新；副合约 AUTD 暂未返回",
   "dataTier": "domestic-live",
   "contracts": [
     {
@@ -44,22 +44,6 @@
       "insideVolume": 306,
       "amplitudePct": 0.01,
       "asOf": "2026-11-17T18:29:56.000Z"
-    },
-    {
-      "symbol": "AUTD",
-      "name": "黄金T+D",
-      "latest": 829.86,
-      "high": 835.6,
-      "low": 824.58,
-      "open": 831.19,
-      "previousClose": 832.33,
-      "change": -0.66,
-      "changePct": -0.08,
-      "volume": 12654,
-      "turnover": 10487323648,
-      "insideVolume": 4210,
-      "amplitudePct": 0.54,
-      "asOf": "2026-11-17T18:29:57.000Z"
     }
   ],
   "fetchedAt": null,
@@ -67,37 +51,37 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-17T22:53:28.340Z",
-  "lastSuccessAt": "2026-11-17T22:53:28.340Z",
+  "checkedAt": "2026-11-17T22:58:33.320Z",
+  "lastSuccessAt": "2026-11-17T22:58:33.320Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
       "ok": true,
-      "checkedAt": "2026-11-17T22:53:25.228Z",
-      "lastSuccessAt": "2026-11-17T22:53:25.228Z",
+      "checkedAt": "2026-11-17T22:58:25.278Z",
+      "lastSuccessAt": "2026-11-17T22:58:25.278Z",
       "kind": "quote",
       "asOf": "2026-11-17T18:29:56.000Z",
-      "latencyMs": 3111
+      "latencyMs": 8041
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-17T22:53:25.228Z",
-      "lastSuccessAt": "2026-11-17T22:53:25.228Z",
+      "checkedAt": "2026-11-17T22:58:25.278Z",
+      "lastSuccessAt": "2026-11-17T22:58:25.278Z",
       "kind": "quote",
       "asOf": "2026-11-17T18:02:28.000Z",
-      "latencyMs": 1212
+      "latencyMs": 1000
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-17T22:53:25.228Z",
-      "lastSuccessAt": "2026-11-17T22:53:25.228Z",
+      "checkedAt": "2026-11-17T22:58:25.278Z",
+      "lastSuccessAt": "2026-11-17T22:58:25.278Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-18",
-      "latencyMs": 1447
+      "latencyMs": 2148
     }
   ],
   "officialReference": {
@@ -129,7 +113,7 @@
       "turnover": false
     }
   },
-  "collectionMs": 3112,
+  "collectionMs": 8042,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
