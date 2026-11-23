@@ -11,53 +11,55 @@
     "changeAmount": true,
     "change": true,
     "volume": true,
-    "turnover": false
+    "turnover": true
   },
   "previousCnyGram": 781.4,
   "openCnyGram": 778,
   "highCnyGram": 780,
   "lowCnyGram": 776,
-  "changeCnyGram": -4.399999999999977,
+  "changeCnyGram": -4.4,
   "changePct": -0.56,
   "volume": 6878,
-  "turnover": 0,
-  "asOf": "2026-11-23T12:56:25.000Z",
-  "source": "新浪财经 SGE_AU9999 国内行情（上金所）",
-  "sourceUrl": "https://finance.sina.com.cn/futures/quotes/SGE_AU9999.shtml",
+  "turnover": 53438346,
+  "asOf": "2026-11-23T12:58:57.000Z",
+  "source": "东方财富 AU9999 国内行情（上金所）",
+  "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "新浪上金所公开行情；与其他来源并发核对，按报价时点选择",
+  "delay": "国内公开行情刷新；非交易终端逐笔行情",
   "dataTier": "domestic-live",
   "contracts": [
     {
       "symbol": "AU9999",
       "name": "黄金9999",
-      "exchangeName": "Au99.99",
       "latest": 777,
       "high": 780,
       "low": 776,
       "open": 778,
       "previousClose": 781.4,
-      "change": -4.399999999999977,
+      "change": -4.4,
       "changePct": -0.56,
       "volume": 6878,
-      "turnover": null,
-      "asOf": "2026-11-23T12:56:25.000Z"
+      "turnover": 53438346,
+      "insideVolume": 3076,
+      "amplitudePct": 0.09,
+      "asOf": "2026-11-23T12:58:57.000Z"
     },
     {
       "symbol": "AUTD",
       "name": "黄金T+D",
-      "exchangeName": "Au(T+D)",
-      "latest": 776.8,
+      "latest": 777.89,
       "high": 778.26,
       "low": 776.4,
       "open": 777.79,
       "previousClose": 780.24,
-      "change": -3.4400000000000546,
-      "changePct": -0.35,
-      "volume": 670,
-      "turnover": null,
-      "asOf": "2026-11-23T12:58:07.000Z"
+      "change": 3.97,
+      "changePct": 0.51,
+      "volume": 678,
+      "turnover": 527014768,
+      "insideVolume": 376,
+      "amplitudePct": 0.13,
+      "asOf": "2026-11-23T12:59:01.000Z"
     }
   ],
   "fetchedAt": null,
@@ -65,35 +67,37 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-23T12:58:15.382Z",
-  "lastSuccessAt": "2026-11-23T12:58:15.382Z",
+  "checkedAt": "2026-11-23T12:59:03.469Z",
+  "lastSuccessAt": "2026-11-23T12:59:03.469Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "checkedAt": "2026-11-23T12:58:13.737Z",
-      "lastSuccessAt": "2026-11-23T12:22:22.957Z",
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "checkedAt": "2026-11-23T12:59:01.706Z",
+      "lastSuccessAt": "2026-11-23T12:59:01.706Z",
+      "kind": "quote",
+      "asOf": "2026-11-23T12:58:57.000Z",
+      "latencyMs": 1761
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-23T12:58:13.737Z",
-      "lastSuccessAt": "2026-11-23T12:58:13.737Z",
+      "checkedAt": "2026-11-23T12:59:01.706Z",
+      "lastSuccessAt": "2026-11-23T12:59:01.706Z",
       "kind": "quote",
-      "asOf": "2026-11-23T12:56:25.000Z",
-      "latencyMs": 1595
+      "asOf": "2026-11-23T12:58:23.000Z",
+      "latencyMs": 726
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-23T12:58:13.737Z",
-      "lastSuccessAt": "2026-11-23T12:58:13.737Z",
+      "checkedAt": "2026-11-23T12:59:01.706Z",
+      "lastSuccessAt": "2026-11-23T12:59:01.706Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-23",
-      "latencyMs": 1198
+      "latencyMs": 1236
     }
   ],
   "officialReference": {
@@ -125,14 +129,14 @@
       "turnover": false
     }
   },
-  "collectionMs": 1645,
+  "collectionMs": 1763,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 3618.39990234375,
+    "priceUsdOz": 3616.39990234375,
     "previousUsdOz": 3515.39990234375,
     "priceCnyGram": null,
     "asOf": "2026-11-23T05:00:00.000Z",
