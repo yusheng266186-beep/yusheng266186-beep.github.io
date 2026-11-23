@@ -67,38 +67,69 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-23T22:21:12.290Z",
-  "lastSuccessAt": "2026-11-23T22:21:12.290Z",
+  "checkedAt": "2026-11-23T22:26:12.502Z",
+  "lastSuccessAt": "2026-11-23T22:26:12.502Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
       "ok": true,
-      "checkedAt": "2026-11-23T22:21:10.207Z",
-      "lastSuccessAt": "2026-11-23T22:21:10.207Z",
+      "checkedAt": "2026-11-23T22:26:10.313Z",
+      "lastSuccessAt": "2026-11-23T22:26:10.313Z",
       "kind": "quote",
       "asOf": "2026-11-23T18:29:57.000Z",
-      "latencyMs": 2083
+      "latencyMs": 2188
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-23T22:21:10.207Z",
-      "lastSuccessAt": "2026-11-23T22:21:10.207Z",
+      "checkedAt": "2026-11-23T22:26:10.313Z",
+      "lastSuccessAt": "2026-11-23T22:26:10.313Z",
       "kind": "quote",
       "asOf": "2026-11-23T18:20:18.000Z",
-      "latencyMs": 1847
+      "latencyMs": 1981
     },
     {
       "source": "SGE delayed",
-      "ok": false,
-      "checkedAt": "2026-11-23T22:21:10.207Z",
-      "lastSuccessAt": "2026-11-23T22:16:10.171Z",
-      "error": "fetch failed"
+      "ok": true,
+      "checkedAt": "2026-11-23T22:26:10.313Z",
+      "lastSuccessAt": "2026-11-23T22:26:10.313Z",
+      "kind": "reference",
+      "asOf": null,
+      "referenceDate": "2026-11-24",
+      "latencyMs": 1514
     }
   ],
-  "officialReference": null,
-  "collectionMs": 2084,
+  "officialReference": {
+    "market": "CN-SGE",
+    "primaryContract": "AU9999",
+    "unit": "CNY/g",
+    "priceCnyGram": 788.1,
+    "highCnyGram": 794.5,
+    "lowCnyGram": 776,
+    "openCnyGram": 778,
+    "previousCnyGram": null,
+    "changeCnyGram": null,
+    "changePct": null,
+    "volume": null,
+    "turnover": null,
+    "asOf": null,
+    "referenceDate": "2026-11-24",
+    "timePrecision": "date-only",
+    "dataTier": "official-reference",
+    "source": "上海黄金交易所官方日期级参照",
+    "sourceUrl": "https://www.sge.com.cn/sjzx/yshqbg",
+    "observed": {
+      "previous": false,
+      "open": true,
+      "range": true,
+      "change": false,
+      "changeAmount": false,
+      "volume": false,
+      "turnover": false
+    }
+  },
+  "collectionMs": 2189,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
