@@ -65,35 +65,30 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-24T08:03:54.519Z",
+  "checkedAt": "2026-11-24T08:04:52.013Z",
   "lastSuccessAt": "2026-11-24T08:03:54.519Z",
-  "collectionError": null,
+  "collectionError": "All domestic sources failed; previous snapshot and its timestamp retained.",
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
       "ok": false,
-      "checkedAt": "2026-11-24T08:03:53.189Z",
+      "checkedAt": "2026-11-24T08:04:45.112Z",
       "lastSuccessAt": "2026-11-24T06:53:10.650Z",
       "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
-      "ok": true,
-      "checkedAt": "2026-11-24T08:03:53.189Z",
+      "ok": false,
+      "checkedAt": "2026-11-24T08:04:45.112Z",
       "lastSuccessAt": "2026-11-24T08:03:53.189Z",
-      "kind": "quote",
-      "asOf": "2026-11-24T07:29:59.000Z",
-      "latencyMs": 1050
+      "error": "Sina returned 403"
     },
     {
       "source": "SGE delayed",
-      "ok": true,
-      "checkedAt": "2026-11-24T08:03:53.189Z",
+      "ok": false,
+      "checkedAt": "2026-11-24T08:04:45.112Z",
       "lastSuccessAt": "2026-11-24T08:03:53.189Z",
-      "kind": "reference",
-      "asOf": null,
-      "referenceDate": "2026-11-24",
-      "latencyMs": 1252
+      "error": "fetch failed"
     }
   ],
   "officialReference": {
