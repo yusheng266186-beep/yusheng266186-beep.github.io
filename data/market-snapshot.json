@@ -67,48 +67,77 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-25T03:46:47.128Z",
-  "lastSuccessAt": "2026-11-25T03:46:47.128Z",
+  "checkedAt": "2026-11-25T03:51:47.008Z",
+  "lastSuccessAt": "2026-11-25T03:51:47.008Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-11-25T03:46:44.959Z",
+      "ok": false,
+      "checkedAt": "2026-11-25T03:51:45.057Z",
       "lastSuccessAt": "2026-11-25T03:46:44.959Z",
-      "kind": "quote",
-      "asOf": "2026-11-25T03:46:41.000Z",
-      "latencyMs": 2168
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-25T03:46:44.959Z",
-      "lastSuccessAt": "2026-11-25T03:46:44.959Z",
+      "checkedAt": "2026-11-25T03:51:45.057Z",
+      "lastSuccessAt": "2026-11-25T03:51:45.057Z",
       "kind": "quote",
       "asOf": "2026-11-25T03:35:36.000Z",
-      "latencyMs": 1026
+      "latencyMs": 1005
     },
     {
       "source": "SGE delayed",
-      "ok": false,
-      "checkedAt": "2026-11-25T03:46:44.959Z",
-      "lastSuccessAt": "2026-11-25T03:45:57.546Z",
-      "error": "fetch failed"
+      "ok": true,
+      "checkedAt": "2026-11-25T03:51:45.057Z",
+      "lastSuccessAt": "2026-11-25T03:51:45.057Z",
+      "kind": "reference",
+      "asOf": null,
+      "referenceDate": "2026-11-25",
+      "latencyMs": 1894
     }
   ],
-  "officialReference": null,
-  "collectionMs": 2169,
+  "officialReference": {
+    "market": "CN-SGE",
+    "primaryContract": "AU9999",
+    "unit": "CNY/g",
+    "priceCnyGram": 763.4,
+    "highCnyGram": 784,
+    "lowCnyGram": 758.01,
+    "openCnyGram": 780,
+    "previousCnyGram": null,
+    "changeCnyGram": null,
+    "changePct": null,
+    "volume": null,
+    "turnover": null,
+    "asOf": null,
+    "referenceDate": "2026-11-25",
+    "timePrecision": "date-only",
+    "dataTier": "official-reference",
+    "source": "上海黄金交易所官方日期级参照",
+    "sourceUrl": "https://www.sge.com.cn/sjzx/yshqbg",
+    "observed": {
+      "previous": false,
+      "open": true,
+      "range": true,
+      "change": false,
+      "changeAmount": false,
+      "volume": false,
+      "turnover": false
+    }
+  },
+  "collectionMs": 1951,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 3549.89990234375,
+    "priceUsdOz": 3550.60009765625,
     "previousUsdOz": 3561.89990234375,
     "priceCnyGram": null,
-    "asOf": "2026-11-25T03:36:38.000Z",
+    "asOf": "2026-11-25T03:41:41.000Z",
     "source": "Yahoo Finance GC=F delayed futures reference",
     "delay": "international delayed reference"
   }
