@@ -67,37 +67,35 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-26T08:09:03.359Z",
-  "lastSuccessAt": "2026-11-26T08:09:03.359Z",
+  "checkedAt": "2026-11-26T08:14:05.345Z",
+  "lastSuccessAt": "2026-11-26T08:14:05.345Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-11-26T08:08:59.468Z",
+      "ok": false,
+      "checkedAt": "2026-11-26T08:13:59.549Z",
       "lastSuccessAt": "2026-11-26T08:08:59.468Z",
-      "kind": "quote",
-      "asOf": "2026-11-26T07:45:00.000Z",
-      "latencyMs": 2557
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-26T08:08:59.468Z",
-      "lastSuccessAt": "2026-11-26T08:08:59.468Z",
+      "checkedAt": "2026-11-26T08:13:59.549Z",
+      "lastSuccessAt": "2026-11-26T08:13:59.549Z",
       "kind": "quote",
       "asOf": "2026-11-26T07:29:59.000Z",
-      "latencyMs": 3700
+      "latencyMs": 2086
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-26T08:08:59.468Z",
-      "lastSuccessAt": "2026-11-26T08:08:59.468Z",
+      "checkedAt": "2026-11-26T08:13:59.549Z",
+      "lastSuccessAt": "2026-11-26T08:13:59.549Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-26",
-      "latencyMs": 1743
+      "latencyMs": 5734
     }
   ],
   "officialReference": {
@@ -129,17 +127,17 @@
       "turnover": false
     }
   },
-  "collectionMs": 3892,
+  "collectionMs": 5796,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 3592.800048828125,
+    "priceUsdOz": 3597,
     "previousUsdOz": 3535.800048828125,
     "priceCnyGram": null,
-    "asOf": "2026-11-26T07:58:53.000Z",
+    "asOf": "2026-11-26T08:03:56.000Z",
     "source": "Yahoo Finance GC=F delayed futures reference",
     "delay": "international delayed reference"
   }
