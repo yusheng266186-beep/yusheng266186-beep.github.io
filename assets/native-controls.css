@@ -1,0 +1,91 @@
+/* Keep the real form controls so keyboard, system pickers and touch remain available. */
+body select:not([multiple]):not([size]) {
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: dark;
+  background-color: var(--native-control-surface, #0b140e);
+  background-image: linear-gradient(45deg, transparent 50%, #d5b777 50%), linear-gradient(135deg, #d5b777 50%, transparent 50%);
+  background-position: right 1.03rem center, right .72rem center;
+  background-repeat: no-repeat;
+  background-size: .32rem .32rem;
+  padding-inline-end: 2.4rem;
+  text-overflow: ellipsis;
+}
+body select option { color: #eeeade; background: #111a13; }
+body select:not([multiple]):not([size]):hover:enabled { border-color: #d5b77780; }
+body select:focus-visible { outline: 2px solid #e1c489; outline-offset: 2px; }
+
+body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"] {
+  --range-position: var(--factor-fill, var(--cursor-fill, var(--stress-fill, 50%)));
+  --range-track: linear-gradient(90deg, #d5b777 var(--range-position), #d9ca9c30 var(--range-position));
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 0;
+  width: 100%;
+  height: 2rem;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"]::-webkit-slider-runnable-track {
+  height: .25rem;
+  border-radius: 1rem;
+  background: var(--range-track);
+}
+body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"]::-moz-range-track {
+  height: .25rem;
+  border-radius: 1rem;
+  background: var(--range-track);
+}
+body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -.375rem;
+  border: 2px solid #182218;
+  border-radius: 50%;
+  background: #e2c987;
+  box-shadow: 0 0 0 1px #d5b777b0;
+}
+body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"]::-moz-range-thumb {
+  width: .75rem;
+  height: .75rem;
+  border: 2px solid #182218;
+  border-radius: 50%;
+  background: #e2c987;
+  box-shadow: 0 0 0 1px #d5b777b0;
+}
+body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"]:focus-visible {
+  outline: 2px solid #e1c489;
+  outline-offset: 2px;
+  border-radius: .65rem;
+}
+body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"]:disabled {
+  opacity: .48;
+  cursor: default;
+}
+@media (pointer: coarse) {
+  body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"] { height: 2.75rem; }
+}
+@media (forced-colors: active) {
+  body select:not([multiple]):not([size]) { appearance: auto; background-image: none; color: CanvasText; background-color: Canvas; }
+  body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"] { appearance: auto; }
+}
+.settings-scroll .settings-model { margin: 0 0 1.5rem; }
+.settings-model-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .85rem 1rem;
+  border: 1px solid #d5b77745;
+  border-radius: .85rem;
+  background: linear-gradient(135deg,#d5b77713,#d5b77705);
+  color: #e8d4a8;
+  text-decoration: none;
+}
+.settings-model-link:hover { border-color: #d5b77795; background-color: #d5b7770f; }
+.settings-model-link strong { display: block; font-size: .9rem; font-weight: 600; }
+.settings-model-link small { display: block; margin-top: .25rem; color: var(--muted); font-size: .75rem; }
+.settings-model-link > [aria-hidden] { flex: 0 0 auto; font-size: 1.1rem; }

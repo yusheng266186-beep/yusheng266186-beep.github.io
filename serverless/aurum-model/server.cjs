@@ -3,6 +3,7 @@
 const http = require('node:http');
 const {createHash, timingSafeEqual} = require('node:crypto');
 const {COSStore} = require('./store.cjs');
+const {createAdminSession} = require('./admin-session.cjs');
 const {createControl} = require('./codex-accounts.cjs');
 const {snapshot, publicCatalog} = require('./model-control.cjs');
 const {completeRemote, completeGemini} = require('./model-completion.cjs');
@@ -11,7 +12,19 @@ const {completeKimi} = require('./kimi.cjs');
 const env = process.env;
 const origin = 'https://yusheng266186-beep.github.io';
 const store = new COSStore({prefix: 'training-control-v1/'});
-const accounts = createControl();
+const adminSessions = createAdminSession({store, env});
+const quotaJobs = {
+  get: key => store.get('aurum-model/' + key),
+  create: (key, value) => store.create('aurum-model/' + key, value)
+};
+const accounts = createControl({
+  env, jobStore: quotaJobs, owner: 'quota',
+  async dispatch(key) {
+    const job = (await quotaJobs.get(key + '/meta.json'))?.value;
+    if (job?.type !== 'codex-quota') throw problem('CODEX_OPERATION_NOT_FOUND', 404);
+    await accounts.run(key, job);
+  }
+});
 const defaults = {
   provider: 'openai-codex', model: 'gpt-6.1-terra', effort: 'max',
   accountId: env.AURUM_DEFAULT_ACCOUNT_ID
@@ -27,7 +40,7 @@ const checkedKey = (secret, digest) => /^[a-f0-9]{64}$/.test(digest || '') &&
   typeof secret === 'string' && timingSafeEqual(bytes(secret), Buffer.from(digest, 'hex'));
 
 function send(res, status, value) {
-  res.writeHead(status, {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff'});
+  res.writeHead(status, {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer'});
   res.end(status === 204 ? undefined : JSON.stringify(value));
 }
 
@@ -109,22 +122,49 @@ async function handle(req, res) {
     return send(res, 403, {error: 'ORIGIN_NOT_ALLOWED'});
   }
   const path = new URL(req.url, 'http://localhost').pathname;
-  if (!['/admin/state', '/admin/switch', '/admin/test', '/runner/config', '/runner/research'].includes(path)) return send(res, 404, {error: 'NOT_FOUND'});
+  const accountId = /^\/admin\/accounts\/([a-f0-9]{32})\/quota$/.exec(path)?.[1];
+  const readOnly = ['/admin/state', '/runner/config'].includes(path);
+  if (!readOnly && !accountId && !['/admin/session', '/admin/logout', '/admin/switch', '/admin/test', '/runner/research'].includes(path)) {
+    return send(res, 404, {error: 'NOT_FOUND'});
+  }
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-Request-ID');
     return send(res, 204, null);
   }
+  if (req.method !== (readOnly ? 'GET' : 'POST')) return send(res, 405, {error: 'METHOD_NOT_ALLOWED'});
+  if (path === '/admin/session') return send(res, 200, await adminSessions.login(await json(req, 1024)));
   const runner = path.startsWith('/runner/');
-  const digest = runner ? env.AURUM_RUNNER_DIGEST : env.AURUM_ADMIN_DIGEST;
-  const secret = /^Bearer ([A-Za-z0-9_-]{25,128})$/.exec(req.headers.authorization || '')?.[1];
-  if (!checkedKey(secret, digest)) return send(res, 401, {error: 'AUTH_REQUIRED'});
-  if (path === '/admin/state' && req.method === 'GET') return send(res, 200, await state());
-  if (path === '/runner/config' && req.method === 'GET') {
+  let adminSession;
+  if (runner) {
+    const secret = /^Bearer ([A-Za-z0-9_-]{25,128})$/.exec(req.headers.authorization || '')?.[1];
+    if (!checkedKey(secret, env.AURUM_RUNNER_DIGEST)) return send(res, 401, {error: 'AUTH_REQUIRED'});
+  } else {
+    adminSession = await adminSessions.authenticate(req.headers.authorization);
+  }
+  if (path === '/admin/state') return send(res, 200, await state());
+  if (path === '/admin/logout') {
+    await adminSessions.logout(adminSession);
+    return send(res, 200, {signedOut: true});
+  }
+  if (accountId) {
+    const input = await json(req, 1024);
+    const queued = await accounts.queueAccount(accountId, 'quota', input, req.headers['x-request-id']);
+    const result = await accounts.operation(queued.id);
+    if (result.status === 'failed') {
+      const status = result.error === 'CODEX_ACCOUNT_BUSY' || result.error === 'CODEX_ACCOUNT_REAUTH_REQUIRED' ? 409 : 502;
+      throw problem(result.error, status);
+    }
+    if (result.status !== 'ready') throw problem('CODEX_ACCOUNT_BUSY', 409);
+    const pool = await accounts.accounts();
+    const account = pool.accounts.find(row => row.id === accountId);
+    if (!account) throw problem('CODEX_ACCOUNT_NOT_FOUND', 404);
+    return send(res, 200, {account, accountRevision: pool.revision});
+  }
+  if (path === '/runner/config') {
     const {revision, selection} = await current();
     return send(res, 200, {...modelInfo(await resolveGeneration(selection)), revision});
   }
-  if (path === '/admin/state' || path === '/runner/config' || req.method !== 'POST') return send(res, 405, {error: 'METHOD_NOT_ALLOWED'});
 
   const disconnected = new AbortController();
   res.once('close', () => disconnected.abort());

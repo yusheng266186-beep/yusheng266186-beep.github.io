@@ -9,7 +9,7 @@ directory = Path(__file__).resolve().parent
 site = directory.parents[1]
 worker, output = sys.argv[1:]
 catalog = json.loads((directory / "official-models.json").read_text())
-roots = ["store.cjs", "codex-accounts.cjs", "model-control.cjs", "model-completion.cjs", "kimi.cjs"]
+roots = ["store.cjs", "codex-accounts.cjs", "model-control.cjs", "model-completion.cjs", "kimi.cjs", "totp.cjs"]
 excluded = {"openai-siwc.cjs", "model-vision.cjs"}
 
 with zipfile.ZipFile(worker) as source, zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as target:
@@ -39,6 +39,6 @@ with zipfile.ZipFile(worker) as source, zipfile.ZipFile(output, "w", compression
             roots.extend(dep.decode() for dep in re.findall(rb"""require\(['"]\./([\w.-]+)['"]\)""", data))
         target.writestr(name, json.dumps(adjusted[name], ensure_ascii=False) if name in adjusted else data)
         written.add(name)
-    for name in ("server.cjs", "scf_bootstrap"):
+    for name in ("server.cjs", "admin-session.cjs", "scf_bootstrap"):
         target.write(directory / name, name)
     target.write(site / "scripts/research-prompt.mjs", "research-prompt.mjs")
