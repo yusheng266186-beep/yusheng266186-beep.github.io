@@ -7,6 +7,7 @@ import {buildHealth} from './pipeline-utils.mjs';
 if(process.env.GITHUB_ACTIONS!=='true')throw Error('Service only runs in its disposable GitHub Actions checkout');
 const run=promisify(execFile),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const git=async(...args)=>(await run('git',args,{maxBuffer:4e6,timeout:90000})).stdout.trim();
+// Reload workflow secrets when the active invocation predates the model backend.
 const digest=async()=>createHash('sha256').update(await readFile('scripts/run-update-service.mjs')).digest('hex');
 const original=await digest(),startedAt=new Date().toISOString(),rounds=Number(process.env.UPDATE_ROUNDS||8);
 const json=async p=>{try{return JSON.parse(await readFile(p,'utf8'));}catch{return {};}};

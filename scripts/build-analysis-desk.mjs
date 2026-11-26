@@ -6,6 +6,10 @@ import {VERSION,generateResearch,updateCases,researchInput} from './research-age
 import {buildSnapshot} from './news-factor-pipeline.mjs';
 import {enrichArticles} from './article-evidence.mjs';
 const require=createRequire(import.meta.url),Analysis=require('../assets/analysis-engine.js'),Intelligence=require('../assets/research-intelligence.js'),json=async file=>{try{return JSON.parse(await readFile(file,'utf8'));}catch{return null;}},save=async(file,data)=>{await writeFile(file+'.tmp',JSON.stringify(data,null,2)+'\n');await rename(file+'.tmp',file);};
+const endpoint=process.env.AURUM_MODEL_ENDPOINT,token=process.env.AURUM_MODEL_RUNNER_KEY;
+const backend=endpoint&&token?{url:endpoint,token}:null;
+const legacyKey=process.env.GITHUB_ACTIONS!=='true'?process.env.AURUM_CODEBUDDY_API_KEY:null;
+const configured=!!(backend||legacyKey);
 const [history,news,research,publication,previous,oldUsage]=await Promise.all(['data/market-history.json','data/news.json','data/research-factors.json','data/forecast-publication.json','data/analysis-desk.json','data/analysis-ai-usage.json'].map(json));
 // Retain complete recent days so uncapped daily usage remains accurate beyond 150 attempts.
 const since=new Date(Date.now()+8*3600000-7*86400000).toISOString().slice(0,10),usage={schema:1,attempts:(Array.isArray(oldUsage?.attempts)?oldUsage.attempts:[]).filter(a=>a.day>=since)};
@@ -15,15 +19,15 @@ const articles=desk.ready?await enrichArticles(desk,old,{now,captureNow:Date.now
 now=Date.now();desk=Analysis.build({history,news,research,publication},now);
 const view=Intelligence.current(desk,old,now),work=desk.ready?researchInput(desk,old,articles,now):null;
 const compatible=desk.ready&&Intelligence.compatible(desk,previous?.narration)&&previous?.narration?.protocol===VERSION&&['ready','partial'].includes(previous.narration.status);
-const selection=decision({desk,previous:compatible?{narration:{...previous.narration,inputKey:desk.inputKey}}:null,usage,now,configured:!!process.env.AURUM_CODEBUDDY_API_KEY,backlog:work?.backlog||0,force:process.argv.includes('--refresh-ai')});
+const selection=decision({desk,previous:compatible?{narration:{...previous.narration,inputKey:desk.inputKey}}:null,usage,now,configured,backlog:work?.backlog||0,force:process.argv.includes('--refresh-ai')});
 desk.narration=compatible?previous.narration:{status:'structured',inputKey:desk.inputKey,reason:selection.reason||'模型正在补齐本轮证据；最新结构化研究继续更新'};
-let intelligence={...old,version:VERSION,model:Intelligence.MODEL,articles,reviews:view.reviews,relations:view.relations},activeAttempt;
+let intelligence={...old,version:VERSION,model:old.model||null,articles,reviews:view.reviews,relations:view.relations},activeAttempt;
 async function checkpoint(queue){
  const time=Date.now();
  if(desk.ready)intelligence.cases=updateCases(intelligence.cases,desk,null,history,time);
  intelligence.stats=Intelligence.current(desk,intelligence,time).stats;intelligence.factorSnapshot=buildSnapshot(desk,intelligence,time);desk.intelligence=intelligence;
- const pending=desk.ready?researchInput(desk,intelligence,articles,time).backlog:0,next=decision({desk,previous:Intelligence.compatible(desk,desk.narration)?{narration:{...desk.narration,inputKey:desk.inputKey}}:null,usage,now:time,configured:!!process.env.AURUM_CODEBUDDY_API_KEY,backlog:pending});
- desk.aiPolicy={...RESEARCH_POLICY,model:Intelligence.MODEL,toolsRegistered:0,usedToday:usage.attempts.filter(a=>a.day===next.day).length,pendingItems:pending,activeIntervalMinutes:next.intervalMinutes,nextEligibleAt:next.nextEligibleAt,schedulingReason:next.reason,queue,continueImmediately:false,mode:'每半小时最多研判一次；新增消息留存至下一窗口，复用已核对内容'};
+ const pending=desk.ready?researchInput(desk,intelligence,articles,time).backlog:0,next=decision({desk,previous:Intelligence.compatible(desk,desk.narration)?{narration:{...desk.narration,inputKey:desk.inputKey}}:null,usage,now:time,configured,backlog:pending});
+ desk.aiPolicy={...RESEARCH_POLICY,model:intelligence.model,toolsRegistered:0,usedToday:usage.attempts.filter(a=>a.day===next.day).length,pendingItems:pending,activeIntervalMinutes:next.intervalMinutes,nextEligibleAt:next.nextEligibleAt,schedulingReason:next.reason,queue,continueImmediately:false,mode:'每半小时最多研判一次；新增消息留存至下一窗口，复用已核对内容'};
  await save('data/analysis-desk.json',desk);
 }
 await checkpoint({callsMade:0,attemptedItems:0,completedItems:0,stopReason:'not-required'});
@@ -33,13 +37,13 @@ if(selection.call){
   buildInput:(excludeIds,time)=>researchInput(desk,intelligence,articles,time,{excludeIds}),
   run:async input=>{
    const time=Date.now(),day=new Date(time+8*3600000).toISOString().slice(0,10);
-   activeAttempt={day,startedAt:new Date(time).toISOString(),inputKey:desk.inputKey,protocol:VERSION,model:Intelligence.MODEL,status:'dispatched',queuedItems:input.workIds.length};usage.attempts.push(activeAttempt);await save('data/analysis-ai-usage.json',usage);
-   return generateResearch(desk,{key:process.env.AURUM_CODEBUDDY_API_KEY,previous:intelligence,articles,now:time,input});
+   activeAttempt={day,startedAt:new Date(time).toISOString(),inputKey:desk.inputKey,protocol:VERSION,model:backend?null:Intelligence.MODEL,status:'dispatched',queuedItems:input.workIds.length};usage.attempts.push(activeAttempt);await save('data/analysis-ai-usage.json',usage);
+   return generateResearch(desk,{backend,key:legacyKey,previous:intelligence,articles,now:time,input});
   },
   onResult:async(result,input,queue)=>{
    const {reviews,relations,followUps,...narration}=result;
-   desk.narration=narration;intelligence={...intelligence,reviews:{...intelligence.reviews,...reviews},relations:[...relations,...intelligence.relations].filter((r,i,a)=>a.findIndex(x=>x.type===r.type&&[...x.evidenceIds].sort().join('|')===[...r.evidenceIds].sort().join('|'))===i).slice(0,120),followUps:[...followUps,...(intelligence.followUps||[])].filter((r,i,a)=>a.findIndex(x=>x.id===r.id)===i).slice(0,24),lastRun:{at:result.generatedAt,submitted:result.submittedCount,accepted:result.reviewedCount,warnings:result.warnings,usage:result.usage}};
-   intelligence.cases=updateCases(intelligence.cases,desk,narration,history,Date.now());Object.assign(activeAttempt,{status:result.status,completedAt:new Date().toISOString(),usage:result.usage,reviewed:result.reviewedCount,hypotheses:result.hypotheses.length});
+   desk.narration=narration;intelligence={...intelligence,model:result.model,reviews:{...intelligence.reviews,...reviews},relations:[...relations,...intelligence.relations].filter((r,i,a)=>a.findIndex(x=>x.type===r.type&&[...x.evidenceIds].sort().join('|')===[...r.evidenceIds].sort().join('|'))===i).slice(0,120),followUps:[...followUps,...(intelligence.followUps||[])].filter((r,i,a)=>a.findIndex(x=>x.id===r.id)===i).slice(0,24),lastRun:{at:result.generatedAt,submitted:result.submittedCount,accepted:result.reviewedCount,warnings:result.warnings,usage:result.usage}};
+   intelligence.cases=updateCases(intelligence.cases,desk,narration,history,Date.now());Object.assign(activeAttempt,{status:result.status,model:result.model,provider:result.provider,reasoningEffort:result.reasoningEffort,configRevision:result.configRevision,completedAt:new Date().toISOString(),usage:result.usage,reviewed:result.reviewedCount,hypotheses:result.hypotheses.length});
    await save('data/analysis-ai-usage.json',usage);await checkpoint(queue);
   },
   onError:async error=>{

@@ -4,8 +4,8 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.3.7";
-  var FORECAST_METHOD = "ca3bcb724dd1738ecfe4cdcd8162e0ba00a3acb7be0183165cd9be4e3a298dae";
+  var RELEASE_VERSION = "5.3.8";
+  var FORECAST_METHOD = "c301969da24df97803ceb07734121efd696d101f515b351c534d86204ecc946d";
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
@@ -689,7 +689,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.3.7");
+      var worker=new Worker("assets/prediction-worker.js?v=5.3.8");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -1037,7 +1037,7 @@
     rows=rows.concat((ctx?.drivers||[]).map(function(d){return '<a class="evidence-row" href="'+safeUrl(d.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(d.label)+'</span><b>'+signedNumber(Math.round(d.value*100))+'</b><small>'+escapeHtml(d.detail+' · 观测 '+d.observedAt.slice(0,10))+'</small></a>';}));
     rows=rows.concat((ctx?.events||[]).slice(0,8).map(function(event){return '<a class="evidence-row" href="'+safeUrl(event.url)+'" target="_blank" rel="noreferrer"><span>'+escapeHtml(event.label)+'</span><b>'+signedNumber(Math.round(event.value*100))+'</b><small>'+escapeHtml(event.source+' · '+formatDateTime(event.publishedAt))+'</small></a>';}));
     var ne=window.AurumEvidence.newsEffect(ctx,(e?.steps||state.forecasts[state.forecastHorizon]?.days*252/365),state.quantProfile.fit?.sigma),coverage=ctx?.aiNews?.coverage;
-    if(ctx?.aiNews?.ready){rows.push('<div class="evidence-row"><span>AI 新闻合计修正</span><b>'+signedPercent(Math.expm1(ne.move)*100)+'</b><small>DeepSeek V4.1 Flash · '+(coverage?.parameterized||0)+' 条参数 · 相关因子去重后，有界先验</small></div>');rows=rows.concat(ne.components.filter(c=>c.value).map(c=>'<div class="evidence-row"><span>'+escapeHtml(c.label)+'</span><b>'+signedPercent(Math.expm1(c.move)*100)+'</b><small>方向分 '+signedNumber(Math.round(c.value*100))+(c.overlapDiscount<1?' · 与数值因子重合，贡献减半':'')+'</small></div>'));}
+    if(ctx?.aiNews?.ready){rows.push('<div class="evidence-row"><span>AI 新闻合计修正</span><b>'+signedPercent(Math.expm1(ne.move)*100)+'</b><small>模型审阅 · '+(coverage?.parameterized||0)+' 条参数 · 相关因子去重后，有界先验</small></div>');rows=rows.concat(ne.components.filter(c=>c.value).map(c=>'<div class="evidence-row"><span>'+escapeHtml(c.label)+'</span><b>'+signedPercent(Math.expm1(c.move)*100)+'</b><small>方向分 '+signedNumber(Math.round(c.value*100))+(c.overlapDiscount<1?' · 与数值因子重合，贡献减半':'')+'</small></div>'));}
     var paired=state.publication?.newsFactors?.forwardSummary?.find(x=>x.days===state.forecasts[state.forecastHorizon]?.days);if(paired)rows.push('<div class="evidence-row"><span>AI / 无 AI 前瞻对照</span><b>'+paired.count+' 组</b><small>'+(paired.count?'MAPE '+money(paired.aiMape)+'% / '+money(paired.baseMape)+'%':'尚无到期独立样本，不宣称准确率提高')+'</small></div>');
     var html=rows.join("");if(state.evidenceHTML!==html){$("evidenceRows").innerHTML=html;state.evidenceHTML=html;}
     var failed=(state.research.status||[]).filter(function(s){return !s.ok;}).map(function(s){return s.id;});
@@ -1337,7 +1337,7 @@
   function baseDeskForAdvice(){return window.AurumAnalysis?.build({history:state.history,news:state.news,research:state.research,publication:state.publication});}
   function renderDecisionContext() {
     $("modelStatus").innerHTML = '<i></i><b>' +
-      escapeHtml(window.AurumResearchIntelligence?.compatible(baseDeskForAdvice(),state.analysisDesk?.narration)&&['ready','partial'].includes(state.analysisDesk?.narration?.status)?"DeepSeek · 证据研究":"结构化研究引擎") +
+      escapeHtml(window.AurumResearchIntelligence?.compatible(baseDeskForAdvice(),state.analysisDesk?.narration)&&['ready','partial'].includes(state.analysisDesk?.narration?.status)?"模型 · 证据研究":"结构化研究引擎") +
       "</b>";
   }
 
@@ -1393,7 +1393,7 @@
   async function generateAdvice() {
     state.aiReportMode = "local";
     renderLocalAdvice();
-    showToast("研究笔记已更新", "使用后台 DeepSeek V4.1 Flash 的有效证据分析；最新未审阅消息保留待核实标记。");
+    showToast("研究笔记已更新", "使用后台模型的有效证据分析；最新未审阅消息保留待核实标记。");
   }
 
   function aiPayload() {

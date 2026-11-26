@@ -7,7 +7,7 @@ export function buildSnapshot(desk,intelligence,now=Date.now()){
   events.push({id:f.id,label:f.label,url:f.url,source:f.source,dimension:p.dimension,effect:p.effect,intensity:p.intensity,novelty:p.novelty,duration:p.duration,status:r.status,relevance:r.relevance,mechanism:p.mechanism,quote:p.quote,cluster:cluster.get(f.id)||f.id,disputed:disputed.has(f.id),sourceWeight:official?1:article?.8:.6,publishedAt:f.publishedAt,knownAt:new Date(Math.max(Date.parse(f.knownAt),Date.parse(r.reviewedAt),article?Date.parse(article.capturedAt):0)).toISOString(),reviewedAt:r.reviewedAt,contentHash:r.fingerprint});
  }
  const generatedAt=new Date(time).toISOString(),material=events.map(e=>[e.id,e.contentHash,e.effect,e.intensity,e.novelty,e.duration,e.knownAt,e.cluster,e.disputed]);
- return {schema:1,version:Factors.version,model:Intelligence.MODEL,generatedAt,inputKey:Factors.hash(material),events,coverage:{total:desk.events?.length||0,reviewed:view.stats.reviewed,parameterized:events.length,pending:view.stats.pending},calibration:{},notice:'AI 提取事件参数；程序执行衰减、去重、抵消和贡献封顶。未审阅、无方向、价格复述及无法核对的字段不作方向修正。'};
+ return {schema:1,version:Factors.version,model:intelligence?.model||Intelligence.MODEL,generatedAt,inputKey:Factors.hash(material),events,coverage:{total:desk.events?.length||0,reviewed:view.stats.reviewed,parameterized:events.length,pending:view.stats.pending},calibration:{},notice:'AI 提取事件参数；程序执行衰减、去重、抵消和贡献封顶。未审阅、无方向、价格复述及无法核对的字段不作方向修正。'};
 }
 export function updateForward(previous,{daily,profile,snapshot,now=Date.now(),historyAsOf}){
  const time=nowTime(now),rows=Core.closedDaily(daily,historyAsOf,time).closed,entries=structuredClone(previous?.entries||[]),latest=rows.at(-1);

@@ -1,15 +1,16 @@
-/* Shared, deterministic gates for the fixed-model research workflow. */
+/* Shared, deterministic gates for the research workflow. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./analysis-engine.js'));else root.AurumResearchIntelligence=factory(root.AurumAnalysis);})(typeof globalThis==='object'?globalThis:this,function(Analysis){
  'use strict';
  const version='research-agent-3',MODEL='deepseek-v4.1-flash';
+ const validModel=model=>typeof model==='string'&&/^[a-z0-9][a-z0-9._:/-]{0,119}$/i.test(model);
  const fingerprint=f=>Analysis.hash([f.id,f.label,f.summary||'',f.value??null,f.change??null,f.direction,f.publishedAt,f.kind==='price'?null:f.knownAt,f.url]);
  const articleKey=f=>Analysis.hash([f.id,f.label,f.summary,f.publishedAt,f.url]);
  const eventId=item=>'N-'+Analysis.hash(String(item.title||'').slice(0,240).toLowerCase().replace(/[^\p{L}\p{N}]/gu,'')+String(item.publishedAt).slice(0,10));
- function validReview(f,r,now=Date.now()){return !!(r&&r.model===MODEL&&r.version===version&&r.fingerprint===fingerprint(f)&&Number.isFinite(Date.parse(r.reviewedAt))&&Date.parse(r.reviewedAt)<=now&&Date.parse(r.reviewedAt)>=Date.parse(f.knownAt));}
+ function validReview(f,r,now=Date.now()){return !!(r&&validModel(r.model)&&r.version===version&&r.fingerprint===fingerprint(f)&&Number.isFinite(Date.parse(r.reviewedAt))&&Date.parse(r.reviewedAt)<=now&&Date.parse(r.reviewedAt)>=Date.parse(f.knownAt));}
  function current(desk,intelligence,now=Date.now()){
   const cache=intelligence?.version===version?intelligence.reviews||{}:{},reviews={};
   for(const f of desk.events||[])if(validReview(f,cache[f.id],now))reviews[f.id]=cache[f.id];
-  const relations=(intelligence?.relations||[]).filter(r=>r.model===MODEL&&Date.parse(r.reviewedAt)<=now&&r.evidenceIds?.length===2&&r.evidenceIds.every(id=>reviews[id]&&r.fingerprints?.[id]===reviews[id].fingerprint));
+  const relations=(intelligence?.relations||[]).filter(r=>validModel(r.model)&&Date.parse(r.reviewedAt)<=now&&r.evidenceIds?.length===2&&r.evidenceIds.every(id=>reviews[id]&&r.fingerprints?.[id]===reviews[id].fingerprint));
   const parent=new Map((desk.events||[]).map(f=>[f.id,f.id])),find=id=>{let n=id;while(parent.get(n)!==n)n=parent.get(n);return n;};
   for(const r of relations)if(r.type==='same_event'){const [a,b]=r.evidenceIds.map(find);if(a!==b)parent.set(b,a);}
   const visible=(desk.events||[]).filter(f=>reviews[f.id]?.relevance!=='unrelated'),groups=new Map();
@@ -24,7 +25,7 @@
  }
  function compatible(desk,narration){
   if(narration?.protocol!==version)return narration?.inputKey===desk.inputKey;
-  if(narration.model!==MODEL||narration.anchor!==desk.price?.origin||!narration.basis)return false;
+  if(!validModel(narration.model)||narration.anchor!==desk.price?.origin||!narration.basis)return false;
   const facts=new Map(desk.facts.map(f=>[f.id,f]));
   return Object.entries(narration.basis).every(([id,key])=>facts.has(id)&&fingerprint(facts.get(id))===key);
  }
@@ -34,5 +35,5 @@
    const row={...item,aiReview:review||null,relatedSources:[]};seen.set(group,row);output.push(row);}
   return output;
  }
- return {version,MODEL,fingerprint,articleKey,eventId,validReview,current,overlay,compatible,feed};
+ return {version,MODEL,validModel,fingerprint,articleKey,eventId,validReview,current,overlay,compatible,feed};
 });

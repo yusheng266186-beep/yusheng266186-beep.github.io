@@ -46,3 +46,23 @@ test('native streaming parses long metadata without a two-megabyte false rejecti
 
 
 test('research synthesis and frozen cases retain every supplied evidence reference instead of silently truncating citations',()=>{const {desk,request}=setup(),v=reply(request),refs=request.evidence.filter(f=>f.type!=='event').map(f=>f.id);v.interpretations[0].evidenceIds=refs.concat(v.interpretations[0].evidenceIds);const out=validateResearch(v,request,desk,now);assert.deepEqual(new Set(out.interpretations[0].evidenceIds),new Set(v.interpretations[0].evidenceIds));assert.ok(out.interpretations[0].evidenceIds.length>4);});
+
+test('cloud-selected model attribution survives research validation and re-use', async () => {
+ const {desk,request}=setup(),model='gpt-6.1-terra',provider='openai-codex';
+ const response=await generateResearch(desk,{
+  input:request,backend:{url:'https://backend.example',token:'runner-fixture'},
+  fetchImpl:async(url,options)=>{
+   assert.equal(url.href,'https://backend.example/runner/research');
+   assert.equal(options.headers.Authorization,'Bearer runner-fixture');
+   assert.deepEqual(JSON.parse(options.body),{input:JSON.parse(JSON.stringify(request))});
+   return Response.json({model,provider,reasoningEffort:'max',revision:7,output:JSON.stringify(reply(request)),usage:{input:100,output:200}});
+  }
+ });
+ assert.equal(response.model,model);
+ assert.equal(response.reasoningEffort,'max');
+ assert.equal(response.configRevision,7);
+ assert.equal(Intelligence.compatible(desk,response),true);
+ assert.equal(Intelligence.current(desk,{version:VERSION,...response}).stats.reviewed,4);
+ assert.ok(Object.values(response.reviews).every(row=>row.model===model));
+ assert.equal(updateCases([],desk,response,clone().history)[0].model,model);
+});

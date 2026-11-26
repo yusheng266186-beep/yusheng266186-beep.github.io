@@ -71,5 +71,6 @@ jobs:
           FORCE_COMPONENTS: ${{ inputs.force_components || false }}
           FORCE_ANALYSIS_AI: ${{ inputs.force_analysis_ai || false }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          AURUM_CODEBUDDY_API_KEY: ${{ secrets.AURUM_CODEBUDDY_API_KEY }}
+          AURUM_MODEL_ENDPOINT: ${{ vars.AURUM_MODEL_ENDPOINT }}
+          AURUM_MODEL_RUNNER_KEY: ${{ secrets.AURUM_MODEL_RUNNER_KEY }}
         run: node scripts/run-update-service.mjs
