@@ -66,7 +66,7 @@
 }
 
 .settings-model .model-admin-login label,
-.model-select-label {
+.settings-model .aurum-select-label {
   display: block;
   margin: 0 0 .35rem;
   color: #e2d5af;
@@ -138,88 +138,13 @@
 .model-admin-fields { display: grid; gap: .7rem; margin: .65rem 0 .9rem; }
 .model-select { min-width: 0; }
 
-.model-select-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .7rem;
-  width: 100%;
-  min-height: 2.75rem;
-  padding: .55rem .8rem;
-  border: 1px solid var(--model-edge);
-  border-radius: var(--radius-control);
-  background: var(--model-surface);
-  color: var(--ink);
-  font-size: .85rem;
-  line-height: 1.45;
-  text-align: start;
-}
-
-.model-select-trigger > span { min-width: 0; overflow-wrap: anywhere; }
-
-.model-select-trigger::after,
-.model-select-option[aria-selected="true"]::after {
-  content: "";
-  flex: 0 0 auto;
-  width: .42rem;
-  height: .42rem;
-  margin-inline-end: .15rem;
-  margin-block-start: -.18rem;
-  border: solid var(--model-focus);
-  border-width: 0 1.5px 1.5px 0;
-  transform: rotate(45deg);
-}
-
-.model-select-trigger[aria-expanded="true"] { border-color: var(--model-focus); }
-.model-select-trigger[aria-expanded="true"]::after { margin-block-start: .18rem; transform: rotate(225deg); }
-
-.model-select-list {
-  max-height: 13.5rem;
-  max-height: min(13.5rem, 42dvh);
-  overflow: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #bda16975 #111b14;
-  scroll-margin-block: .5rem;
-  margin: .35rem 0 0;
-  padding: .25rem;
-  border: 1px solid var(--model-edge);
-  border-radius: var(--radius-control);
-  background: linear-gradient(155deg, #1e2a1e, #131d15);
-  box-shadow: 0 .6rem 1.25rem #04080558;
-  list-style: none;
-}
-
-.model-select-option {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: .7rem;
-  min-height: 2.75rem;
-  padding: .5rem .6rem;
-  border: 1px solid transparent;
-  border-radius: .55rem;
-  color: var(--ink);
-  font-size: .82rem;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-  cursor: pointer;
-}
-
-.model-select-option[aria-selected="true"] { background: #d5b7771a; color: #f1dbad; }
-.model-select-option[aria-selected="true"]::after { width: .34rem; height: .63rem; }
-.model-select-option[data-active] { border-color: #d5b7778a; background: #d5b77722; }
-.model-select-option[aria-disabled="true"] { color: #a2aa9c; cursor: default; }
-
 @media (hover: hover) {
-  .model-select-trigger:hover:enabled,
   .settings-model .model-admin-button:hover:enabled { border-color: var(--model-focus); }
   .settings-model .model-admin-primary:hover:enabled { background: #f0daaa; }
-  .model-select-option:hover:not([aria-disabled="true"]) { background: #d5b77724; }
 }
 
-.settings-model :is(.model-admin-button, .model-select-trigger):disabled { opacity: .5; cursor: default; }
-.settings-model :is(.model-admin-button, .model-select-trigger):focus-visible {
+.settings-model .model-admin-button:disabled { opacity: .5; cursor: default; }
+.settings-model .model-admin-button:focus-visible {
   outline: 2px solid var(--model-focus);
   outline-offset: 2px;
 }
@@ -255,8 +180,5 @@
 }
 
 @media (forced-colors: active) {
-  .model-select-trigger::after,
-  .model-select-option[aria-selected="true"]::after { border-color: currentColor; }
-  .model-select-option[data-active] { border-color: Highlight; }
-  .settings-model :is(.model-admin-button, .model-select-trigger):focus-visible { outline-color: Highlight; }
+  .settings-model .model-admin-button:focus-visible { outline-color: Highlight; }
 }

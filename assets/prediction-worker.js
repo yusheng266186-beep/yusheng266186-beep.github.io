@@ -1,5 +1,5 @@
 /* Keep rolling regressions and historical replay off the rendering thread. */
-importScripts('core.js?v=5.3.11','news-factors.js?v=5.3.11','evidence.js?v=5.3.11','quant.js?v=5.3.11','adaptive-model.js?v=5.3.11','research-engine.js?v=5.3.11','vintage-store.js?v=5.3.11','event-engine.js?v=5.3.11','forecast-system.js?v=5.3.11');
+importScripts('core.js?v=5.3.12','news-factors.js?v=5.3.12','evidence.js?v=5.3.12','quant.js?v=5.3.12','adaptive-model.js?v=5.3.12','research-engine.js?v=5.3.12','vintage-store.js?v=5.3.12','event-engine.js?v=5.3.12','forecast-system.js?v=5.3.12');
 self.onmessage=function({data}){
   try {
     const result=data.type==='replay'?(data.model?.startsWith('system')?AurumForecastSystem.replay(data.daily,data.date,data.days,data.systemInputs,{mode:data.model==='system-snapshot'?'snapshot':'strict'}):AurumResearchEngine.replay(data.daily,data.date,data.days,data.evidence,data.model)):AurumResearchEngine.profile(data.daily,data.evidence);

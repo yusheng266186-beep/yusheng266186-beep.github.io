@@ -4,7 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.3.11";
+  var RELEASE_VERSION = "5.3.12";
   var FORECAST_METHOD = "55c73e612f24ef925ffbb3c3565e0094961b28874c760ae50c5cb9a3c8c98e38";
   var portfolioSignature = null;
   var storageNotice = "";
@@ -689,7 +689,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.3.11");
+      var worker=new Worker("assets/prediction-worker.js?v=5.3.12");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -1043,9 +1043,17 @@
     var failed=(state.research.status||[]).filter(function(s){return !s.ok;}).map(function(s){return s.id;});
     setText("evidenceLimits","价格贡献单位为收益百分比；预测幅度根据此前已结束的误差收缩，当前保留 "+((e?.shrink||.5)*100).toFixed(0)+"%。外部输入为 −100 至 +100 的方向分，合计修正封顶 ±4%，随时间衰减。AI 新闻使用弱先验转换为收益修正，按新颖度、持续时间和消息状态衰减；最多贡献约 ±1.2%，价格复述不加方向，分歧仅增加不确定性。与无 AI 版本冻结配对，待真实结果积累后判断提升。"+(failed.length?"本次市场来源不可用："+failed.join("、")+"；旧观测超过 7 日退出。":"")+"央行储备、ETF 资金流只有明确事件时参与；未取得的数据不补零冒充观测。消息首次见到和发布均须早于计算时点。");
     var daily=state.history.daily;
-    if(daily.length>=120){$("replayDate").min=daily[119].time;$("replayDate").max=daily.at(-1).time;if(!$("replayDate").value)$("replayDate").value=daily[Math.max(119,daily.length-64)].time;}
+    if(daily.length>=120){$("replayDate").min=daily[119].time;$("replayDate").max=daily.at(-1).time;if(!$("replayDate").value)setControlValue("replayDate",daily[Math.max(119,daily.length-64)].time);}
     $("runReplay").disabled=daily.length<120;
   }
+  function openReplay(date, days, model) {
+    setControlValue("replayDate", date);
+    setControlValue("replayHorizon", days);
+    setControlValue("replayModel", model);
+    $("replayLab").open = true;
+    runReplay();
+  }
+
   async function runReplay(){
     var date=$("replayDate").value,days=Number($("replayHorizon").value);
     if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>$("replayDate").max||date<$("replayDate").min){setText("replayStatus","请选择有效历史范围内的日期。");return;}
@@ -1958,8 +1966,14 @@
       try {
         if (file.size > 20 * 1024 * 1024) throw new Error("账户文件超过 20MB");
         var data = JSON.parse(await file.text()), next = Core.validatePortfolio(data.portfolio || data);
-        if (!window.confirm("用备份替换本机模拟账户？现有记录将被替换，请确认已备份。")) return;
-        savePortfolio(next, true); state.portfolio = next; renderAll(); showToast("账户已恢复", next.trades.length + " 笔练习记录。");
+        openPortfolioConfirmation("恢复模拟账户？", "备份将替换本机现有的模拟持仓和成交记录。", "替换并恢复", function () {
+          try { savePortfolio(next, true); }
+          catch (error) { showToast("恢复失败", error.message, "error"); return; }
+          state.portfolio = next;
+          closeResetModal();
+          renderAll();
+          showToast("账户已恢复", next.trades.length + " 笔练习记录。");
+        });
       } catch (error) { showToast("恢复失败", error.message, "error"); }
       finally { e.target.value = ""; }
     };
@@ -2028,7 +2042,7 @@
     $("resetBtn").addEventListener("click", openResetModal);
     $("cancelReset").addEventListener("click", closeResetModal);
     $("confirmBackdrop").addEventListener("click", closeResetModal);
-    $("confirmReset").addEventListener("click", resetPortfolio);
+    $("confirmReset").addEventListener("click", function () { confirmPortfolioAction?.(); });
     document.querySelectorAll("#newsFilters button").forEach(function (button) {
       button.addEventListener("click", function () {
         state.newsFilter = button.dataset.filter;
@@ -2122,6 +2136,7 @@
   }
 
   var dialogFocus = null;
+  var confirmPortfolioAction = null;
 
   function lockSurface(dialog, opening) {
     if (opening) { dialogFocus = document.activeElement; $("surface").inert = true; dialog.inert = false; dialog.setAttribute("aria-hidden", "false"); }
@@ -2153,10 +2168,10 @@
 
   function syncSettingsForm() {
     var config = state.config;
-    $("priceProvider").value = config.priceProvider;
+    setControlValue("priceProvider", config.priceProvider);
     $("manualPrice").value = config.manualPrice || "";
     $("refreshSeconds").value = config.refreshSeconds;
-    $("purity").value = String(config.purity);
+    setControlValue("purity", String(config.purity));
     $("productPremium").value = config.productPremium;
     $("maxPosition").value = config.maxPosition;
     $("stopLoss").value = config.stopLoss;
@@ -2168,6 +2183,12 @@
     $("aiProvider").value = config.aiProvider;
     $("aiApiKey").value = config.aiApiKey;
     $("saveApiKey").checked = !!config.saveApiKey;
+  }
+
+  function setControlValue(id, value) {
+    var control = $(id);
+    control.value = value;
+    control.dispatchEvent(new Event("aurum:control-sync"));
   }
 
   function applySettings() {
@@ -2205,10 +2226,18 @@
 
   function restoreDefaults() {
     var before = state.config; state.config = Object.assign({}, DEFAULT_CONFIG); syncSettingsForm(); state.config = before; renderProductEstimate();
-    showToast("已填入默认参数", "保存并应用后生效。");
+    showToast("已填入默认参数", "应用网页设置后生效。");
   }
 
   function openResetModal() {
+    openPortfolioConfirmation("重置模拟账户？", "这会清空全部虚拟持仓、盈亏和成交记录。", "确认重置", resetPortfolio);
+  }
+
+  function openPortfolioConfirmation(title, detail, label, action) {
+    setText("confirmTitle", title);
+    setText("confirmDetail", detail);
+    setText("confirmReset", label);
+    confirmPortfolioAction = action;
     lockSurface($("confirmModal"), true);
     $("confirmBackdrop").classList.add("open");
     $("confirmModal").classList.add("open");
@@ -2218,6 +2247,7 @@
 
   function closeResetModal() {
     if (!$("confirmModal").classList.contains("open")) return;
+    confirmPortfolioAction = null;
     $("confirmBackdrop").classList.remove("open");
     $("confirmModal").classList.remove("open");
     document.body.classList.remove("modal-open");
@@ -2630,8 +2660,8 @@
     $("validationPhase").addEventListener("change",function(){state.validationLimit=4;renderValidation();});
     $("moreValidation").addEventListener("click",function(){state.validationLimit=(state.validationLimit||4)+4;renderValidation();});
     $("exportValidation").addEventListener("click",exportValidation);
-    $("modelResearchLab").addEventListener("click",function(event){var link=event.target.closest("[data-research-model]");if(!link)return;$("replayDate").value=link.dataset.validationDate;$("replayHorizon").value=link.dataset.validationDays;$("replayModel").value=link.dataset.researchModel;$("replayLab").open=true;runReplay();});
-    $("validationRecords").addEventListener("click",function(event){var link=event.target.closest("[data-validation-date]");if(!link)return;$("replayDate").value=link.dataset.validationDate;$("replayHorizon").value=link.dataset.validationDays;$("replayModel").value="legacy";$("replayLab").open=true;runReplay();});
+    $("modelResearchLab").addEventListener("click",function(event){var link=event.target.closest("[data-research-model]");if(link)openReplay(link.dataset.validationDate,link.dataset.validationDays,link.dataset.researchModel);});
+    $("validationRecords").addEventListener("click",function(event){var link=event.target.closest("[data-validation-date]");if(link)openReplay(link.dataset.validationDate,link.dataset.validationDays,"legacy");});
     $("runReplay").addEventListener("click",runReplay);
     $("refreshResearchBtn").addEventListener("click",function(){refreshResearchData(true);});
     $("riskBudgetPct").addEventListener("input",renderRiskLab);

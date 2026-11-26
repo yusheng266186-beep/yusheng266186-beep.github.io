@@ -105,7 +105,10 @@
     button.setAttribute("aria-pressed", String(minimized));
     button.setAttribute("aria-label", minimized ? "恢复标准动效" : "减少动态效果");
     button.title = minimized ? (motionPreference === "auto" && reduce.matches ? "系统减少动效已开启 · 点击恢复本站动效" : "恢复标准动效") : "减少动态效果";
-    if (select) select.value = ["standard","reduced"].includes(motionPreference) ? motionPreference : "auto";
+    if (select) {
+      select.value = ["standard","reduced"].includes(motionPreference) ? motionPreference : "auto";
+      select.dispatchEvent(new Event("aurum:control-sync"));
+    }
     if (minimized) { animations.forEach(a => a.cancel()); document.getAnimations().forEach(a => a.cancel()); }
     dispatchEvent(new CustomEvent("aurum:motion", { detail: minimized }));
   }

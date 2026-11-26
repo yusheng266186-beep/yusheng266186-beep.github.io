@@ -1,18 +1,28 @@
-export function mountModelSelect(field) {
+let openMenu;
+
+export function closeOpenMenu() {
+  openMenu?.close();
+}
+
+document.addEventListener('click', event => {
+  if (openMenu && !openMenu.field.contains(event.target)) closeOpenMenu();
+});
+
+export function mountSelectMenu(field, onChange = () => field.dispatchEvent(new Event('change', {bubbles: true}))) {
   const label = document.createElement('span');
   const trigger = document.createElement('button');
   const value = document.createElement('span');
   const list = document.createElement('ul');
-  label.className = 'model-select-label';
+  label.className = 'aurum-select-label';
   label.id = field.id + '-label';
   label.textContent = field.dataset.label;
   value.id = field.id + '-value';
-  trigger.className = 'model-select-trigger';
+  trigger.className = 'aurum-select-trigger';
   trigger.type = 'button';
   trigger.setAttribute('role', 'combobox');
   trigger.setAttribute('aria-haspopup', 'listbox');
   trigger.setAttribute('aria-labelledby', label.id + ' ' + value.id);
-  list.className = 'model-select-list';
+  list.className = 'aurum-select-list';
   list.id = field.id + '-options';
   list.setAttribute('role', 'listbox');
   list.setAttribute('aria-labelledby', label.id);
@@ -24,6 +34,7 @@ export function mountModelSelect(field) {
   let search = '', lastTyped = 0;
 
   function close() {
+    if (openMenu?.field === field) openMenu = undefined;
     list.hidden = true;
     trigger.setAttribute('aria-expanded', 'false');
     trigger.removeAttribute('aria-activedescendant');
@@ -46,6 +57,8 @@ export function mountModelSelect(field) {
 
   function open(index = selected) {
     if (trigger.disabled) return;
+    closeOpenMenu();
+    openMenu = {field, close};
     list.hidden = false;
     trigger.setAttribute('aria-expanded', 'true');
     highlight(index < 0 ? enabled[0] ?? -1 : index);
@@ -67,7 +80,7 @@ export function mountModelSelect(field) {
     close();
     update();
     trigger.focus({preventScroll: true});
-    if (changed) field.dispatchEvent(new Event('change', {bubbles: true}));
+    if (changed) onChange(entries[index].value);
   }
 
   trigger.addEventListener('click', () => {
@@ -79,9 +92,6 @@ export function mountModelSelect(field) {
   list.addEventListener('click', event => {
     const option = event.target.closest('[role="option"]');
     if (option) choose(Number(option.dataset.index));
-  });
-  document.addEventListener('click', event => {
-    if (!list.hidden && !field.contains(event.target)) close();
   });
 
   trigger.addEventListener('keydown', event => {
@@ -134,6 +144,7 @@ export function mountModelSelect(field) {
   close();
   update();
   return {
+    trigger,
     get value() { return entries[selected]?.value || ''; },
     setOptions(options, requested) {
       close();
@@ -142,7 +153,7 @@ export function mountModelSelect(field) {
       selected = enabled.find(index => entries[index].value === requested) ?? enabled[0] ?? -1;
       list.replaceChildren(...entries.map((entry, index) => {
         const node = document.createElement('li');
-        node.className = 'model-select-option';
+        node.className = 'aurum-select-option';
         node.id = list.id + '-' + index;
         node.dataset.index = index;
         node.setAttribute('role', 'option');

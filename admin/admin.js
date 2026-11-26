@@ -1,11 +1,11 @@
-import {mountModelSelect} from './model-select.js?v=1';
+import {mountSelectMenu} from '../assets/control-select.js?v=5.3.12';
 
 const endpoint = 'https://1459223409-lnoxklunue.ap-chengdu.tencentscf.com';
 const storageKey = 'aurum.model-admin.session.v1';
 const panel = document.getElementById('model-settings');
 const drawer = panel.closest('.settings-drawer');
 const $ = id => document.getElementById('modelAdmin-' + id);
-const pickers = Object.fromEntries(['provider', 'model', 'effort', 'account'].map(id => [id, mountModelSelect($(id))]));
+const pickers = Object.fromEntries(['provider', 'model', 'effort', 'account'].map(id => [id, mountSelectMenu($(id))]));
 const loginButton = $('login').querySelector('button[type="submit"]');
 const clock = new Intl.DateTimeFormat('zh-CN', {
   timeZone: 'Asia/Shanghai', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
