@@ -8,6 +8,7 @@ import {buildHealth} from './pipeline-utils.mjs';
 if(process.env.GITHUB_ACTIONS!=='true')throw Error('Service only runs in its disposable GitHub Actions checkout');
 const run=promisify(execFile),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const git=async(...args)=>(await run('git',args,{maxBuffer:4e6,timeout:90000})).stdout.trim();
+const bot=['-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com'];
 // Reload workflow secrets when the active invocation predates the model backend.
 const digest=async()=>createHash('sha256').update(await readFile('scripts/run-update-service.mjs')).digest('hex');
 const original=await digest(),startedAt=new Date().toISOString(),bulk=process.env.AURUM_REVIEW_BACKLOG==='true';
@@ -25,10 +26,10 @@ async function collect(env){
 async function publish(paths){
  await git('add','--',...paths);
  if(!await git('diff','--cached','--name-only'))return false;
- await git('-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','chore: refresh AURUM inputs and source health');
+ await git(...bot,'commit','-m','chore: refresh AURUM inputs and source health');
  for(let attempt=0;attempt<3;attempt++){
   try{await git('push','origin','HEAD:main');return true;}
-  catch(error){if(attempt===2)throw error;try{await git('pull','--rebase','origin','main');}catch{try{await git('rebase','--abort');}catch{}throw Error('Concurrent data edit; leaving remote data intact and restarting from main');}}
+  catch(error){if(attempt===2)throw error;try{await git(...bot,'pull','--rebase','origin','main');}catch{try{await git('rebase','--abort');}catch{}throw Error('Concurrent data edit; leaving remote data intact and restarting from main');}}
  }
 }
 const results=await runUpdateWindow({rounds,maxRounds:bulk?30:8,continueService:process.env.CONTINUE_SERVICE!=='false',sleep,
