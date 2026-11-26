@@ -4,7 +4,7 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.3.10";
+  var RELEASE_VERSION = "5.3.11";
   var FORECAST_METHOD = "55c73e612f24ef925ffbb3c3565e0094961b28874c760ae50c5cb9a3c8c98e38";
   var portfolioSignature = null;
   var storageNotice = "";
@@ -689,7 +689,7 @@
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.3.10");
+      var worker=new Worker("assets/prediction-worker.js?v=5.3.11");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -2094,6 +2094,7 @@
       state.resizeTimer = setTimeout(drawAllCharts, 120);
     });
     window.addEventListener("keydown", function (event) {
+      if (event.defaultPrevented) return;
       if (event.key === "Escape") {
         closeSettings();
         closeResetModal();
@@ -2128,22 +2129,26 @@
   }
 
   function openSettings() {
+    var drawer = $("settingsDrawer");
+    if (drawer.classList.contains("open")) return;
     syncSettingsForm();
-    lockSurface($("settingsDrawer"), true);
-    $("settingsDrawer").classList.add("open"); renderProductEstimate();
-    $("settingsDrawer").setAttribute("aria-hidden", "false");
+    lockSurface(drawer, true);
+    drawer.classList.add("open");
+    renderProductEstimate();
     $("drawerBackdrop").classList.add("open");
     document.body.classList.add("drawer-open");
+    drawer.dispatchEvent(new Event("aurum:settings-open"));
     requestAnimationFrame(function(){ $("closeSettings").focus({preventScroll:true}); });
   }
 
   function closeSettings() {
-    if (!$("settingsDrawer").classList.contains("open")) return;
-    $("settingsDrawer").classList.remove("open");
-    $("settingsDrawer").setAttribute("aria-hidden", "true");
+    var drawer = $("settingsDrawer");
+    if (!drawer.classList.contains("open")) return;
+    drawer.classList.remove("open");
+    drawer.dispatchEvent(new Event("aurum:settings-close"));
     $("drawerBackdrop").classList.remove("open");
     document.body.classList.remove("drawer-open");
-    lockSurface($("settingsDrawer"), false);
+    lockSurface(drawer, false);
   }
 
   function syncSettingsForm() {
@@ -2620,6 +2625,7 @@
       }
     });
     bindEvents();
+    if (new URLSearchParams(window.location.search).get("settings") === "model") openSettings();
     $("exportBacktest").addEventListener("click",exportBacktest);
     $("validationPhase").addEventListener("change",function(){state.validationLimit=4;renderValidation();});
     $("moreValidation").addEventListener("click",function(){state.validationLimit=(state.validationLimit||4)+4;renderValidation();});

@@ -72,20 +72,3 @@ body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) inp
   body select:not([multiple]):not([size]) { appearance: auto; background-image: none; color: CanvasText; background-color: Canvas; }
   body :is(.assumption-console, .inspection-slider, .analysis-stress-controls) input[type="range"] { appearance: auto; }
 }
-.settings-scroll .settings-model { margin: 0 0 1.5rem; }
-.settings-model-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: .85rem 1rem;
-  border: 1px solid #d5b77745;
-  border-radius: .85rem;
-  background: linear-gradient(135deg,#d5b77713,#d5b77705);
-  color: #e8d4a8;
-  text-decoration: none;
-}
-.settings-model-link:hover { border-color: #d5b77795; background-color: #d5b7770f; }
-.settings-model-link strong { display: block; font-size: .9rem; font-weight: 600; }
-.settings-model-link small { display: block; margin-top: .25rem; color: var(--muted); font-size: .75rem; }
-.settings-model-link > [aria-hidden] { flex: 0 0 auto; font-size: 1.1rem; }

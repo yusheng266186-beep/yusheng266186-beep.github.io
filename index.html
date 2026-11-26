@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css?v=5.3.10"><link rel="stylesheet" href="assets/styles.css?v=5.3.10"><link rel="stylesheet" href="assets/cinematic.css?v=5.3.10"><link rel="stylesheet" href="assets/layout.css?v=5.3.10"><link rel="stylesheet" href="assets/analysis.css?v=5.3.10"><link rel="stylesheet" href="assets/native-controls.css?v=5.3.10"><link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-variable.woff2" crossorigin><link rel="preload" as="image" href="assets/gold-sculpture-poster.webp" fetchpriority="high"></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080909"><meta name="color-scheme" content="dark"><meta name="description" content="AURUM 黄金市场档案。观察上海金 AU9999 的真实走势，检验情景假设，记录每一次模拟练习。"><title>AURUM · 黄金市场档案</title><link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/fonts.css?v=5.3.11"><link rel="stylesheet" href="assets/styles.css?v=5.3.11"><link rel="stylesheet" href="assets/cinematic.css?v=5.3.11"><link rel="stylesheet" href="assets/layout.css?v=5.3.11"><link rel="stylesheet" href="assets/analysis.css?v=5.3.11"><link rel="stylesheet" href="assets/native-controls.css?v=5.3.11"><link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-variable.woff2" crossorigin><link rel="preload" as="image" href="assets/gold-sculpture-poster.webp" fetchpriority="high"><link rel="stylesheet" href="admin/admin.css?v=3"><script src="admin/admin.js?v=3" type="module"></script></head><body data-chapter="overview"><a class="skip-link" href="#mainContent">跳到主要内容</a><svg class="icon-sprite" aria-hidden="true">
       <symbol id="i-grid" viewBox="0 0 24 24">
         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
         <rect x="14" y="3" width="7" height="7" rx="1"></rect>
@@ -405,15 +405,64 @@
         <button class="icon-button" id="closeSettings" type="button" aria-label="关闭设置"><svg><use href="#i-x"></use></svg></button>
       </div>
       <div class="settings-scroll">
-        <section class="settings-model">
-          <a class="settings-model-link" href="./admin/">
-            <span><strong>黄金分析模型后台</strong><small>切换模型、账号和思考强度，校准 ChatGPT 额度</small></span>
-            <span aria-hidden="true">↗</span>
-          </a>
-          <div hidden>
-            <input id="aiEndpoint"><input id="aiModel"><input id="aiProvider"><input id="aiApiKey" type="password"><input id="saveApiKey" type="checkbox">
+        <section id="model-settings" class="settings-model" aria-labelledby="modelAdmin-title">
+          <div class="model-admin-head">
+            <span class="model-admin-icon" aria-hidden="true"><svg><use href="#i-shield"></use></svg></span>
+            <h3 id="modelAdmin-title" tabindex="-1">黄金分析模型后台</h3>
+            <button class="model-admin-button" id="modelAdmin-logout" type="button" hidden>退出后台</button>
+          </div>
+          <form id="modelAdmin-login" class="model-admin-login" method="post">
+            <label for="modelAdmin-code">动态验证码</label>
+            <p id="modelAdmin-codeHint">输入验证器中「AURUM 黄金分析后台」的 6 位验证码。</p>
+            <div class="model-admin-login-fields">
+              <input id="modelAdmin-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" placeholder="000000" aria-describedby="modelAdmin-codeHint" required spellcheck="false">
+              <button class="model-admin-button model-admin-primary" type="submit" disabled>进入后台</button>
+            </div>
+          </form>
+          <p class="model-admin-feedback" id="modelAdmin-feedback" role="status" aria-atomic="true"></p>
+          <div id="modelAdmin-workspace" class="model-admin-workspace" hidden>
+            <div class="model-admin-current">
+              <div class="model-admin-section-head">
+                <h4>生产配置</h4>
+                <button class="model-admin-button" type="button" id="modelAdmin-reload">回读云端</button>
+              </div>
+              <dl class="model-admin-receipt" id="modelAdmin-receipt" hidden>
+                <div class="model-admin-active-model"><dt>模型与思考强度</dt><dd id="modelAdmin-active-model"></dd></div>
+                <div><dt>服务</dt><dd id="modelAdmin-active-provider"></dd></div>
+                <div id="modelAdmin-active-account-row"><dt>账号</dt><dd id="modelAdmin-active-account"></dd></div>
+                <div><dt>更新时间</dt><dd id="modelAdmin-active-time"></dd></div>
+              </dl>
+            </div>
+            <div id="modelAdmin-configuration" hidden>
+              <form id="modelAdmin-selection" class="model-admin-configuration" aria-labelledby="modelAdmin-selectionTitle" method="post">
+                <h4 id="modelAdmin-selectionTitle">切换模型</h4>
+                <div class="model-admin-fields">
+                  <div class="model-select" id="modelAdmin-provider" data-label="服务"></div>
+                  <div class="model-select" id="modelAdmin-model" data-label="模型"></div>
+                  <div class="model-select" id="modelAdmin-effort" data-label="思考强度"></div>
+                  <div class="model-select" id="modelAdmin-account" data-label="云端账号" hidden></div>
+                </div>
+                <div class="model-admin-actions">
+                  <button class="model-admin-button" type="button" id="modelAdmin-test">测试连通</button>
+                  <button class="model-admin-button model-admin-primary" type="submit" id="modelAdmin-save">保存并切换</button>
+                </div>
+                <p class="model-admin-note">下一轮符合调度条件的新闻审阅会使用已保存的配置。</p>
+              </form>
+              <div class="model-admin-quota" id="modelAdmin-quota" role="region" aria-labelledby="modelAdmin-quotaTitle" hidden>
+                <div class="model-admin-section-head">
+                  <h4 id="modelAdmin-quotaTitle">ChatGPT 额度</h4>
+                  <button class="model-admin-button" type="button" id="modelAdmin-calibrate">校准额度</button>
+                </div>
+                <p class="model-admin-quota-account" id="modelAdmin-quota-account"></p>
+                <div class="model-admin-quota-windows" id="modelAdmin-quota-windows"></div>
+                <p class="model-admin-note" id="modelAdmin-quota-updated"></p>
+              </div>
+            </div>
           </div>
         </section>
+        <div hidden>
+          <input id="aiEndpoint"><input id="aiModel"><input id="aiProvider"><input id="aiApiKey" type="password"><input id="saveApiKey" type="checkbox">
+        </div>
         <section class="scene-settings">
           <h3>空间与动效</h3>
           <label><span>本站动效偏好 · 即时生效</span><select id="motionPreference"><option value="auto">跟随系统</option><option value="standard">标准动效</option><option value="reduced">减少动效</option></select></label>
@@ -455,8 +504,8 @@
 
       </div>
       <div class="drawer-footer">
-        <button class="wide-button" id="saveSettings" type="button">保存并应用</button>
-        <button class="text-button" id="restoreDefaults" type="button">恢复默认设置</button>
+        <button class="wide-button" id="saveSettings" type="button">应用网页设置</button>
+        <button class="text-button" id="restoreDefaults" type="button">恢复网页默认设置</button>
       </div>
     </aside>
 
@@ -469,9 +518,9 @@
     </div>
 
 <dialog class="journal-dialog" id="journalDialog" aria-labelledby="journalDialogTitle"><form id="journalForm"><div class="journal-dialog-head"><div><span class="eyebrow">KEEP A PERSPECTIVE</span><h2 id="journalDialogTitle">记录这一刻的判断。</h2></div><button type="button" class="icon-button" id="closeJournal" aria-label="关闭记录窗口">×</button></div><p id="journalCaptureMeta"></p><label for="journalNote"><span id="journalNotePrompt">此刻，你在观察什么？</span><span id="journalNoteHint">选填 · 最多 280 字</span></label><textarea id="journalNote" maxlength="280" rows="4" placeholder="写下理由，以及下一次要核实的变化。"></textarea><p class="form-error" id="journalError" role="alert"></p><p class="journal-caption" id="journalSaveHint">记录时的报价、周期、区间与全部假设将一并保存到本机。</p><button class="wide-button primary" id="journalSave" type="submit">保存并查看手记 ↗</button></form></dialog>
-<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div><script src="data/embedded-data.js?v=5.3.10"></script><script src="assets/core.js?v=5.3.10"></script><script src="assets/news-factors.js?v=5.3.10"></script><script src="assets/evidence.js?v=5.3.10"></script><script src="assets/quant.js?v=5.3.10"></script><script src="assets/adaptive-model.js?v=5.3.10"></script><script src="assets/research-engine.js?v=5.3.10"></script><script src="assets/model-lab-ui.js?v=5.3.10"></script><script src="assets/gold-geometry.js?v=5.3.10"></script><script src="assets/gold-surface.js?v=5.3.10"></script><script src="assets/render-policy.js?v=5.3.10"></script><script src="assets/gold-world.js?v=5.3.10"></script><script src="assets/scene.js?v=5.3.10"></script><script src="assets/research-journal.js?v=5.3.10"></script><script src="assets/journal-ui.js?v=5.3.10"></script><script src="assets/vintage-store.js?v=5.3.10"></script>
-<script src="assets/event-engine.js?v=5.3.10"></script>
-<script src="assets/forecast-system.js?v=5.3.10"></script>
-<script src="assets/publication-policy.js?v=5.3.10"></script>
-<script src="assets/system-ui.js?v=5.3.10"></script>
-<script src="assets/analysis-engine.js?v=5.3.10"></script><script src="assets/research-intelligence.js?v=5.3.10"></script><script src="assets/analysis-notebook.js?v=5.3.10"></script><script src="assets/research-layout.js?v=5.3.10"></script><script src="assets/analysis-ui.js?v=5.3.10"></script><script src="assets/forecast-details.js?v=5.3.10"></script><script src="assets/layout-rails.js?v=5.3.10"></script><script src="assets/app.js?v=5.3.10"></script></body></html>
+<div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div><script src="data/embedded-data.js?v=5.3.11"></script><script src="assets/core.js?v=5.3.11"></script><script src="assets/news-factors.js?v=5.3.11"></script><script src="assets/evidence.js?v=5.3.11"></script><script src="assets/quant.js?v=5.3.11"></script><script src="assets/adaptive-model.js?v=5.3.11"></script><script src="assets/research-engine.js?v=5.3.11"></script><script src="assets/model-lab-ui.js?v=5.3.11"></script><script src="assets/gold-geometry.js?v=5.3.11"></script><script src="assets/gold-surface.js?v=5.3.11"></script><script src="assets/render-policy.js?v=5.3.11"></script><script src="assets/gold-world.js?v=5.3.11"></script><script src="assets/scene.js?v=5.3.11"></script><script src="assets/research-journal.js?v=5.3.11"></script><script src="assets/journal-ui.js?v=5.3.11"></script><script src="assets/vintage-store.js?v=5.3.11"></script>
+<script src="assets/event-engine.js?v=5.3.11"></script>
+<script src="assets/forecast-system.js?v=5.3.11"></script>
+<script src="assets/publication-policy.js?v=5.3.11"></script>
+<script src="assets/system-ui.js?v=5.3.11"></script>
+<script src="assets/analysis-engine.js?v=5.3.11"></script><script src="assets/research-intelligence.js?v=5.3.11"></script><script src="assets/analysis-notebook.js?v=5.3.11"></script><script src="assets/research-layout.js?v=5.3.11"></script><script src="assets/analysis-ui.js?v=5.3.11"></script><script src="assets/forecast-details.js?v=5.3.11"></script><script src="assets/layout-rails.js?v=5.3.11"></script><script src="assets/app.js?v=5.3.11"></script></body></html>

@@ -1,12 +1,17 @@
+import {mountModelSelect} from './model-select.js?v=1';
+
 const endpoint = 'https://1459223409-lnoxklunue.ap-chengdu.tencentscf.com';
 const storageKey = 'aurum.model-admin.session.v1';
-const $ = id => document.getElementById(id);
-const controls = ['code', 'provider', 'model', 'effort', 'account', 'test', 'save', 'reload'];
+const panel = document.getElementById('model-settings');
+const drawer = panel.closest('.settings-drawer');
+const $ = id => document.getElementById('modelAdmin-' + id);
+const pickers = Object.fromEntries(['provider', 'model', 'effort', 'account'].map(id => [id, mountModelSelect($(id))]));
+const loginButton = $('login').querySelector('button[type="submit"]');
 const clock = new Intl.DateTimeFormat('zh-CN', {
   timeZone: 'Asia/Shanghai', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
 });
 const percent = new Intl.NumberFormat('zh-CN', {maximumFractionDigits: 1});
-let credentials, expiry, state, busy = false, session = new AbortController();
+let credentials, expiry, state, busy = false, restored = false, session = new AbortController();
 
 const errors = {
   AUTH_REQUIRED: '会话已结束，请输入新的动态验证码。',
@@ -29,7 +34,6 @@ const errors = {
 
 function feedback(message, error = false) {
   $('feedback').textContent = message || '';
-  $('feedback').hidden = !message;
   $('feedback').toggleAttribute('data-error', error);
 }
 
@@ -53,11 +57,11 @@ async function request(path, body, {bearer = credentials?.token, timeout = 75_00
 }
 
 function setSession(record) {
-  if (typeof record?.token !== 'string' || !Number.isFinite(record.expiresAt) || record.expiresAt <= Date.now()) {
+  if (typeof record?.token !== 'string' || !record.token || !Number.isFinite(record.expiresAt) || record.expiresAt <= Date.now()) {
     throw Error('AUTH_REQUIRED');
   }
-  credentials = record;
-  try { sessionStorage.setItem(storageKey, JSON.stringify(record)); } catch {}
+  credentials = {token: record.token, expiresAt: record.expiresAt};
+  try { sessionStorage.setItem(storageKey, JSON.stringify(credentials)); } catch {}
   clearTimeout(expiry);
   expiry = setTimeout(() => {
     leave();
@@ -67,30 +71,26 @@ function setSession(record) {
   $('workspace').hidden = $('logout').hidden = false;
 }
 
-function leave(focus = true) {
+function shouldRestoreFocus() {
+  return drawer.classList.contains('open') && (document.activeElement === document.body || panel.contains(document.activeElement));
+}
+
+function leave(focus = shouldRestoreFocus()) {
   session.abort();
   session = new AbortController();
   credentials = state = undefined;
   clearTimeout(expiry);
   try { sessionStorage.removeItem(storageKey); } catch {}
   for (const id of ['workspace', 'logout', 'configuration', 'receipt']) $(id).hidden = true;
+  for (const picker of Object.values(pickers)) picker.setOptions([]);
+  for (const id of ['active-model', 'active-provider', 'active-account', 'quota-account', 'quota-windows', 'quota-updated']) $(id).replaceChildren();
   $('login').hidden = false;
   $('code').value = '';
   lock(false);
   if (focus) $('code').focus();
 }
 
-function option(value, name, disabled = false) {
-  const entry = new Option(name, value);
-  entry.disabled = disabled;
-  return entry;
-}
-
-function selectOptions(control, options, value) {
-  control.replaceChildren(...options);
-  control.value = options.some(entry => !entry.disabled && entry.value === value)
-    ? value : options.find(entry => !entry.disabled)?.value || '';
-}
+const option = (value, label, disabled = false) => ({value, label, disabled});
 
 function number(value) {
   if (value == null || value === '') return null;
@@ -130,9 +130,9 @@ function quotaRow(label, window) {
   const reset = time(window?.resetsAt ?? window?.resets_at);
   const remaining = used === null ? null : Math.max(0, Math.min(100, 100 - used));
   const labelText = [label, duration(minutes)].filter(Boolean).join(' · ');
-  const row = tile('div', 'quota-row');
-  const metric = tile('div', 'quota-metric');
-  metric.append(tile('span', 'quota-period', labelText),
+  const row = tile('div', 'model-admin-quota-row');
+  const metric = tile('div', 'model-admin-quota-metric');
+  metric.append(tile('span', '', labelText),
     tile('strong', '', remaining === null ? '额度未返回' : '剩余 ' + percent.format(remaining) + '%'));
   row.append(metric);
   if (remaining !== null) {
@@ -142,7 +142,7 @@ function quotaRow(label, window) {
     bar.setAttribute('aria-label', labelText + '剩余额度');
     row.append(bar);
   }
-  row.append(tile('p', 'quota-detail', [
+  row.append(tile('p', 'model-admin-note', [
     ...(used === null ? [] : ['已用 ' + percent.format(used) + '%']),
     reset ? '北京时间 ' + reset + ' 重置' : '重置时间未返回'
   ].join(' · ')));
@@ -150,44 +150,44 @@ function quotaRow(label, window) {
 }
 
 function selectedAccount() {
-  return state?.accounts.find(account => account.id === $('account').value);
+  return state?.accounts.find(account => account.id === pickers.account.value);
 }
 
 function renderQuota() {
   const account = selectedAccount();
-  $('quota').hidden = $('provider').value !== 'openai-codex';
+  $('quota').hidden = pickers.provider.value !== 'openai-codex';
   $('quota-account').textContent = account ? account.label + ' · ' + (account.planType || '套餐未返回') : '请选择可用云端账号';
   const groups = quotaGroups(account?.quota).map(([id, buckets]) => {
-    const group = tile('div', 'quota-group');
-    if (id.toLowerCase() !== 'codex') group.append(tile('h3', '', buckets.limitName || id));
+    const group = tile('div', 'model-admin-quota-group');
+    if (id.toLowerCase() !== 'codex') group.append(tile('h5', '', buckets.limitName || id));
     group.append(quotaRow('主窗口', buckets.primary), quotaRow('次窗口', buckets.secondary));
     return group;
   });
-  $('quota-windows').replaceChildren(...(groups.length ? groups : [tile('p', 'quota-detail', '暂无可显示的官方额度快照。')]));
+  $('quota-windows').replaceChildren(...(groups.length ? groups : [tile('p', 'model-admin-note', '暂无官方额度快照。')]));
   const updated = time(account?.quota?.fetchedAt);
-  $('quota-updated').textContent = updated ? '上次校准 · 北京时间 ' + updated : '校准后在此显示更新时间';
-  $('calibrate').disabled = busy || account?.status !== 'ready';
+  $('quota-updated').textContent = updated ? '上次校准 · 北京时间 ' + updated : '';
+  syncButtons();
 }
 
 function renderEfforts(value) {
-  const provider = state.providers.find(row => row.id === $('provider').value);
-  const model = provider?.models.find(row => row.id === $('model').value);
+  const provider = state.providers.find(row => row.id === pickers.provider.value);
+  const model = provider?.models.find(row => row.id === pickers.model.value);
   const choices = new Map();
   for (const [key, actual] of Object.entries(model?.efforts || {})) {
     if (!choices.has(actual) || key === actual) choices.set(actual, key);
   }
-  selectOptions($('effort'), [...choices].map(([actual, key]) => option(key, actual)), choices.get(model?.efforts?.[value]));
+  pickers.effort.setOptions([...choices].map(([actual, key]) => option(key, actual)), choices.get(model?.efforts?.[value]));
+  syncButtons();
 }
 
 function renderModels(selection = {}) {
-  const provider = state.providers.find(row => row.id === $('provider').value);
+  const provider = state.providers.find(row => row.id === pickers.provider.value);
   const hasAccounts = provider?.id === 'openai-codex';
-  selectOptions($('model'), (provider?.models || []).map(row => option(row.id, row.name)), selection.model || provider?.defaultModel);
+  pickers.model.setOptions((provider?.models || []).map(row => option(row.id, row.name)), selection.model || provider?.defaultModel);
   renderEfforts(selection.effort);
-  $('account-field').hidden = !hasAccounts;
-  $('account').required = hasAccounts;
-  selectOptions($('account'), state.accounts.map(row => option(row.id,
-    row.label + ' · ' + row.planType + (row.status === 'ready' ? '' : ' · 待授权'), row.status !== 'ready')),
+  $('account').hidden = !hasAccounts;
+  pickers.account.setOptions(state.accounts.map(row => option(row.id,
+    row.label + (row.planType ? ' · ' + row.planType : '') + (row.status === 'ready' ? '' : ' · 待授权'), row.status !== 'ready')),
     selection.accountId || state.active.selection.accountId);
   renderQuota();
 }
@@ -197,11 +197,11 @@ function render() {
   const provider = state.providers.find(row => row.id === selection.provider);
   const model = provider?.models.find(row => row.id === selection.model);
   $('active-provider').textContent = provider?.label || selection.provider;
-  $('active-model').textContent = (model?.name || selection.model) + ' / ' + (model?.efforts[selection.effort] || selection.effort);
+  $('active-model').textContent = (model?.name || selection.model) + ' / ' + (model?.efforts?.[selection.effort] || selection.effort);
   $('active-account-row').hidden = !selection.accountId;
   $('active-account').textContent = state.accounts.find(row => row.id === selection.accountId)?.label || '待授权';
   $('active-time').textContent = time(updatedAt) || '初始配置';
-  selectOptions($('provider'), state.providers.map(row => option(row.id,
+  pickers.provider.setOptions(state.providers.map(row => option(row.id,
     row.label + (row.configured ? '' : ' · 未配置'), !row.configured)), selection.provider);
   renderModels(selection);
   $('configuration').hidden = $('receipt').hidden = false;
@@ -209,9 +209,16 @@ function render() {
 
 function lock(locked) {
   busy = locked;
-  for (const id of controls) $(id).disabled = locked;
-  $('login').querySelector('button[type="submit"]').disabled = locked;
-  $('calibrate').disabled = locked || selectedAccount()?.status !== 'ready';
+  $('code').readOnly = locked;
+  $('reload').disabled = loginButton.disabled = locked;
+  for (const picker of Object.values(pickers)) picker.setDisabled(locked);
+  syncButtons();
+}
+
+function syncButtons() {
+  const ready = state && validSelection(selection());
+  $('test').disabled = $('save').disabled = busy || !ready;
+  $('calibrate').disabled = busy || selectedAccount()?.status !== 'ready';
 }
 
 async function action(message, task) {
@@ -238,30 +245,40 @@ async function load() {
 }
 
 function selection() {
-  const provider = $('provider').value;
-  return {provider, model: $('model').value, effort: $('effort').value,
-    ...(provider === 'openai-codex' ? {accountId: $('account').value} : {})};
+  const provider = pickers.provider.value;
+  return {provider, model: pickers.model.value, effort: pickers.effort.value,
+    ...(provider === 'openai-codex' ? {accountId: pickers.account.value} : {})};
+}
+
+function validSelection({provider, model, effort, accountId}) {
+  return Boolean(provider && model && effort && (provider !== 'openai-codex' || accountId));
 }
 
 $('code').addEventListener('input', event => {
-  event.target.value = event.target.value.replace(/\D/g, '').slice(0, 6);
+  event.target.value = event.target.value.normalize('NFKC').replace(/\D/g, '').slice(0, 6);
 });
-$('login').addEventListener('submit', event => {
+$('login').addEventListener('submit', async event => {
   event.preventDefault();
-  const code = $('code').value.trim();
-  action('正在验证动态验证码…', async () => {
+  const code = $('code').value;
+  if (!/^\d{6}$/.test(code)) return;
+  await action('正在验证动态验证码…', async () => {
     const result = await request('session', {code}, {bearer: null});
     $('code').value = '';
+    const focus = shouldRestoreFocus();
     setSession(result);
-    $('adminTitle').focus();
+    if (focus) $('title').focus({preventScroll: true});
     feedback('正在读取云端配置…');
     await load();
     return '';
   });
+  if (!credentials && shouldRestoreFocus()) {
+    $('code').focus({preventScroll: true});
+    $('code').select();
+  }
 });
 $('logout').addEventListener('click', () => {
   const previous = credentials?.token;
-  leave();
+  leave(true);
   feedback('已退出本机后台。');
   const currentSession = session;
   if (previous) request('logout', {}, {bearer: previous, timeout: 12_000}).catch(error => {
@@ -275,7 +292,7 @@ $('reload').addEventListener('click', () => action('正在回读云端配置…'
   return '已回读云端配置。';
 }));
 $('provider').addEventListener('change', () => renderModels());
-$('model').addEventListener('change', () => renderEfforts($('effort').value));
+$('model').addEventListener('change', () => renderEfforts(pickers.effort.value));
 $('account').addEventListener('change', renderQuota);
 $('calibrate').addEventListener('click', () => {
   const account = selectedAccount();
@@ -290,28 +307,42 @@ $('calibrate').addEventListener('click', () => {
   });
 });
 $('test').addEventListener('click', () => {
-  if (!$('selection').reportValidity()) return;
+  const selected = selection();
+  if (!state || !validSelection(selected)) return;
   action('正在发送模型测试…', async () => {
-    const result = await request('test', {selection: selection()});
+    const result = await request('test', {selection: selected});
     return '连通测试通过 · ' + result.model + ' / ' + result.reasoningEffort + ' · ' + (result.latencyMs / 1000).toFixed(1) + ' 秒';
   });
 });
 $('selection').addEventListener('submit', event => {
   event.preventDefault();
+  const selected = selection();
+  if (!state || !validSelection(selected)) return;
   action('正在保存生产配置…', async () => {
-    state.active = await request('switch', {expectedRevision: state.active.revision, selection: selection()});
+    state.active = await request('switch', {expectedRevision: state.active.revision, selection: selected});
     render();
     return '切换已保存。';
   });
 });
 
-try {
-  const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
-  if (saved) {
+function restoreSession() {
+  if (restored) return;
+  restored = true;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+    if (!saved) return;
     setSession(saved);
     action('正在回读云端配置…', async () => {
       await load();
       return '';
     });
-  }
-} catch { leave(false); }
+  } catch { leave(false); }
+}
+
+drawer.addEventListener('aurum:settings-open', restoreSession);
+drawer.addEventListener('aurum:settings-close', () => {
+  $('code').value = '';
+  for (const picker of Object.values(pickers)) picker.close();
+});
+lock(false);
+if (drawer.classList.contains('open')) restoreSession();
