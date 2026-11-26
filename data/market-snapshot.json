@@ -67,37 +67,35 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-26T09:20:41.806Z",
-  "lastSuccessAt": "2026-11-26T09:20:41.806Z",
+  "checkedAt": "2026-11-26T09:25:40.971Z",
+  "lastSuccessAt": "2026-11-26T09:25:40.971Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-11-26T09:20:39.584Z",
+      "ok": false,
+      "checkedAt": "2026-11-26T09:25:39.651Z",
       "lastSuccessAt": "2026-11-26T09:20:39.584Z",
-      "kind": "quote",
-      "asOf": "2026-11-26T07:45:00.000Z",
-      "latencyMs": 2221
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-26T09:20:39.584Z",
-      "lastSuccessAt": "2026-11-26T09:20:39.584Z",
+      "checkedAt": "2026-11-26T09:25:39.651Z",
+      "lastSuccessAt": "2026-11-26T09:25:39.651Z",
       "kind": "quote",
       "asOf": "2026-11-26T07:29:59.000Z",
-      "latencyMs": 941
+      "latencyMs": 1004
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-26T09:20:39.584Z",
-      "lastSuccessAt": "2026-11-26T09:20:39.584Z",
+      "checkedAt": "2026-11-26T09:25:39.651Z",
+      "lastSuccessAt": "2026-11-26T09:25:39.651Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-26",
-      "latencyMs": 1556
+      "latencyMs": 1262
     }
   ],
   "officialReference": {
@@ -129,17 +127,17 @@
       "turnover": false
     }
   },
-  "collectionMs": 2222,
+  "collectionMs": 1320,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 3600,
+    "priceUsdOz": 3598.5,
     "previousUsdOz": 3535.800048828125,
     "priceCnyGram": null,
-    "asOf": "2026-11-26T09:10:38.000Z",
+    "asOf": "2026-11-26T09:15:32.000Z",
     "source": "Yahoo Finance GC=F delayed futures reference",
     "delay": "international delayed reference"
   }
