@@ -8,17 +8,16 @@ const require=createRequire(import.meta.url),Intelligence=require('../assets/res
 export const VERSION=Intelligence.version;
 export {SYSTEM};
 const dimensions={rates:'利率',fx:'汇率',risk:'风险',inflation:'通胀',flows:'资金',demand:'需求',supply:'供给',price:'价格',other:'待核实'},text=(s,n=180)=>typeof s==='string'?s.trim().slice(0,n):'',unique=a=>[...new Set(Array.isArray(a)?a:[])],forbidden=/https?:|买入|卖出|做多|做空|止盈|止损|保证获利|必然|一定会|目标价|上涨概率|下跌概率/;
-export function researchInput(desk,previous={},articles=[],now=Date.now(),{excludeIds=[]}={}){
+export function researchInput(desk,previous={},articles=[],now=Date.now(),{excludeIds=[],targetIds,batchSize=RESEARCH_POLICY.newItemsPerCall}={}){
  const view=Intelligence.current(desk,previous,now),rank=f=>(f.weight||0)+(f.direction?10:0)-f.ageDays*4;
  const bodyChanged=f=>{const a=articles.find(a=>a.key===Intelligence.articleKey(f)&&a.status==='ok'&&Date.parse(a.capturedAt)<=now);return !!(a&&view.reviews[f.id]?.articleHash!==Intelligence.articleKey({id:f.id,label:a.excerpt}));};
- const excluded=new Set(excludeIds),allPending=desk.events.filter(f=>!view.reviews[f.id]||!view.reviews[f.id].factor||bodyChanged(f)),pending=allPending.filter(f=>!excluded.has(f.id)).sort((a,b)=>rank(b)-rank(a)),context=desk.events.filter(f=>view.reviews[f.id]?.factor&&!bodyChanged(f)&&view.reviews[f.id].relevance!=='unrelated').sort((a,b)=>rank(b)-rank(a));
+ const excluded=new Set(excludeIds),targets=targetIds?new Set(targetIds):null,allPending=desk.events.filter(f=>(!targets||targets.has(f.id))&&(!view.reviews[f.id]||!view.reviews[f.id].factor||bodyChanged(f))),pending=allPending.filter(f=>!excluded.has(f.id)).sort((a,b)=>rank(b)-rank(a)),context=desk.events.filter(f=>view.reviews[f.id]?.factor&&!bodyChanged(f)&&view.reviews[f.id].relevance!=='unrelated').sort((a,b)=>rank(b)-rank(a));
  // Reserve half of each batch for recent arrivals and half for the oldest waiting work.
  // Smaller replies leave room for reasoning without truncating the structured factor output.
- const p=RESEARCH_POLICY,fresh=[...pending].sort((a,b)=>Date.parse(b.publishedAt)-Date.parse(a.publishedAt)||rank(b)-rank(a)).slice(0,p.freshItemsPerCall),waiting=pending.filter(f=>!fresh.some(x=>x.id===f.id)).sort((a,b)=>Date.parse(a.knownAt||a.publishedAt)-Date.parse(b.knownAt||b.publishedAt)||Date.parse(a.publishedAt)-Date.parse(b.publishedAt)||rank(b)-rank(a)),events=[...fresh,...waiting.slice(0,p.newItemsPerCall-fresh.length)].concat(context.slice(0,p.contextItemsPerCall)),base=aiInput({...desk,events:[]}),eventInput=aiInput({...desk,events,facts:[]}).evidence;
- // aiInput caps its legacy selection at twelve; the agent has a separate, explicit news work queue.
+ const p=RESEARCH_POLICY,freshCount=Math.floor(batchSize/2),fresh=[...pending].sort((a,b)=>Date.parse(b.publishedAt)-Date.parse(a.publishedAt)||rank(b)-rank(a)).slice(0,freshCount),waiting=pending.filter(f=>!fresh.some(x=>x.id===f.id)).sort((a,b)=>Date.parse(a.knownAt||a.publishedAt)-Date.parse(b.knownAt||b.publishedAt)||Date.parse(a.publishedAt)-Date.parse(b.publishedAt)||rank(b)-rank(a)),events=[...fresh,...waiting.slice(0,batchSize-fresh.length)].concat(context.slice(0,p.contextItemsPerCall)),base=aiInput({...desk,events:[]}),eventInput=aiInput({...desk,events,facts:[]},{eventLimit:events.length}).evidence;
  const eventMap=new Map(eventInput.map(f=>[f.id,f]));
  base.evidence.push(...events.map(f=>({...eventMap.get(f.id),id:f.id,type:'event',label:f.label,summary:f.summary,source:f.source,publishedAt:f.publishedAt,knownAt:f.knownAt,conditional:f.conditional,direction:f.direction,articleExcerpt:articles.find(a=>a.key===Intelligence.articleKey(f)&&a.status==='ok'&&Date.parse(a.capturedAt)<=now)?.excerpt||'',previousReview:view.reviews[f.id]?{relevance:view.reviews[f.id].relevance,status:view.reviews[f.id].status}:null})));
- return {...base,protocol:VERSION,scope:'新闻语义审阅、来源对照与价格条件观察；数值预测不由文字输出改写',levels:desk.levels.map(l=>({id:l.id,label:l.label,threshold:l.threshold,invalidation:l.invalidation})),backlog:allPending.length,workIds:events.filter(f=>allPending.some(p=>p.id===f.id)).map(f=>f.id)};
+ return {...base,protocol:VERSION,scope:'新闻语义审阅、来源对照与价格条件观察；数值预测不由文字输出改写',levels:desk.levels.map(l=>({id:l.id,label:l.label,threshold:l.threshold,invalidation:l.invalidation})),backlog:allPending.length,pendingIds:allPending.map(f=>f.id),workIds:events.filter(f=>allPending.some(p=>p.id===f.id)).map(f=>f.id)};
 }
 export function validateResearch(value,input,desk,now=Date.now(),model=MODEL){
  const base=canonicalize(value,input,{maxRefs:32}),byId=new Map(input.evidence.map(f=>[f.id,f])),facts=new Map(desk.facts.map(f=>[f.id,f])),warnings=[...base.warnings],reviews={};
@@ -43,14 +42,25 @@ export function validateResearch(value,input,desk,now=Date.now(),model=MODEL){
  const ids=unique([...input.evidence.filter(f=>f.type!=='event').map(f=>f.id),...base.interpretations.flatMap(r=>r.evidenceIds),...base.questions.flatMap(r=>r.evidenceIds),...hypotheses.flatMap(h=>[...h.evidenceIds,...h.counterEvidenceIds])]);
  return {headline:base.headline,interpretations:base.interpretations,questions:base.questions,reviews,relations,hypotheses,followUps,warnings:unique(warnings),basis:Object.fromEntries(ids.map(id=>[id,Intelligence.fingerprint(facts.get(id))]))};
 }
-export async function generateResearch(desk,{key,backend,previous={},articles=[],fetchImpl=fetch,now=Date.now(),input=researchInput(desk,previous,articles,now)}={}){
+export async function readResearchConfig(backend){
+ const response=await fetch(new URL('/runner/config',backend.url),{
+  headers:{Authorization:'Bearer '+backend.token},redirect:'error',signal:AbortSignal.timeout(15000)
+ });
+ if(!response.ok)throw Error('MODEL_HTTP_'+response.status);
+ const configuration=await response.json();
+ if(!Number.isSafeInteger(configuration?.revision)||configuration.revision<0)throw Error('MODEL_INVALID_RECEIPT');
+ return configuration;
+}
+export async function generateResearch(desk,{key,backend,expectedRevision,previous={},articles=[],fetchImpl=fetch,now=Date.now(),input=researchInput(desk,previous,articles,now)}={}){
  if(backend){
-  const body={input},response=await fetchImpl(new URL('/runner/research',backend.url),{
+  const {pendingIds, ...evidence}=input;
+  const body={input:evidence,...(expectedRevision===undefined?{}:{expectedRevision})},response=await fetchImpl(new URL('/runner/research',backend.url),{
    method:'POST',redirect:'error',headers:{'Content-Type':'application/json',Authorization:'Bearer '+backend.token},
-   body:JSON.stringify(body),signal:AbortSignal.timeout(145_000)
+   body:JSON.stringify(body),signal:AbortSignal.timeout(270_000)
   });
   let reply;try{reply=await response.json();}catch{throw Error('MODEL_HTTP_'+response.status);}
   if(!response.ok)throw Error(/^(?:MODEL|CODEX)_[A-Z0-9_]{2,58}$/.test(reply?.error)?reply.error:'MODEL_HTTP_'+response.status);
+  if(expectedRevision!==undefined&&reply.revision!==expectedRevision)throw Error('MODEL_REVISION_CONFLICT');
   if(!Intelligence.validModel(reply?.model)||!Intelligence.validModel(reply.provider)||typeof reply.output!=='string'
      ||!Number.isSafeInteger(reply.revision)||reply.revision<0)throw Error('MODEL_INVALID_RECEIPT');
   return finalizeResearch(desk,input,body,reply.output,{model:reply.model,returnedModel:reply.model,provider:reply.provider,

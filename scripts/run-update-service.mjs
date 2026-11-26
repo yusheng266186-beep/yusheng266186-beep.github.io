@@ -1,6 +1,7 @@
 import {readFile,writeFile,readdir,appendFile} from 'node:fs/promises';
 import {execFile,spawn} from 'node:child_process';import {promisify} from 'node:util';
 import {createHash} from 'node:crypto';
+import {join} from 'node:path';
 import {runUpdateWindow,dataPaths} from './update-service.mjs';
 import {dispatchWorkflow} from './actions-api.mjs';
 import {buildHealth} from './pipeline-utils.mjs';
@@ -9,7 +10,9 @@ const run=promisify(execFile),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const git=async(...args)=>(await run('git',args,{maxBuffer:4e6,timeout:90000})).stdout.trim();
 // Reload workflow secrets when the active invocation predates the model backend.
 const digest=async()=>createHash('sha256').update(await readFile('scripts/run-update-service.mjs')).digest('hex');
-const original=await digest(),startedAt=new Date().toISOString(),rounds=Number(process.env.UPDATE_ROUNDS||8);
+const original=await digest(),startedAt=new Date().toISOString(),bulk=process.env.AURUM_REVIEW_BACKLOG==='true';
+const rounds=bulk?30:Number(process.env.UPDATE_ROUNDS||8);
+const backlogFile=bulk?join(process.env.RUNNER_TEMP,'aurum-backlog-'+process.env.GITHUB_RUN_ID+'.json'):'';
 const json=async p=>{try{return JSON.parse(await readFile(p,'utf8'));}catch{return {};}};
 async function collect(env){
  await new Promise((resolve,reject)=>{
@@ -28,13 +31,13 @@ async function publish(paths){
   catch(error){if(attempt===2)throw error;try{await git('pull','--rebase','origin','main');}catch{try{await git('rebase','--abort');}catch{}throw Error('Concurrent data edit; leaving remote data intact and restarting from main');}}
  }
 }
-const results=await runUpdateWindow({rounds,continueService:process.env.CONTINUE_SERVICE!=='false',sleep,
+const results=await runUpdateWindow({rounds,maxRounds:bulk?30:8,continueService:process.env.CONTINUE_SERVICE!=='false',sleep,
  handoff:async()=>{await dispatchWorkflow('refresh-research.yml');console.log('Successor update window requested.');},
  cycle:async({round,nextAttemptAt})=>{
   await git('fetch','origin','main');await git('merge','--ff-only','origin/main');
   if(await digest()!==original)return {restart:true};
   const paths=dataPaths(await readdir('data')),backup=new Map(await Promise.all(paths.map(async p=>[p,await readFile(p)])));
-  const env={...process.env,AURUM_SOURCE_SHA:await git('rev-parse','HEAD'),AURUM_UPDATE_STARTED_AT:startedAt,AURUM_UPDATE_ROUND:String(round),AURUM_UPDATE_ROUNDS:String(rounds),AURUM_NEXT_ATTEMPT_AT:nextAttemptAt};
+  const env={...process.env,AURUM_BACKLOG_STATE:backlogFile,AURUM_SOURCE_SHA:await git('rev-parse','HEAD'),AURUM_UPDATE_STARTED_AT:startedAt,AURUM_UPDATE_ROUND:String(round),AURUM_UPDATE_ROUNDS:String(rounds),AURUM_NEXT_ATTEMPT_AT:nextAttemptAt};
   if(round>1)for(const key of ['FORCE_HISTORY','FORCE_COMPONENTS','FORCE_ANALYSIS_AI'])env[key]='false';
   let failure=null;
   try{await collect(env);}catch(error){
@@ -55,8 +58,15 @@ const results=await runUpdateWindow({rounds,continueService:process.env.CONTINUE
   if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,`\nRound ${round}: ${h.status}, collected ${h.generatedAt}, news checked ${h.news?.checkedAt}, quote ${h.quote?.asOf}. Pages requested.\n`);
   if(failure)throw failure;
   if(h.status==='failed')throw Error('Critical collector failure; dated recovery receipt published');
-  return {status:h.status,completedAt:h.generatedAt,continueImmediately:analysis.aiPolicy?.continueImmediately===true};
+  const progress=bulk&&analysis.aiPolicy?.lastBulkReview?.runId===process.env.GITHUB_RUN_ID?analysis.aiPolicy.lastBulkReview:null;
+  if(progress)console.log(JSON.stringify({backlog:progress}));
+  return {status:h.status,completedAt:h.generatedAt,continueImmediately:analysis.aiPolicy?.continueImmediately===true,
+   ...(progress?{done:progress.remaining===0||progress.status==='blocked',backlog:progress}:{})};
  }
 });
 console.log(JSON.stringify({rounds:results}));
 if(results.length&&results.every(r=>!r.ok))process.exitCode=1;
+if(bulk){
+ const progress=results.findLast(r=>r.backlog)?.backlog;
+ if(!progress||progress.remaining>0)process.exitCode=1;
+}

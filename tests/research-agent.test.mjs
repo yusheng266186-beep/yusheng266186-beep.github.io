@@ -54,7 +54,8 @@ test('cloud-selected model attribution survives research validation and re-use',
   fetchImpl:async(url,options)=>{
    assert.equal(url.href,'https://backend.example/runner/research');
    assert.equal(options.headers.Authorization,'Bearer runner-fixture');
-   assert.deepEqual(JSON.parse(options.body),{input:JSON.parse(JSON.stringify(request))});
+   const {pendingIds,...input}=request;
+   assert.deepEqual(JSON.parse(options.body),{input:JSON.parse(JSON.stringify(input))});
    return Response.json({model,provider,reasoningEffort:'max',revision:7,output:JSON.stringify(reply(request)),usage:{input:100,output:200}});
   }
  });

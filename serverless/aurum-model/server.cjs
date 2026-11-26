@@ -109,18 +109,22 @@ async function handle(req, res) {
     return send(res, 403, {error: 'ORIGIN_NOT_ALLOWED'});
   }
   const path = new URL(req.url, 'http://localhost').pathname;
-  if (!['/admin/state', '/admin/switch', '/admin/test', '/runner/research'].includes(path)) return send(res, 404, {error: 'NOT_FOUND'});
+  if (!['/admin/state', '/admin/switch', '/admin/test', '/runner/config', '/runner/research'].includes(path)) return send(res, 404, {error: 'NOT_FOUND'});
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
     return send(res, 204, null);
   }
-  const runner = path === '/runner/research';
+  const runner = path.startsWith('/runner/');
   const digest = runner ? env.AURUM_RUNNER_DIGEST : env.AURUM_ADMIN_DIGEST;
   const secret = /^Bearer ([A-Za-z0-9_-]{25,128})$/.exec(req.headers.authorization || '')?.[1];
   if (!checkedKey(secret, digest)) return send(res, 401, {error: 'AUTH_REQUIRED'});
   if (path === '/admin/state' && req.method === 'GET') return send(res, 200, await state());
-  if (path === '/admin/state' || req.method !== 'POST') return send(res, 405, {error: 'METHOD_NOT_ALLOWED'});
+  if (path === '/runner/config' && req.method === 'GET') {
+    const {revision, selection} = await current();
+    return send(res, 200, {...modelInfo(await resolveGeneration(selection)), revision});
+  }
+  if (path === '/admin/state' || path === '/runner/config' || req.method !== 'POST') return send(res, 405, {error: 'METHOD_NOT_ALLOWED'});
 
   const disconnected = new AbortController();
   res.once('close', () => disconnected.abort());
@@ -133,7 +137,8 @@ async function handle(req, res) {
     if (!await store.create(revisionKey(next.revision), next)) throw problem('REVISION_CONFLICT', 409);
     return send(res, 200, next);
   }
-  const signal = AbortSignal.any([disconnected.signal, AbortSignal.timeout(runner ? 135_000 : 66_000)]);
+  const deadline = AbortSignal.timeout(runner ? 260_000 : 66_000);
+  const signal = AbortSignal.any([disconnected.signal, deadline]);
   if (path === '/admin/test') {
     const generation = await resolveGeneration(body.selection);
     const started = Date.now(), response = await complete(probePrompt, generation, signal, true);
@@ -143,10 +148,18 @@ async function handle(req, res) {
     return send(res, 200, {...modelInfo(generation), latencyMs: Date.now() - started});
   }
   if (!object(body.input) || !Array.isArray(body.input.evidence) || !body.input.evidence.length || body.input.evidence.length > 60) throw problem('EVIDENCE_INVALID');
-  const {SYSTEM} = await import('./research-prompt.mjs');
+  const {SYSTEM, BULK_SYSTEM} = await import('./research-prompt.mjs');
   const {selection, revision} = await current();
+  if (body.expectedRevision !== undefined && body.expectedRevision !== revision) throw problem('MODEL_REVISION_CONFLICT', 409);
   const generation = await resolveGeneration(selection);
-  const response = await complete({system: SYSTEM, input: body.input, outputFormat: 'html'}, generation, signal);
+  const system = body.expectedRevision === undefined ? SYSTEM : BULK_SYSTEM;
+  let response;
+  try {
+    response = await complete({system, input: body.input, outputFormat: 'html'}, generation, signal);
+  } catch (error) {
+    if (deadline.aborted) throw problem('MODEL_UPSTREAM_TIMEOUT', 504);
+    throw error;
+  }
   if (typeof response.output !== 'string' || !response.output.trim() || response.output.length > 160_000) throw problem('MODEL_INCOMPLETE', 502);
   const usage = Object.fromEntries(['input', 'output', 'thinking'].map(key => [key, Number(response.usage?.[key]) || 0]));
   return send(res, 200, {...modelInfo(generation), revision, output: response.output, usage});

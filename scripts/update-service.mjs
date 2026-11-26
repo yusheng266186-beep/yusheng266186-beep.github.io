@@ -1,10 +1,10 @@
 // The runner is finite; one concurrency group and an explicit successor keep it alive.
-export async function runUpdateWindow({cycle,handoff,sleep,now=Date.now,rounds=8,intervalMs=300000,continueService=true}) {
- if(!Number.isInteger(rounds)||rounds<1||rounds>8||intervalMs<300000)throw Error('Invalid update window');
+export async function runUpdateWindow({cycle,handoff,sleep,now=Date.now,rounds=8,maxRounds=8,intervalMs=300000,continueService=true}) {
+ if(!Number.isInteger(rounds)||rounds<1||rounds>maxRounds||intervalMs<300000)throw Error('Invalid update window');
  const results=[];let failures=0;
  for(let round=1;round<=rounds;round++){
   const started=now();let continuing=false;
-  try{const result=await cycle({round,rounds,nextAttemptAt:new Date(started+intervalMs).toISOString()});results.push({round,ok:true,...result});failures=0;continuing=result?.continueImmediately===true;if(result?.restart)break;}
+  try{const result=await cycle({round,rounds,nextAttemptAt:new Date(started+intervalMs).toISOString()});results.push({round,ok:true,...result});failures=0;continuing=result?.continueImmediately===true;if(result?.restart||result?.done)break;}
   catch(error){results.push({round,ok:false,error:String(error.message).slice(0,250)});failures++;}
   if(round===rounds||failures>=2)break;
   await sleep(continuing?0:Math.max(0,intervalMs-(now()-started)));

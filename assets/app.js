@@ -5,7 +5,7 @@
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
   var RELEASE_VERSION = "5.3.8";
-  var FORECAST_METHOD = "c301969da24df97803ceb07734121efd696d101f515b351c534d86204ecc946d";
+  var FORECAST_METHOD = "4330c02e2cdaa254ec1a86923004150702da502146af1adad11b95c5db90ec5d";
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;

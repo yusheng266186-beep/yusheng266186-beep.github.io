@@ -26,6 +26,10 @@ on:
         description: Refresh interpretation in the next eligible half-hour window
         type: boolean
         default: false
+      review_backlog:
+        description: Review the current news backlog as one bounded batch job
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       rounds:
@@ -53,7 +57,7 @@ jobs:
   refresh:
     if: vars.AURUM_UPDATES_PAUSED != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: ${{ inputs.review_backlog && 180 || 55 }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,6 +73,7 @@ jobs:
           CONTINUE_SERVICE: ${{ github.event_name == 'schedule' || inputs.continue_service }}
           FORCE_HISTORY: ${{ inputs.force_history || false }}
           FORCE_COMPONENTS: ${{ inputs.force_components || false }}
+          AURUM_REVIEW_BACKLOG: ${{ github.event_name == 'workflow_dispatch' && inputs.review_backlog || false }}
           FORCE_ANALYSIS_AI: ${{ inputs.force_analysis_ai || false }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           AURUM_MODEL_ENDPOINT: ${{ vars.AURUM_MODEL_ENDPOINT }}
