@@ -3,7 +3,7 @@
   "marketRegion": "CN",
   "unit": "CNY/g",
   "primaryContract": "AU9999",
-  "priceCnyGram": 766.8,
+  "priceCnyGram": 764,
   "observed": {
     "previous": true,
     "open": true,
@@ -11,53 +11,55 @@
     "changeAmount": true,
     "change": true,
     "volume": true,
-    "turnover": false
+    "turnover": true
   },
   "previousCnyGram": 765.82,
   "openCnyGram": 767.9,
   "highCnyGram": 768,
-  "lowCnyGram": 765.1,
-  "changeCnyGram": 0.9799999999999045,
-  "changePct": 0.04,
-  "volume": 3668,
-  "turnover": 0,
-  "asOf": "2026-11-26T12:58:01.000Z",
-  "source": "新浪财经 SGE_AU9999 国内行情（上金所）",
-  "sourceUrl": "https://finance.sina.com.cn/futures/quotes/SGE_AU9999.shtml",
+  "lowCnyGram": 764,
+  "changeCnyGram": -1.82,
+  "changePct": -0.24,
+  "volume": 4094,
+  "turnover": 31349537,
+  "asOf": "2026-11-26T13:04:58.000Z",
+  "source": "东方财富 AU9999 国内行情（上金所）",
+  "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "新浪上金所公开行情；与其他来源并发核对，按报价时点选择",
+  "delay": "国内公开行情刷新；非交易终端逐笔行情",
   "dataTier": "domestic-live",
   "contracts": [
     {
       "symbol": "AU9999",
       "name": "黄金9999",
-      "exchangeName": "Au99.99",
-      "latest": 766.8,
+      "latest": 764,
       "high": 768,
-      "low": 765.1,
+      "low": 764,
       "open": 767.9,
       "previousClose": 765.82,
-      "change": 0.9799999999999045,
-      "changePct": 0.04,
-      "volume": 3668,
-      "turnover": null,
-      "asOf": "2026-11-26T12:58:01.000Z"
+      "change": -1.82,
+      "changePct": -0.24,
+      "volume": 4094,
+      "turnover": 31349537,
+      "insideVolume": 3136,
+      "amplitudePct": 0.04,
+      "asOf": "2026-11-26T13:04:58.000Z"
     },
     {
       "symbol": "AUTD",
       "name": "黄金T+D",
-      "exchangeName": "Au(T+D)",
-      "latest": 764.59,
+      "latest": 764,
       "high": 767,
-      "low": 764.59,
+      "low": 764,
       "open": 766.52,
       "previousClose": 765.78,
-      "change": -1.1899999999999409,
-      "changePct": -0.16,
-      "volume": 210,
-      "turnover": null,
-      "asOf": "2026-11-26T12:59:33.000Z"
+      "change": 0.82,
+      "changePct": 0.11,
+      "volume": 392,
+      "turnover": 300041520,
+      "insideVolume": 118,
+      "amplitudePct": 0.06,
+      "asOf": "2026-11-26T13:05:01.000Z"
     }
   ],
   "fetchedAt": null,
@@ -65,35 +67,37 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-26T12:59:50.315Z",
-  "lastSuccessAt": "2026-11-26T12:59:50.315Z",
+  "checkedAt": "2026-11-26T13:05:03.460Z",
+  "lastSuccessAt": "2026-11-26T13:05:03.460Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "checkedAt": "2026-11-26T12:59:45.768Z",
-      "lastSuccessAt": "2026-11-26T12:44:45.460Z",
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "checkedAt": "2026-11-26T13:05:01.102Z",
+      "lastSuccessAt": "2026-11-26T13:05:01.102Z",
+      "kind": "quote",
+      "asOf": "2026-11-26T13:04:58.000Z",
+      "latencyMs": 2358
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-26T12:59:45.768Z",
-      "lastSuccessAt": "2026-11-26T12:59:45.768Z",
+      "checkedAt": "2026-11-26T13:05:01.102Z",
+      "lastSuccessAt": "2026-11-26T13:05:01.102Z",
       "kind": "quote",
-      "asOf": "2026-11-26T12:58:01.000Z",
-      "latencyMs": 655
+      "asOf": "2026-11-26T13:04:57.000Z",
+      "latencyMs": 1193
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-26T12:59:45.768Z",
-      "lastSuccessAt": "2026-11-26T12:59:45.768Z",
+      "checkedAt": "2026-11-26T13:05:01.102Z",
+      "lastSuccessAt": "2026-11-26T13:05:01.102Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-26",
-      "latencyMs": 4470
+      "latencyMs": 2049
     }
   ],
   "officialReference": {
@@ -125,17 +129,17 @@
       "turnover": false
     }
   },
-  "collectionMs": 4548,
+  "collectionMs": 2359,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 3593.10009765625,
+    "priceUsdOz": 3591.300048828125,
     "previousUsdOz": 3535.800048828125,
     "priceCnyGram": null,
-    "asOf": "2026-11-26T12:49:42.000Z",
+    "asOf": "2026-11-26T12:54:51.000Z",
     "source": "Yahoo Finance GC=F delayed futures reference",
     "delay": "international delayed reference"
   }
