@@ -67,35 +67,37 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-26T10:10:48.564Z",
-  "lastSuccessAt": "2026-11-26T10:10:48.564Z",
+  "checkedAt": "2026-11-26T10:11:39.260Z",
+  "lastSuccessAt": "2026-11-26T10:11:39.260Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": false,
-      "checkedAt": "2026-11-26T10:10:46.511Z",
-      "lastSuccessAt": "2026-11-26T09:35:46.032Z",
-      "error": "Eastmoney did not return a valid AU9999 quote"
+      "ok": true,
+      "checkedAt": "2026-11-26T10:11:37.189Z",
+      "lastSuccessAt": "2026-11-26T10:11:37.189Z",
+      "kind": "quote",
+      "asOf": "2026-11-26T07:45:00.000Z",
+      "latencyMs": 2070
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-26T10:10:46.511Z",
-      "lastSuccessAt": "2026-11-26T10:10:46.511Z",
+      "checkedAt": "2026-11-26T10:11:37.189Z",
+      "lastSuccessAt": "2026-11-26T10:11:37.189Z",
       "kind": "quote",
       "asOf": "2026-11-26T07:29:59.000Z",
-      "latencyMs": 1938
+      "latencyMs": 778
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-26T10:10:46.511Z",
-      "lastSuccessAt": "2026-11-26T10:10:46.511Z",
+      "checkedAt": "2026-11-26T10:11:37.189Z",
+      "lastSuccessAt": "2026-11-26T10:11:37.189Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-26",
-      "latencyMs": 1968
+      "latencyMs": 1385
     }
   ],
   "officialReference": {
@@ -127,17 +129,17 @@
       "turnover": false
     }
   },
-  "collectionMs": 2053,
+  "collectionMs": 2071,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
   "internationalReference": {
     "market": "COMEX",
     "symbol": "GC=F",
-    "priceUsdOz": 3600.199951171875,
+    "priceUsdOz": 3599.800048828125,
     "previousUsdOz": 3535.800048828125,
     "priceCnyGram": null,
-    "asOf": "2026-11-26T10:00:44.000Z",
+    "asOf": "2026-11-26T10:01:22.000Z",
     "source": "Yahoo Finance GC=F delayed futures reference",
     "delay": "international delayed reference"
   }
