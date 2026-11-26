@@ -1,5 +1,5 @@
 // One policy for automatic calls, manual refreshes, queue sizing, and public receipts.
-export const RESEARCH_POLICY=Object.freeze({trigger:'half-hour-window',minimumIntervalMinutes:30,catchUpIntervalMinutes:30,maxCallsPerDay:null,maxCallsPerCycle:1,newItemsPerCall:8,freshItemsPerCall:4,contextItemsPerCall:2});
+export const RESEARCH_POLICY=Object.freeze({trigger:'half-hour-window',minimumIntervalMinutes:30,catchUpIntervalMinutes:30,maxCallsPerDay:null,maxCallsPerCycle:1,newItemsPerCall:10,freshItemsPerCall:5,contextItemsPerCall:2});
 export function decision({desk,previous,usage,now=Date.now(),configured=false,backlog=0,force=false}){
  const intervalMinutes=RESEARCH_POLICY.minimumIntervalMinutes,day=new Date(now+8*3600000).toISOString().slice(0,10),times=(Array.isArray(usage?.attempts)?usage.attempts:[]).map(a=>Date.parse(a.startedAt)).filter(Number.isFinite),latest=times.length?Math.max(...times):null,eligible=latest===null?now:latest+intervalMinutes*60000,base={call:false,day,intervalMinutes,nextEligibleAt:new Date(Math.max(now,eligible)).toISOString()};
  if(!desk.ready)return {...base,nextEligibleAt:null,reason:'价格资料不足'};

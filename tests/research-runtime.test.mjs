@@ -24,14 +24,14 @@ globalThis.fetch=async(url,options)=>{
 };\n`);
   const run=(time,extra={})=>exec(process.execPath,['--import',pathToFileURL(preload).href,script],{cwd:dir,env:{...process.env,GITHUB_ACTIONS:'true',AURUM_MODEL_ENDPOINT:'https://fixture-model.example',AURUM_MODEL_RUNNER_KEY:'isolated-fixture-key',AURUM_ANALYSIS_DEADLINE:'',FIXTURE_NOW:String(time),...extra},timeout:10000});
   await run(now);let desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));
-  assert.equal(desk.aiPolicy.maxCallsPerDay,null);assert.equal(desk.aiPolicy.minimumIntervalMinutes,30);assert.equal(desk.aiPolicy.usedToday,251);assert.equal(desk.aiPolicy.pendingItems,16);assert.equal(desk.aiPolicy.queue.callsMade,1);assert.equal(desk.aiPolicy.queue.completedItems,8);assert.equal(desk.intelligence.stats.reviewed,8);assert.equal(desk.aiPolicy.continueImmediately,false);assert.equal(desk.aiPolicy.activeIntervalMinutes,30);
+  assert.equal(desk.aiPolicy.maxCallsPerDay,null);assert.equal(desk.aiPolicy.minimumIntervalMinutes,30);assert.equal(desk.aiPolicy.usedToday,251);assert.equal(desk.aiPolicy.pendingItems,14);assert.equal(desk.aiPolicy.queue.callsMade,1);assert.equal(desk.aiPolicy.queue.completedItems,10);assert.equal(desk.intelligence.stats.reviewed,10);assert.equal(desk.aiPolicy.continueImmediately,false);assert.equal(desk.aiPolicy.activeIntervalMinutes,30);
   assert.equal(desk.narration.model,'gpt-6.1-terra');assert.equal(desk.narration.reasoningEffort,'max');
   assert.equal(desk.aiPolicy.nextEligibleAt,new Date(now+30*60000).toISOString());
-  await run(now+5*60000);desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));assert.equal(desk.aiPolicy.queue.callsMade,0);assert.equal(desk.aiPolicy.usedToday,251);assert.equal(desk.aiPolicy.pendingItems,16);
-  await run(now+30*60000);desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));assert.equal(desk.aiPolicy.queue.callsMade,1);assert.equal(desk.aiPolicy.usedToday,252);assert.equal(desk.aiPolicy.pendingItems,8);
+  await run(now+5*60000);desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));assert.equal(desk.aiPolicy.queue.callsMade,0);assert.equal(desk.aiPolicy.usedToday,251);assert.equal(desk.aiPolicy.pendingItems,14);
+  await run(now+30*60000);desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));assert.equal(desk.aiPolicy.queue.callsMade,1);assert.equal(desk.aiPolicy.usedToday,252);assert.equal(desk.aiPolicy.pendingItems,4);
   await run(now+60*60000);desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));assert.equal(desk.aiPolicy.queue.callsMade,1);assert.equal(desk.aiPolicy.pendingItems,0);assert.equal(desk.intelligence.stats.reviewed,24);
   await run(now+90*60000);desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));assert.equal(desk.aiPolicy.queue.callsMade,0);
-  const calls=(await readFile(join(dir,'model-calls.ndjson'),'utf8')).trim().split('\n').map(JSON.parse);assert.deepEqual(calls.map(c=>c.workIds.length),[8,8,8]);assert.ok(calls.every(c=>c.submitted<=10));
+  const calls=(await readFile(join(dir,'model-calls.ndjson'),'utf8')).trim().split('\n').map(JSON.parse);assert.deepEqual(calls.map(c=>c.workIds.length),[10,10,4]);assert.ok(calls.every(c=>c.submitted<=12));
 
   const bulkTime=now+61*60000;
   input.news.items.push(...Array.from({length:16},(_,i)=>({title:'黄金市场待补审报道片段第'+i+'条',
@@ -44,8 +44,8 @@ globalThis.fetch=async(url,options)=>{
   const receipt=desk.aiPolicy.lastBulkReview;
   assert.deepEqual([receipt.status,receipt.total,receipt.reviewed,receipt.remaining,receipt.attempts],['completed',16,16,0,2]);
   const afterBulk=(await readFile(join(dir,'model-calls.ndjson'),'utf8')).trim().split('\n').map(JSON.parse);
-  assert.deepEqual(afterBulk.map(c=>c.workIds.length),[8,8,8,12,4]);
-  assert.ok(afterBulk.slice(-2).every(c=>c.submitted<=14));
+  assert.deepEqual(afterBulk.map(c=>c.workIds.length),[10,10,4,10,6]);
+  assert.ok(afterBulk.slice(-2).every(c=>c.submitted<=12));
   await run(bulkTime+60000);
   desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));
   assert.equal(desk.aiPolicy.queue.callsMade,0);

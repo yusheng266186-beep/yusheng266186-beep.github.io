@@ -1,10 +1,10 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {drainResearchQueue} from '../scripts/research-queue.mjs';
 import {RESEARCH_POLICY} from '../scripts/research-policy.mjs';
-function fixture(count){
+function fixture(count,batchSize=8){
  const remaining=new Set(Array.from({length:count},(_,i)=>'N-'+i)),starts=[],sizes=[];let time=0;
  return {remaining,starts,sizes,options:{now:()=>time,
-  buildInput:excluded=>({backlog:remaining.size,workIds:[...remaining].filter(id=>!excluded.includes(id)).slice(0,8)}),
+  buildInput:excluded=>({backlog:remaining.size,workIds:[...remaining].filter(id=>!excluded.includes(id)).slice(0,batchSize)}),
   run:async input=>{starts.push(time);sizes.push(input.workIds.length);time+=1000;return {reviews:Object.fromEntries(input.workIds.map(id=>[id,{factor:{dimension:'none'}}]))};},
   onResult:async result=>Object.keys(result.reviews).forEach(id=>remaining.delete(id)),onError:async error=>{throw error;}
  }};
@@ -29,6 +29,6 @@ test('checkpointed progress survives finite runner handoff without imposing a ca
 });
 
 test('half-hour policy makes one paid call and preserves the rest of a large queue',async()=>{
- const f=fixture(25),result=await drainResearchQueue({...f.options,maxCalls:RESEARCH_POLICY.maxCallsPerCycle});
- assert.equal(result.callsMade,1);assert.equal(result.completedItems,8);assert.equal(result.stopReason,'batch-limit');assert.equal(f.remaining.size,17);assert.deepEqual(f.starts,[0]);
+ const f=fixture(25,RESEARCH_POLICY.newItemsPerCall),result=await drainResearchQueue({...f.options,maxCalls:RESEARCH_POLICY.maxCallsPerCycle});
+ assert.equal(result.callsMade,1);assert.equal(result.completedItems,10);assert.equal(result.stopReason,'batch-limit');assert.equal(f.remaining.size,15);assert.deepEqual(f.starts,[0]);
 });

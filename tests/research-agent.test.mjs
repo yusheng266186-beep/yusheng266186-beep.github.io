@@ -18,8 +18,8 @@ test('bounded news batches serve fresh and oldest waiting items, then drain with
  let intel={version:VERSION,reviews:{},relations:[]};const handled=new Set();
  for(let round=0;round<3;round++){
   const input=researchInput(desk,intel,[],now),events=input.evidence.filter(f=>f.type==='event'),fresh=events.filter(f=>!intel.reviews[f.id]);
-  assert.equal(input.backlog,24-round*8);assert.equal(fresh.length,8);assert.ok(events.length<=10);
-  if(!round){assert.deepEqual(new Set(fresh.map(f=>f.id)),new Set([0,1,2,3,20,21,22,23].map(i=>'N-queue-'+i)));}
+  assert.equal(input.backlog,24-round*10);assert.equal(fresh.length,Math.min(10,input.backlog));assert.ok(events.length<=12);
+  if(!round){assert.deepEqual(new Set(fresh.map(f=>f.id)),new Set([0,1,2,3,4,19,20,21,22,23].map(i=>'N-queue-'+i)));}
   for(const f of fresh){assert.ok(!handled.has(f.id));handled.add(f.id);}
   const out=validateResearch(reply(input),input,desk,now);intel={...intel,reviews:{...intel.reviews,...out.reviews}};
  }

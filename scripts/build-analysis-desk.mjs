@@ -23,7 +23,7 @@ let bulk=backlogFile?await json(backlogFile):null;
 if(backlogFile&&!bulk&&work&&backend){
  const configuration=await readResearchConfig(backend);
  bulk={runId:process.env.GITHUB_RUN_ID,startedAt:new Date(now).toISOString(),targetIds:work.pendingIds,configuration,
-  batchSize:12,failures:0,attempts:0,status:'running'};
+  batchSize:RESEARCH_POLICY.newItemsPerCall,failures:0,attempts:0,status:'running'};
  await save(backlogFile,bulk);
 }
 const bulkOptions=()=>bulk?{targetIds:bulk.targetIds,batchSize:bulk.batchSize}:{};
