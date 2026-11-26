@@ -4,12 +4,14 @@
   var Core = window.AurumCore;
   var Quant = window.AurumResearchEngine;
   var Evidence = window.AurumEvidence;
-  var RELEASE_VERSION = "5.3.12";
+  var SiteData = window.AurumSiteData;
+  var RELEASE_VERSION = "5.4.0";
   var FORECAST_METHOD = "55c73e612f24ef925ffbb3c3565e0094961b28874c760ae50c5cb9a3c8c98e38";
   var portfolioSignature = null;
   var storageNotice = "";
   var portfolioReadFailed = false;
   var DATA = window.__AURUM_DATA__ || {};
+  var loadedSections = new Map(), inflightSections = new Map();
   var CONFIG_KEY = "aurum-os-config-v5";
   var PORTFOLIO_KEY = "aurum-os-portfolio-v3";
   var DEFAULT_CONFIG = {
@@ -228,34 +230,124 @@
   }
 
   async function loadStaticData() {
-    if (location.protocol === "file:") return;
-    var stamp = Date.now();
-    var settled = await Promise.allSettled([
-      fetchJson("data/market-snapshot.json?_=" + stamp),
-      fetchJson("data/research-bundle.json?_=" + stamp)
-    ]);
-    if (settled[0].status === "fulfilled") adoptPublishedMarket(settled[0].value);
-    if (settled[1].status === "fulfilled") {try{adoptResearchBundle(settled[1].value);}catch(error){state.researchFailures=[0,1,2,3];}}
-    state.lastResearchAt=Date.now();
+    if (location.protocol !== "file:") {
+      await refreshResearchData(true);
+      return;
+    }
+    await new Promise(function (resolve) {
+      var script = document.createElement("script");
+      script.src = "data/embedded-data.js?v=" + RELEASE_VERSION;
+      script.onload = script.onerror = resolve;
+      document.head.append(script);
+    });
+    DATA = window.__AURUM_DATA__ || {};
+    if (DATA.history && DATA.news && DATA.research && DATA.ledger) {
+      state.fullHistory = true;
+      adoptResearchBundle({schema: 1, ...DATA});
+      renderForecastStudy();
+    }
+  }
+
+  function adoptSiteSnapshot(snapshot) {
+    if (!SiteData.valid(snapshot)) throw Error("新版站点快照未通过结构校验");
+    if (state.siteSnapshot && Date.parse(snapshot.generatedAt) <= Date.parse(state.siteSnapshot.generatedAt)) return false;
+    state.siteSnapshot = snapshot;
+    adoptPipelineHealth(snapshot.health);
+    if (snapshot.market) {
+      adoptPublishedMarket(snapshot.market);
+      DATA.market = state.publishedMarket;
+    }
+    if (!state.fullHistory) state.history = normalizeHistory(snapshot.history);
+    if (snapshot.newsStatus) {
+      state.news = {...normalizeNews(snapshot.newsStatus), items: state.news.items};
+    }
+    return true;
+  }
+
+  function getSection(name, record) {
+    var active = inflightSections.get(name);
+    if (active?.version === record.version) return active.task;
+    var task = (async function () {
+      var response = await fetch("data/" + SiteData.files[name] + "?rev=" + record.sha256.slice(0, 24), {cache:"no-cache", signal:AbortSignal.timeout(15000)});
+      if (!response.ok) throw Error("HTTP " + response.status);
+      return SiteData.decodeResource(await response.arrayBuffer(), record.sha256);
+    })();
+    inflightSections.set(name, {version: record.version, task: task});
+    task.finally(function () {if (inflightSections.get(name)?.task === task) inflightSections.delete(name);}).catch(function () {});
+    return task;
+  }
+
+  function applySection(name, value) {
+    if (name === "history" && Array.isArray(value?.daily)) {
+      var next = normalizeHistory(value);
+      if (next.daily.length < 120) return false;
+      state.history = next;
+      state.fullHistory = true;
+    } else if (name === "news" && Array.isArray(value?.items)) {
+      var news = normalizeNews(value);
+      state.news = state.siteSnapshot.newsStatus ? {...normalizeNews(state.siteSnapshot.newsStatus), items: news.items} : news;
+    } else if (name === "research" && Array.isArray(value?.snapshots)) state.research = value;
+    else if (name === "ledger" && Array.isArray(value?.entries)) state.ledger = value;
+    else if (name === "publication" && window.AurumPublication.valid(value, FORECAST_METHOD)) state.publication = value;
+    else if (name === "analysisDesk" && value?.schema === 1 && value.engine === window.AurumAnalysis.version) state.analysisDesk = value;
+    else if (["validation", "modelResearch", "systemValidation", "studyEvaluation", "studyStatus"].includes(name) && value && typeof value === "object") DATA[name] = value;
+    else return false;
+    return true;
+  }
+
+  async function loadChapterData() {
+    var snapshot = state.siteSnapshot;
+    if (!snapshot) return {changed: false, failed: []};
+    var chapter = document.body.dataset.chapter;
+    var names = SiteData.forChapter(chapter, {reports: chapter === "forecast" && $("forecastDetails").open || chapter === "intelligence" && $("forecastResearchArchive").open,
+      study: chapter === "forecast" && $("forecastStudy").open});
+    var requests = names.map(function (name) {return [name, snapshot.resources[name]];}).filter(function ([name, record]) {return record && loadedSections.get(name) !== record.version;});
+    var results = await Promise.allSettled(requests.map(function ([name, record]) {return getSection(name, record);}));
+    var changed = false, failed = [];
+    results.forEach(function (result, index) {
+      var [name, record] = requests[index];
+      if (state.siteSnapshot.resources[name]?.version !== record.version || loadedSections.get(name) === record.version) return;
+      if (result.status === "fulfilled" && applySection(name, result.value)) {loadedSections.set(name, record.version); changed = true;}
+      else failed.push(name);
+    });
+    return {changed: changed, failed: failed};
+  }
+
+  function sectionIsCurrent(name) {
+    var descriptor = state.siteSnapshot?.resources[name];
+    return !!descriptor && loadedSections.get(name) === descriptor.version;
+  }
+
+  function redrawPublishedData() {
+    syncDynamicFactors();
+    buildForecasts();
+    renderAll();
+    renderForecastStudy();
+  }
+
+  async function revealChapterData() {
+    if (!state.siteSnapshot) return refreshResearchData(true);
+    var details = await loadChapterData();
+    if (details.changed) redrawPublishedData();
+    if (details.failed.length) {
+      state.researchFailures = details.failed;
+      renderResearchHealth();
+    }
   }
 
   async function refreshResearchData(force) {
     var delay=Math.min(300000,60000*Math.pow(2,Math.min(3,state.researchFailureCount||0)));
-    if(state.researchRefreshing || document.hidden || navigator.onLine===false || (!force && Date.now()-(state.lastResearchAt||0)<delay))return;
+    if(location.protocol==="file:" || state.researchRefreshing || document.hidden || navigator.onLine===false || (!force && Date.now()-(state.lastResearchAt||0)<delay))return;
     state.researchRefreshing=true;state.lastResearchAt=Date.now();
     renderResearchHealth();
     try {
-      var results=await Promise.allSettled(["data/research-bundle.json","data/pipeline-health.json"].map(async function(url){
-        var response=await fetch(url+"?_="+Math.floor(Date.now()/60000),{cache:"no-cache",signal:AbortSignal.timeout(12000)});
-        if(!response.ok)throw Error("HTTP "+response.status);return response.json();
-      }));
-      state.researchFailures=results[0].status==='rejected'?[0,1,2,3]:[];
-      var changed=results[0].status==='fulfilled'?adoptResearchBundle(results[0].value):false;
-      if(results[0].status==='rejected')state.researchFailureCount=(state.researchFailureCount||0)+1;
-      else{state.researchFailureCount=0;state.lastResearchCheckedAt=new Date().toISOString();}
-      if(results[1].status==='fulfilled')adoptPipelineHealth(results[1].value);
-      if(changed) {syncDynamicFactors();buildForecasts();renderAll();}
-      renderIntelligence();
+      var changed = adoptSiteSnapshot(await fetchJson("data/site-snapshot.json?_=" + Math.floor(Date.now()/60000)));
+      state.lastResearchCheckedAt = new Date().toISOString();
+      if (changed) redrawPublishedData();
+      var details = await loadChapterData();
+      state.researchFailures = details.failed;
+      state.researchFailureCount = details.failed.length ? (state.researchFailureCount||0)+1 : 0;
+      if (details.changed) redrawPublishedData();
     } catch(error) {state.researchFailures=[0,1,2,3];state.researchFailureCount=(state.researchFailureCount||0)+1;renderIntelligence();}
     finally {state.researchRefreshing=false;renderResearchHealth();}
   }
@@ -668,15 +760,19 @@
   }
 
   function buildForecasts() {
-    if (state.profileHistory !== state.history.daily || state.profileNews!==state.news.items || state.profileResearch!==state.research.snapshots || state.profilePublication!==state.publication) {
-      state.profileHistory = state.history.daily;state.profileNews=state.news.items;state.profileResearch=state.research.snapshots;state.profilePublication=state.publication;
-      var cached=state.publication,valid=window.AurumPublication.matches(cached,{method:FORECAST_METHOD,history:state.history,news:state.news,research:state.research});
-      var worker=valid?null:predictionWorker();
+    var lean = state.siteSnapshot?.forecast;
+    if (state.profileHistory !== state.history.daily || state.profileNews!==state.news.items || state.profileResearch!==state.research.snapshots || state.profilePublication!==state.publication || state.profileLean!==lean) {
+      state.profileHistory = state.history.daily;state.profileNews=state.news.items;state.profileResearch=state.research.snapshots;state.profilePublication=state.publication;state.profileLean=lean;
+      var cached=state.publication,valid=window.AurumPublication.matches(cached,{method:FORECAST_METHOD,history:state.history,news:state.news,research:state.research})
+        || sectionIsCurrent("publication") && window.AurumPublication.valid(cached,FORECAST_METHOD) && cached.origin===lean?.origin;
+      var compact = SiteData.validProfile(lean,FORECAST_METHOD);
+      var worker=valid||compact||state.history.daily.length<120?null:predictionWorker();
       if(valid){state.profileRequest=(state.profileRequest||0)+1;state.quantProfile=structuredClone(cached.defaultProfile);state.profilePending=false;state.profileBackend=true;}
+      else if(compact){state.profileRequest=(state.profileRequest||0)+1;state.quantProfile=structuredClone(lean.profile);state.profilePending=false;state.profileBackend=true;}
       else if(worker){state.profileBackend=false;state.profileRequest=(state.profileRequest||0)+1;state.quantProfile=state.quantProfile||Quant.profile([]);state.profilePending=true;worker.postMessage({type:"profile",id:state.profileRequest,daily:state.history.daily,evidence:evidenceData()});}
-      else {state.profileBackend=false;state.quantProfile=Quant.profile(state.history.daily,evidenceData());}
+      else {state.profileBackend=false;state.quantProfile=Quant.profile(state.fullHistory?state.history.daily:[],evidenceData());}
     }
-    state.quantProfile.context=Evidence.context(evidenceData());
+    if (location.protocol === "file:" || sectionIsCurrent("news") && sectionIsCurrent("research") && sectionIsCurrent("publication") || !state.profileBackend) state.quantProfile.context=Evidence.context(evidenceData());
     var baselineFactors=dataBaselineFactors();
     var adjustedFactors=baselineFactors.map(function(f){return state.factorOverrides[f.id]?state.factors.find(function(x){return x.id===f.id;}):f;});
     var delta = factorScore(adjustedFactors)-factorScore(baselineFactors);
@@ -684,12 +780,12 @@
     state.forecasts = state.scenarioModel.points;
     state.baselineForecasts = Quant.scenarioModel(state.quote.priceCnyGram, {...state.quantProfile,context:null}, 0).points;
   }
-  function evidenceData(){return {news:state.news.items,snapshots:state.research.snapshots||[],aiNews:state.analysisDesk?.intelligence?.factorSnapshot||state.publication?.newsFactors?.snapshot||{schema:1,version:window.AurumNewsFactors.version,generatedAt:new Date().toISOString(),events:[]}};}
+  function evidenceData(){return {news:state.news.items,snapshots:state.research.snapshots||[],aiNews:state.publication?.newsFactors?.snapshot||state.analysisDesk?.intelligence?.factorSnapshot||{schema:1,version:window.AurumNewsFactors.version,generatedAt:new Date().toISOString(),events:[]}};}
   function predictionWorker(){
     if(state.workerUnavailable||typeof Worker!=="function"||location.protocol==="file:")return null;
     if(state.predictionWorker)return state.predictionWorker;
     try{
-      var worker=new Worker("assets/prediction-worker.js?v=5.3.12");
+      var worker=new Worker("assets/prediction-worker.js?v=5.4.0");
       worker.onmessage=function(event){var data=event.data;if(data.type==="profile"&&data.id===state.profileRequest){
         state.profilePending=false;if(data.error){worker.onerror();return;}state.quantProfile=data.result;buildForecasts();renderAll();
       }else if(data.type==="replay"&&data.id===state.replayRequest){$("runReplay").disabled=false;if(data.error)setText("replayStatus","回放计算未完成，请重新核对输入。");else renderReplayResult(data.result);}};
@@ -995,8 +1091,41 @@
     if(state.quantProfile.context?.active && !(e?.augmentedCount>=6))message+=" 当前外部修正尚无充分前瞻检验，不能据此声称提高了准确率。";
     if(changed)message+=" 当前有手动假设，历史覆盖率不适用于人为平移。";
     setText("auditConclusion",message);
-    $("exportBacktest").disabled=!e?.count;
-    setText("auditWindow", e?.count ? e.records[0].origin+" — "+e.records.at(-1).target+" · "+e.steps+" 个记录交易日/期" : "每年按 252 个交易日近似换算；至少 120 日训练，另需 8 次已结束预测进行初始校准。");
+    $("exportBacktest").disabled=!e?.records?.length;
+    var span=e?.records?.length?[e.records[0].origin,e.records.at(-1).target]:e?.auditSpan;
+    setText("auditWindow", span ? span.join(" — ")+" · "+e.steps+" 个记录交易日/期" : "每年按 252 个交易日近似换算；至少 120 日训练，另需 8 次已结束预测进行初始校准。");
+  }
+
+  function renderForecastStudy() {
+    var evaluation = DATA.studyEvaluation, status = DATA.studyStatus;
+    if (evaluation?.schema !== 1 || !Array.isArray(evaluation.horizons)) return;
+    if (state.renderedStudy === evaluation && state.renderedStudyStatus === status) return;
+    state.renderedStudy = evaluation; state.renderedStudyStatus = status;
+    var match = status?.schema === 1 && status.revision === evaluation.revision;
+    var percent = function (value) {return Number.isFinite(value) ? value.toFixed(2) + "%" : "—";};
+    var ids = ["flat", "incumbent", "price-ridge", "gold-fx", "gold-fx-rates"];
+    var rows = evaluation.horizons.map(function (horizon) {
+      var phase = horizon.phases.historical;
+      var row = document.createElement("tr");
+      var label = document.createElement("th");
+      label.scope = "row";
+      label.textContent = (horizon.days === 7 ? "1 周" : "1 个月") + " · " + phase.count + " 组";
+      row.append(label);
+      for (var id of ids) {
+        var cell = document.createElement("td");
+        cell.textContent = percent(phase.metrics[id]?.mape);
+        row.append(cell);
+      }
+      return row;
+    });
+    $("forecastStudyRows").replaceChildren(...rows);
+    setText("forecastStudyHistory", evaluation.history.count.toLocaleString("zh-CN") + " 条 AU9999 闭市日线。表中是 2025 年起的历史诊断段，同一批不重叠目标。平均价格误差越低越好。");
+    if (match) {
+      var progress = status.horizons.map(function (row) {return (row.days === 7 ? "周度 " : "月度 ") + row.count + " / " + row.minimum;}).join(" · ");
+      setText("forecastStudyLive", "已在 GitHub 确认冻结 " + status.publicReceipts + " 个收盘起点。已到期的不重叠配对 " + progress + "。" + (status.latest ? "最近确认起点 " + status.latest + "。" : ""));
+    }
+    var qualified = evaluation.horizons.some(function (horizon) {return Object.values(horizon.gate).some(function (candidate) {return candidate.qualified;});});
+    setText("forecastStudyDecision", qualified ? "部分候选达到历史门槛，继续等待真实前瞻结果。" : "候选尚未达到历史门槛，正式模型继续运行，后台保留旁路对照。");
   }
   function renderValidation(){
     window.AurumSystemUI?.render(state.publication,state.forecasts[state.forecastHorizon]?.days||30,DATA.systemValidation,state.ledger);
@@ -2315,7 +2444,10 @@
   }
 
   function setupObservers() {
-    window.addEventListener("aurum:chapter", function () { requestAnimationFrame(drawAllCharts); });
+    window.addEventListener("aurum:chapter", function () { requestAnimationFrame(drawAllCharts); revealChapterData(); });
+    ["forecastDetails", "forecastResearchArchive", "forecastStudy"].forEach(function (id) {
+      $(id).addEventListener("toggle", function (event) {if (event.currentTarget.open) revealChapterData();});
+    });
     document.fonts && document.fonts.ready.then(drawAllCharts);
     window.addEventListener("offline",renderStatus);
     window.addEventListener("online",function(){if(!document.hidden)refreshResearchData(true);!document.hidden && state.config.priceProvider === "domestic"?refreshQuote():renderStatus();});

@@ -50,8 +50,8 @@ const results=await runUpdateWindow({rounds,maxRounds:bulk?30:8,continueService:
    await writeFile('data/pipeline-health.json',JSON.stringify(health,null,2)+'\n');await run(process.execPath,['scripts/build-embedded-data.mjs']);
   }
   // The public bundle must describe the same receipt as its companion JSON.
-  const h=await json('data/pipeline-health.json'),bundle=await json('data/research-bundle.json'),analysis=await json('data/analysis-desk.json');
-  if(!h.generatedAt||bundle.health?.generatedAt!==h.generatedAt)throw Error('Collection receipt and public bundle disagree');
+  const h=await json('data/pipeline-health.json'),bundle=await json('data/research-bundle.json'),snapshot=await json('data/site-snapshot.json'),analysis=await json('data/analysis-desk.json');
+  if(!h.generatedAt||bundle.health?.generatedAt!==h.generatedAt||snapshot.health?.generatedAt!==h.generatedAt)throw Error('Collection receipt and public snapshots disagree');
   const changed=await publish(dataPaths(await readdir('data')));
   // GITHUB_TOKEN pushes do not trigger Pages; dispatch explicitly each round.
   await dispatchWorkflow('pages.yml');

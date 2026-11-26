@@ -1,5 +1,5 @@
-import {closeOpenMenu, mountSelectMenu} from './control-select.js?v=5.3.12';
-import {mountDatePicker} from './date-picker.js?v=5.3.12';
+import {closeOpenMenu, mountSelectMenu} from './control-select.js?v=5.4.0';
+import {mountDatePicker} from './date-picker.js?v=5.4.0';
 
 function fieldFor(control) {
   const label = control.closest('label');

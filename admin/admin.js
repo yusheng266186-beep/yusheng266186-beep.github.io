@@ -1,4 +1,4 @@
-import {mountSelectMenu} from '../assets/control-select.js?v=5.3.12';
+import {mountSelectMenu} from '../assets/control-select.js?v=5.4.0';
 
 const endpoint = 'https://1459223409-lnoxklunue.ap-chengdu.tencentscf.com';
 const storageKey = 'aurum.model-admin.session.v1';

@@ -22,6 +22,7 @@ attempts.push(await run('archive','scripts/archive-inputs.mjs'));
 attempts.push(await run('analysis','scripts/build-analysis-desk.mjs',Math.max(1000,analysisDeadline-Date.now()+3000),process.env.FORCE_ANALYSIS_AI==='true'?['--refresh-ai']:[]));
 attempts.push(await run('publication','scripts/build-forecast-publication.mjs'));
 attempts.push(await run('ledger','scripts/build-prediction-ledger.mjs'));
+attempts.push(await run('forecastStudy','scripts/build-forecast-study.mjs'));
 const [news,research,latestHistory,market,analysis]=await Promise.all(['data/news.json','data/research-factors.json','data/market-history.json','data/market-snapshot.json','data/analysis-desk.json'].map(json));
 const runUrl=process.env.GITHUB_RUN_ID?`https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`:null;
 const continuing=analysis.aiPolicy?.continueImmediately===true,service=process.env.AURUM_UPDATE_ROUND?{mode:'continuous-window',intervalSeconds:continuing?0:300,round:Number(process.env.AURUM_UPDATE_ROUND),rounds:Number(process.env.AURUM_UPDATE_ROUNDS),startedAt:process.env.AURUM_UPDATE_STARTED_AT,nextAttemptAt:continuing?new Date().toISOString():process.env.AURUM_NEXT_ATTEMPT_AT,sourceSha:process.env.AURUM_SOURCE_SHA}:null;
