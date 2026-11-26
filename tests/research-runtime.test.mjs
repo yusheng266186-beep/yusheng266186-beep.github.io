@@ -12,15 +12,16 @@ test('the actual builder makes one call per half hour, preserves backlog and rec
   await writeFile(preload,`import {appendFile} from 'node:fs/promises';
 Date.now=()=>Number(process.env.FIXTURE_NOW);
 globalThis.fetch=async(url,options)=>{
- if(url!=='https://www.codebuddy.cn/v2/chat/completions')throw Error('Unexpected network access');
- const request=JSON.parse(options.body),input=JSON.parse(request.messages[1].content),events=input.evidence.filter(f=>f.type==='event');
+ if(url.href!=='https://fixture-model.example/runner/research'||options.headers.Authorization!=='Bearer isolated-fixture-key')throw Error('Unexpected network access');
+ const {input}=JSON.parse(options.body),events=input.evidence.filter(f=>f.type==='event');
  await appendFile('model-calls.ndjson',JSON.stringify({workIds:input.workIds,submitted:events.length})+'\\n');
  const content={headline:'对照价格与消息',interpretations:[{text:'需要结合后续收盘核对消息传导。',evidenceIds:['P-CLOSE']}],questions:[{text:'后续收盘能否确认区间变化？',evidenceIds:['P-CLOSE']}],newsReviews:events.map(f=>({id:f.id,relevance:'direct',status:'reported',dimension:'price',effect:'unclear',quote:f.label,reason:'价格报道保留为观察资料。',factor:{dimension:'none',effect:'unclear',intensity:'weak',novelty:'unknown',duration:'days',quote:f.label,mechanism:'传导证据不足，暂不修正预测。'}})),relations:[],hypotheses:[],followUps:[]};
- return new Response(JSON.stringify({model:'deepseek-v4.1-flash',choices:[{finish_reason:'stop',message:{content:JSON.stringify(content)}}],usage:{prompt_tokens:100,completion_tokens:200}}));
+ return Response.json({model:'gpt-6.1-terra',provider:'openai-codex',reasoningEffort:'max',revision:1,output:JSON.stringify(content),usage:{input:100,output:200}});
 };\n`);
-  const run=time=>exec(process.execPath,['--import',pathToFileURL(preload).href,script],{cwd:dir,env:{...process.env,AURUM_CODEBUDDY_API_KEY:'isolated-fixture-key',AURUM_ANALYSIS_DEADLINE:'',FIXTURE_NOW:String(time)},timeout:10000});
+  const run=time=>exec(process.execPath,['--import',pathToFileURL(preload).href,script],{cwd:dir,env:{...process.env,GITHUB_ACTIONS:'true',AURUM_MODEL_ENDPOINT:'https://fixture-model.example',AURUM_MODEL_RUNNER_KEY:'isolated-fixture-key',AURUM_ANALYSIS_DEADLINE:'',FIXTURE_NOW:String(time)},timeout:10000});
   await run(now);let desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));
   assert.equal(desk.aiPolicy.maxCallsPerDay,null);assert.equal(desk.aiPolicy.minimumIntervalMinutes,30);assert.equal(desk.aiPolicy.usedToday,251);assert.equal(desk.aiPolicy.pendingItems,16);assert.equal(desk.aiPolicy.queue.callsMade,1);assert.equal(desk.aiPolicy.queue.completedItems,8);assert.equal(desk.intelligence.stats.reviewed,8);assert.equal(desk.aiPolicy.continueImmediately,false);assert.equal(desk.aiPolicy.activeIntervalMinutes,30);
+  assert.equal(desk.narration.model,'gpt-6.1-terra');assert.equal(desk.narration.reasoningEffort,'max');
   assert.equal(desk.aiPolicy.nextEligibleAt,new Date(now+30*60000).toISOString());
   await run(now+5*60000);desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));assert.equal(desk.aiPolicy.queue.callsMade,0);assert.equal(desk.aiPolicy.usedToday,251);assert.equal(desk.aiPolicy.pendingItems,16);
   await run(now+30*60000);desk=JSON.parse(await readFile(join(dir,'data/analysis-desk.json'),'utf8'));assert.equal(desk.aiPolicy.queue.callsMade,1);assert.equal(desk.aiPolicy.usedToday,252);assert.equal(desk.aiPolicy.pendingItems,8);

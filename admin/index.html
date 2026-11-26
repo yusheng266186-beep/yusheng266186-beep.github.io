@@ -41,10 +41,10 @@
       <form id="selection" class="panel" aria-labelledby="selection-title">
         <h2 id="selection-title">切换模型</h2>
         <div class="fields">
-          <label for="provider">服务<select id="provider" required></select></label>
-          <label for="model">模型<select id="model" required></select></label>
-          <label for="effort">思考强度<select id="effort" required></select></label>
-          <label for="account" id="account-field">共享云端账号<select id="account"></select></label>
+          <div><label for="provider">服务</label><select id="provider" required></select></div>
+          <div><label for="model">模型</label><select id="model" required></select></div>
+          <div><label for="effort">思考强度</label><select id="effort" required></select></div>
+          <div id="account-field"><label for="account">共享云端账号</label><select id="account"></select></div>
         </div>
         <p id="quota" class="note" hidden></p>
         <p class="note">保存后，下一次符合调度条件的 GitHub Actions 研判会使用新配置。</p>
