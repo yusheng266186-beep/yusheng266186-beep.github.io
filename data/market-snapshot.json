@@ -67,37 +67,35 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-27T22:32:41.197Z",
-  "lastSuccessAt": "2026-11-27T22:32:41.197Z",
+  "checkedAt": "2026-11-27T22:33:26.956Z",
+  "lastSuccessAt": "2026-11-27T22:33:26.956Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
-      "ok": true,
-      "checkedAt": "2026-11-27T22:32:38.359Z",
+      "ok": false,
+      "checkedAt": "2026-11-27T22:33:24.871Z",
       "lastSuccessAt": "2026-11-27T22:32:38.359Z",
-      "kind": "quote",
-      "asOf": "2026-11-27T18:29:57.000Z",
-      "latencyMs": 2837
+      "error": "Eastmoney did not return a valid AU9999 quote"
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-27T22:32:38.359Z",
-      "lastSuccessAt": "2026-11-27T22:32:38.359Z",
+      "checkedAt": "2026-11-27T22:33:24.871Z",
+      "lastSuccessAt": "2026-11-27T22:33:24.871Z",
       "kind": "quote",
       "asOf": "2026-11-27T15:58:54.000Z",
-      "latencyMs": 979
+      "latencyMs": 2003
     },
     {
       "source": "SGE delayed",
       "ok": true,
-      "checkedAt": "2026-11-27T22:32:38.359Z",
-      "lastSuccessAt": "2026-11-27T22:32:38.359Z",
+      "checkedAt": "2026-11-27T22:33:24.871Z",
+      "lastSuccessAt": "2026-11-27T22:33:24.871Z",
       "kind": "reference",
       "asOf": null,
       "referenceDate": "2026-11-28",
-      "latencyMs": 1729
+      "latencyMs": 1512
     }
   ],
   "officialReference": {
@@ -129,18 +127,9 @@
       "turnover": false
     }
   },
-  "collectionMs": 2838,
+  "collectionMs": 2085,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
-  "internationalReference": {
-    "market": "COMEX",
-    "symbol": "GC=F",
-    "priceUsdOz": 3668.5,
-    "previousUsdOz": 3535.800048828125,
-    "priceCnyGram": null,
-    "asOf": "2026-11-27T19:44:58.000Z",
-    "source": "Yahoo Finance GC=F delayed futures reference",
-    "delay": "international delayed reference"
-  }
+  "internationalReference": null
 }
