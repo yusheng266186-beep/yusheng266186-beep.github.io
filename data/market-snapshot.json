@@ -26,7 +26,7 @@
   "sourceUrl": "https://quote.eastmoney.com/q/118.AU9999.html",
   "officialSource": "上海黄金交易所延时行情",
   "officialUrl": "https://www.sge.com.cn/sjzx/yshqbg",
-  "delay": "国内公开行情刷新；非交易终端逐笔行情",
+  "delay": "国内公开行情刷新；副合约 AUTD 暂未返回",
   "dataTier": "domestic-live",
   "contracts": [
     {
@@ -44,22 +44,6 @@
       "insideVolume": 612,
       "amplitudePct": 0.01,
       "asOf": "2026-11-27T18:29:57.000Z"
-    },
-    {
-      "symbol": "AUTD",
-      "name": "黄金T+D",
-      "latest": 780.14,
-      "high": 786.61,
-      "low": 773.87,
-      "open": 786.6,
-      "previousClose": 783.35,
-      "change": 4.37,
-      "changePct": 0.56,
-      "volume": 7520,
-      "turnover": 5875371264,
-      "insideVolume": 4034,
-      "amplitudePct": 0.21,
-      "asOf": "2026-11-27T18:29:57.000Z"
     }
   ],
   "fetchedAt": null,
@@ -67,38 +51,38 @@
   "domesticPremiumPct": null,
   "premiumNote": "国际报价或汇率时间不匹配，暂不比较",
   "sourceConflict": false,
-  "checkedAt": "2026-11-28T16:21:16.644Z",
-  "lastSuccessAt": "2026-11-28T16:21:16.644Z",
+  "checkedAt": "2026-11-28T16:26:16.902Z",
+  "lastSuccessAt": "2026-11-28T16:26:16.902Z",
   "collectionError": null,
   "sourceHealth": [
     {
       "source": "Eastmoney AU9999",
       "ok": true,
-      "checkedAt": "2026-11-28T16:21:14.696Z",
-      "lastSuccessAt": "2026-11-28T16:21:14.696Z",
+      "checkedAt": "2026-11-28T16:26:14.787Z",
+      "lastSuccessAt": "2026-11-28T16:26:14.787Z",
       "kind": "quote",
       "asOf": "2026-11-27T18:29:57.000Z",
-      "latencyMs": 1947
+      "latencyMs": 2114
     },
     {
       "source": "Sina AU9999",
       "ok": true,
-      "checkedAt": "2026-11-28T16:21:14.696Z",
-      "lastSuccessAt": "2026-11-28T16:21:14.696Z",
+      "checkedAt": "2026-11-28T16:26:14.787Z",
+      "lastSuccessAt": "2026-11-28T16:26:14.787Z",
       "kind": "quote",
       "asOf": "2026-11-27T15:58:54.000Z",
-      "latencyMs": 1014
+      "latencyMs": 1012
     },
     {
       "source": "SGE delayed",
       "ok": false,
-      "checkedAt": "2026-11-28T16:21:14.696Z",
+      "checkedAt": "2026-11-28T16:26:14.787Z",
       "lastSuccessAt": "2026-11-28T11:05:02.987Z",
       "error": "Official page has no valid Au99.99 reference"
     }
   ],
   "officialReference": null,
-  "collectionMs": 1948,
+  "collectionMs": 2115,
   "usdCny": null,
   "fxAsOf": null,
   "fxSource": null,
